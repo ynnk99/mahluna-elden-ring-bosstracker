@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elden Ring – Boss Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --gold:        #c9a44a;
+  --gold-light:  #e3b873;
+  --gold-dim:    #7d6a3d;
+  --parchment:   #e6dcc8;
+  --parchment-dim: #a89880;
+  --bg-deep:     #0a0907;
+  --bg-mid:      #111008;
+  --bg-panel:    rgba(12, 10, 6, 0.92);
+  --bg-card:     rgba(20, 17, 10, 0.85);
+  --red:         #c44a3a;
+  --red-bright:  #e05a4f;
+  --border:      rgba(201, 164, 74, 0.25);
+  --border-bright: rgba(201, 164, 74, 0.6);
+  --shadow-gold: 0 0 30px rgba(201, 164, 74, 0.12);
+  --radius: 6px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  background: var(--bg-deep);
+  color: var(--parchment);
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 16px;
+  min-height: 100vh;
+}
+
+body {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(201,164,74,0.06) 0%, transparent 65%),
+    radial-gradient(ellipse 60% 80% at 80% 100%, rgba(100,40,20,0.08) 0%, transparent 60%),
+    var(--bg-deep);
+  min-height: 100vh;
+}
+
+/* ─── NOISE TEXTURE OVERLAY ─── */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.35;
+}
+
+/* ─── LAYOUT ─── */
+.page-wrapper {
+  position: relative;
+  z-index: 1;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px 60px;
+}
+
+/* ─── HEADER ─── */
+.site-header {
+  padding: 40px 0 0;
+  text-align: center;
+  position: relative;
+}
+
+.site-header h1 {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(28px, 5vw, 52px);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--gold-light);
+  text-shadow: 0 0 40px rgba(201,164,74,0.4), 0 2px 8px rgba(0,0,0,0.8);
+  line-height: 1.1;
+}
+
+.site-header .subtitle {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 18px;
+  color: var(--parchment-dim);
+  letter-spacing: 0.08em;
+  margin-top: 6px;
+}
+
+.header-ornament {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: center;
+  margin: 18px 0 30px;
+}
+
+.header-ornament::before,
+.header-ornament::after {
+  content: "";
+  flex: 1;
+  max-width: 220px;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--gold-dim), transparent);
+}
+
+.ornament-rune {
+  font-family: 'Cinzel', serif;
+  font-size: 20px;
+  color: var(--gold-dim);
+}
+
+/* ─── STATS BAR ─── */
+.stats-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.stat-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-family: 'Cinzel', serif;
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  color: var(--gold);
+  box-shadow: var(--shadow-gold);
+  transition: all 0.3s ease;
+}
+
+.stat-chip .icon {
+  font-size: 18px;
+}
+
+.stat-chip.deaths-chip {
+  border-color: rgba(180, 60, 50, 0.4);
+  color: var(--red-bright);
+}
+
+.stat-chip .value {
+  font-weight: 700;
+  font-size: 17px;
+}
+
+/* ─── TIMER ─── */
+#timer-chip {
+  display: none;
+}
+
+#timer-chip .timer-value {
+  font-family: 'Crimson Pro', serif;
+  font-size: 18px;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── CONTROLS ─── */
+.controls-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 36px;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.ctrl-label {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--gold-dim);
+  text-transform: uppercase;
+  margin-right: 4px;
+}
+
+.toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--parchment-dim);
+  font-family: 'Crimson Pro', serif;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.toggle-btn:hover {
+  border-color: var(--gold-dim);
+  color: var(--parchment);
+  background: rgba(201,164,74,0.06);
+}
+
+.toggle-btn.active {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(201,164,74,0.1);
+  box-shadow: 0 0 12px rgba(201,164,74,0.15);
+}
+
+.toggle-btn .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gold-dim);
+  flex-shrink: 0;
+  transition: background 0.25s ease, box-shadow 0.25s ease;
+}
+
+.toggle-btn.active .dot {
+  background: var(--gold);
+  box-shadow: 0 0 8px var(--gold);
+}
+
+.divider {
+  width: 1px;
+  height: 28px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.refresh-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--parchment-dim);
+  margin-left: auto;
+}
+
+.refresh-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4a8c4a;
+  box-shadow: 0 0 6px #4a8c4a;
+  animation: pulse-green 2.5s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes pulse-green {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.refresh-dot.loading {
+  background: var(--gold);
+  box-shadow: 0 0 6px var(--gold);
+  animation: pulse-gold 0.6s ease-in-out infinite;
+}
+
+@keyframes pulse-gold {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+/* ─── PINNED BOSSES ─── */
+#pinned-section {
+  display: none;
+  margin-bottom: 30px;
+}
+
+.pinned-header {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.pinned-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pinned-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--bg-card);
+  border: 1px solid rgba(201,164,74,0.3);
+  border-radius: var(--radius);
+  animation: pinnedGlow 2.5s ease-in-out infinite;
+}
+
+@keyframes pinnedGlow {
+  0%, 100% { box-shadow: 0 0 8px rgba(201,164,74,0.1); }
+  50% { box-shadow: 0 0 20px rgba(201,164,74,0.35); }
+}
+
+.pinned-card.done {
+  opacity: 0.45;
+  animation: none;
+}
+
+.pinned-name {
+  font-family: 'Crimson Pro', serif;
+  font-size: 15px;
+  color: var(--parchment);
+}
+
+.pinned-name.main-boss {
+  color: var(--gold-light);
+  font-weight: 600;
+}
+
+.pinned-deaths {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  color: var(--gold);
+}
+
+/* ─── AREA GRID ─── */
+.areas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+/* ─── AREA CARD ─── */
+.area-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.area-card:hover {
+  border-color: rgba(201,164,74,0.4);
+  box-shadow: 0 4px 30px rgba(0,0,0,0.4), 0 0 20px rgba(201,164,74,0.05);
+}
+
+.area-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s ease;
+  gap: 10px;
+}
+
+.area-header:hover {
+  background: rgba(201,164,74,0.04);
+}
+
+.area-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.area-toggle-icon {
+  font-size: 10px;
+  color: var(--gold-dim);
+  flex-shrink: 0;
+  transition: transform 0.25s ease;
+}
+
+.area-card.collapsed .area-toggle-icon {
+  transform: rotate(-90deg);
+}
+
+.area-name {
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  color: var(--gold-light);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.area-progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.area-fraction {
+  font-family: 'Crimson Pro', serif;
+  font-size: 13px;
+  color: var(--parchment-dim);
+  white-space: nowrap;
+}
+
+.area-progress-bar {
+  width: 60px;
+  height: 3px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.area-progress-fill {
+  height: 100%;
+  background: linear-gradient(to right, var(--gold-dim), var(--gold));
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+
+.area-progress-fill.complete {
+  background: linear-gradient(to right, #4a7c4a, #6ab86a);
+}
+
+/* ─── BOSS LIST ─── */
+.boss-list {
+  overflow: hidden;
+  max-height: 2000px;
+  transition: max-height 0.35s ease;
+}
+
+.area-card.collapsed .boss-list {
+  max-height: 0;
+}
+
+.boss-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 7px 16px;
+  border-bottom: 1px solid rgba(201,164,74,0.06);
+  transition: background 0.15s ease;
+}
+
+.boss-row:last-child { border-bottom: none; }
+.boss-row:hover { background: rgba(201,164,74,0.04); }
+
+.boss-deaths {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  color: var(--red-bright);
+  min-width: 40px;
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+.boss-deaths-zero {
+  opacity: 0.3;
+}
+
+.boss-name {
+  font-family: 'Crimson Pro', serif;
+  font-size: 15px;
+  color: var(--parchment);
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.3s ease, opacity 0.3s ease;
+}
+
+.boss-name.main {
+  color: var(--gold-light);
+  font-weight: 600;
+}
+
+.boss-row.done .boss-name {
+  opacity: 0.3;
+  text-decoration: line-through;
+  text-decoration-color: rgba(201,164,74,0.3);
+}
+
+.boss-row.done .boss-deaths {
+  opacity: 0.2;
+}
+
+.boss-check {
+  font-size: 14px;
+  flex-shrink: 0;
+  margin-left: 8px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  color: #6ab86a;
+}
+
+.boss-row.done .boss-check {
+  opacity: 0.7;
+}
+
+/* ─── FLASH ANIMATIONS ─── */
+@keyframes deathFlash {
+  0%   { background: transparent; }
+  20%  { background: rgba(196, 74, 58, 0.2); }
+  100% { background: transparent; }
+}
+
+.death-flash {
+  animation: deathFlash 0.8s ease-out;
+}
+
+@keyframes bossComplete {
+  0%   { background: transparent; }
+  20%  { background: rgba(201, 164, 74, 0.25); }
+  100% { background: transparent; }
+}
+
+.boss-complete-flash {
+  animation: bossComplete 1.5s ease-out;
+}
+
+/* ─── COMPLETION TOAST ─── */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: linear-gradient(135deg, rgba(20,17,10,0.97), rgba(12,10,6,0.97));
+  border: 1px solid var(--gold);
+  border-radius: var(--radius);
+  padding: 14px 28px;
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  color: var(--gold-light);
+  letter-spacing: 0.08em;
+  box-shadow: 0 0 40px rgba(201,164,74,0.3), 0 8px 30px rgba(0,0,0,0.6);
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.4s ease;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ─── LOADING STATE ─── */
+.loading-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  gap: 16px;
+  color: var(--gold-dim);
+  font-family: 'Cinzel', serif;
+  font-size: 15px;
+  letter-spacing: 0.1em;
+}
+
+.loading-spinner {
+  width: 36px;
+  height: 36px;
+  border: 2px solid rgba(201,164,74,0.15);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── STAT PULSE ─── */
+@keyframes statPulse {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.18); }
+  60%  { transform: scale(0.96); }
+  100% { transform: scale(1); }
+}
+
+.stat-pulse {
+  animation: statPulse 0.6s ease-out;
+}
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-deep); }
+::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 600px) {
+  .areas-grid { grid-template-columns: 1fr; }
+  .controls-bar { flex-direction: column; align-items: flex-start; }
+  .refresh-indicator { margin-left: 0; }
+  .divider { display: none; }
+}
+
+/* ─── FOOTER ─── */
+.site-footer {
+  text-align: center;
+  margin-top: 60px;
+  padding: 20px 0;
+  border-top: 1px solid var(--border);
+  font-family: 'Crimson Pro', serif;
+  font-size: 13px;
+  color: var(--parchment-dim);
+  opacity: 0.5;
+}
+
+</style>
+</head>
+<body>
+
+<div class="page-wrapper">
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <h1>Elden Ring</h1>
+    <p class="subtitle">Boss Tracker &amp; Fortschrittsübersicht</p>
+    <div class="header-ornament">
+      <span class="ornament-rune">⚔</span>
+    </div>
+  </header>
+
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="stat-chip deaths-chip" id="stat-deaths">
+      <span class="icon">💀</span>
+      <span>Tode:</span>
+      <span class="value" id="val-deaths">–</span>
+    </div>
+    <div class="stat-chip" id="stat-bosses">
+      <span class="icon">🏆</span>
+      <span>Bosse:</span>
+      <span class="value" id="val-bosses">–</span>
+    </div>
+    <div class="stat-chip" id="stat-percent">
+      <span class="icon">📜</span>
+      <span>Abschluss:</span>
+      <span class="value" id="val-percent">–</span>
+    </div>
+    <div class="stat-chip" id="timer-chip">
+      <span class="icon">⏳</span>
+      <span id="val-timer-label">Aktueller Boss:</span>
+      <span class="value timer-value" id="val-timer">00:00:00</span>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls-bar">
+    <span class="ctrl-label">Anzeige:</span>
+
+    <button class="toggle-btn" id="btn-basegame" onclick="toggleFlag('base')">
+      <span class="dot"></span>
+      Base Game
+    </button>
+
+    <button class="toggle-btn" id="btn-dlc" onclick="toggleFlag('dlc')">
+      <span class="dot"></span>
+      Shadow of the Erdtree DLC
+    </button>
+
+    <div class="divider"></div>
+
+    <button class="toggle-btn" id="btn-expand-all" onclick="setAllCollapsed(false)">
+      <span class="dot"></span>
+      Alle aufklappen
+    </button>
+
+    <button class="toggle-btn" id="btn-collapse-all" onclick="setAllCollapsed(true)">
+      <span class="dot"></span>
+      Alle zuklappen
+    </button>
+
+    <div class="refresh-indicator" id="refresh-indicator">
+      <span class="refresh-dot" id="refresh-dot"></span>
+      <span id="refresh-text">Verbunden</span>
+    </div>
+  </div>
+
+  <!-- PINNED BOSSES -->
+  <section id="pinned-section">
+    <div class="pinned-header">📌 Angepinnte Bosse</div>
+    <div class="pinned-list" id="pinned-list"></div>
+  </section>
+
+  <!-- MAIN CONTENT -->
+  <main id="main-content">
+    <div class="loading-overlay" id="loading-overlay">
+      <div class="loading-spinner"></div>
+      <span>Lade Daten aus den Archiven&hellip;</span>
+    </div>
+    <div class="areas-grid" id="areas-grid" style="display:none;"></div>
+  </main>
+
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  Daten werden alle 5 Sekunden aus Google Sheets geladen &bull; Elden Ring Boss Tracker
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// KONFIGURATION
+// ═══════════════════════════════════════════════════════════
+
+const SPREADSHEET_ID = "1r9BzZJYFrk4rQLlMn4ZPBBUuc8u_peqwThTi1UTCQcE";
+const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json`;
+
+const MAIN_BOSSES = new Set([
+  "Margit, das Grausame Mal",
+  "Godrick der Verpflanzte",
+  "Rennala, Königin des Vollmonds",
+  "Roter Wolf von Radagon",
+  "Sternengeißel Radahn",
+  "Götterverschlingende Schlange / Rykard, Fürst der Blasphemie",
+  "Drachenbaumwächter",
+  "Godfrey, Erster Eldenfürst",
+  "Morgott, König des Mals",
+  "Mohg, Fürst des Blutes",
+  "Feuerriese",
+  "Bestienkleriker / Maliketh, die Schwarze Klinge",
+  "Duo der Götterskalpe",
+  "Malenia, Klinge von Miquella",
+  "Godfrey, Erster Eldenfürst (Hoarah Loux)",
+  "Sir Gideon Ofnir, der Allwissende",
+  "Radagon von der Goldenen Ordnung / Eldenbestie",
+  "Rellana Twin Moon Knight",
+  "Divine Beast Dancing Lion",
+  "Messmer the Impaler + Base Serpent Messmer",
+  "Bayle the Dread",
+  "Midra Lord of Frenzied Flame",
+  "Commander Gaius",
+  "Romina, Saint of the Bud",
+  "Promised Consort + Radahn Consort of Miquella",
+]);
+
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+
+let localCollapsed    = {};   // area → true/false (local override)
+let showBase          = true;
+let showDLC           = true;
+let previousBossStates = {};
+let prevDeaths        = null;
+let prevDoneBosses    = null;
+
+// Timer state
+let timerStartTs   = 0;
+let timerElapsed   = 0;
+let timerVisible   = false;
+let timerInterval  = null;
+
+// ═══════════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════════
+
+const isTrue = v => [true, "TRUE", "WAHR", 1, "1", "true", "wahr"].includes(v);
+const normalize = s => s.trim().toLowerCase().replace(/\s+/g, " ");
+
+function fmtTime(ms) {
+  const s = Math.floor(ms / 1000);
+  const h = String(Math.floor(s / 3600)).padStart(2, "0");
+  const m = String(Math.floor((s % 3600) / 60)).padStart(2, "0");
+  const sec = String(s % 60).padStart(2, "0");
+  return `${h}:${m}:${sec}`;
+}
+
+function showToast(msg, duration = 3500) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  setTimeout(() => el.classList.remove("show"), duration);
+}
+
+function pulseEl(el) {
+  if (!el) return;
+  el.classList.remove("stat-pulse");
+  void el.offsetWidth;
+  el.classList.add("stat-pulse");
+}
+
+// ═══════════════════════════════════════════════════════════
+// TIMER
+// ═══════════════════════════════════════════════════════════
+
+function updateTimerDisplay() {
+  const timerChip = document.getElementById("timer-chip");
+  if (!timerChip) return;
+
+  if (!timerVisible) {
+    timerChip.style.display = "none";
+    return;
+  }
+  timerChip.style.display = "flex";
+
+  const elapsed = timerStartTs > 0
+    ? timerElapsed + (Date.now() - timerStartTs)
+    : timerElapsed;
+
+  document.getElementById("val-timer").textContent = fmtTime(elapsed);
+}
+
+function startTimerTick() {
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(updateTimerDisplay, 1000);
+}
+
+// ═══════════════════════════════════════════════════════════
+// TOGGLE CONTROLS
+// ═══════════════════════════════════════════════════════════
+
+function toggleFlag(flag) {
+  if (flag === 'base') {
+    showBase = !showBase;
+    document.getElementById("btn-basegame").classList.toggle("active", showBase);
+  } else {
+    showDLC = !showDLC;
+    document.getElementById("btn-dlc").classList.toggle("active", showDLC);
+  }
+  renderFromCache();
+}
+
+function setAllCollapsed(val) {
+  Object.keys(currentAreas).forEach(k => localCollapsed[k] = val);
+  renderAreas(currentAreas);
+}
+
+// ═══════════════════════════════════════════════════════════
+// MAIN DATA FETCH
+// ═══════════════════════════════════════════════════════════
+
+let currentAreas = {};
+
+async function loadData() {
+  setRefreshState("loading");
+  try {
+    const res  = await fetch(SHEET_URL + "&t=" + Date.now());
+    const text = await res.text();
+    const json = JSON.parse(text.substring(47).slice(0, -2));
+    const rows = json.table.rows;
+    processData(rows);
+    setRefreshState("ok");
+    document.getElementById("loading-overlay").style.display = "none";
+    document.getElementById("areas-grid").style.display = "grid";
+  } catch (err) {
+    console.error("Fehler beim Laden:", err);
+    setRefreshState("error");
+  }
+}
+
+function setRefreshState(state) {
+  const dot  = document.getElementById("refresh-dot");
+  const text = document.getElementById("refresh-text");
+  if (state === "loading") {
+    dot.className  = "refresh-dot loading";
+    text.textContent = "Lade…";
+  } else if (state === "ok") {
+    dot.className  = "refresh-dot";
+    const now = new Date();
+    text.textContent = `Zuletzt: ${now.toLocaleTimeString("de-DE", {hour:"2-digit",minute:"2-digit",second:"2-digit"})}`;
+  } else {
+    dot.style.background = "#c44a3a";
+    text.textContent = "Verbindungsfehler";
+  }
+}
+
+function processData(rows) {
+
+  // ── FLAGS ──
+  const baseGameFlag = isTrue(rows[0]?.c[15]?.v);
+  const dlcFlag      = isTrue(rows[1]?.c[15]?.v);
+
+  // Keep Sheet-flags as initial state; local toggles override
+  // (first load only)
+  if (prevDeaths === null) {
+    showBase = baseGameFlag;
+    showDLC  = dlcFlag;
+    document.getElementById("btn-basegame").classList.toggle("active", showBase);
+    document.getElementById("btn-dlc").classList.toggle("active", showDLC);
+  }
+
+  // ── TIMER ──
+  timerStartTs  = Number(rows[0]?.c[21]?.v) || 0;
+  timerElapsed  = Number(rows[2]?.c[21]?.v) || 0;
+  timerVisible  = isTrue(rows[0]?.c[12]?.v);
+  updateTimerDisplay();
+
+  // ── DEATHS ──
+  const baseDeaths = Number(rows[1]?.c[9]?.v)   || 0;
+  const dlcDeaths  = Number(rows[168]?.c[9]?.v) || 0;
+
+  let globalDeaths = 0;
+  if (showBase && showDLC) globalDeaths = baseDeaths + dlcDeaths;
+  else if (showBase)        globalDeaths = baseDeaths;
+  else if (showDLC)         globalDeaths = dlcDeaths;
+
+  if (prevDeaths !== null && globalDeaths !== prevDeaths) {
+    pulseEl(document.getElementById("stat-deaths"));
+    const el = document.getElementById("stat-deaths");
+    el.classList.remove("death-flash");
+    void el.offsetWidth;
+    el.classList.add("death-flash");
+  }
+  document.getElementById("val-deaths").textContent = globalDeaths.toLocaleString("de-DE");
+  prevDeaths = globalDeaths;
+
+  // ── BOSS ROWS ──
+  const separatorIndex = rows.findIndex(r => r.c[1]?.v?.trim() === "SHADOW OF THE ERDTREE DLC");
+  const areas = {};
+
+  rows.forEach((r, index) => {
+    const area = r.c[0]?.v?.trim();
+    const boss = r.c[1]?.v?.trim();
+    if (!area || !boss) return;
+    if (area === "Gebiet" && boss === "Boss") return;
+    if (boss === "SHADOW OF THE ERDTREE DLC") return;
+
+    const isBaseGame = separatorIndex === -1 || index < separatorIndex;
+    const isDLC      = separatorIndex !== -1  && index > separatorIndex;
+    if (isBaseGame && !showBase) return;
+    if (isDLC      && !showDLC)  return;
+
+    const done    = isTrue(r.c[2]?.v);
+    const pinned  = isTrue(r.c[4]?.v);
+    const deaths  = Number(r.c[3]?.v) || 0;
+    const sheetCollapsed = isTrue(r.c[5]?.v);
+    const key     = area + "|" + boss;
+
+    // victory detection
+    if (!(key in previousBossStates)) {
+      previousBossStates[key] = done;
+    } else if (!previousBossStates[key] && done) {
+      if (MAIN_BOSSES.has(boss)) showToast(`✔ ${boss} besiegt!`);
+    }
+    previousBossStates[key] = done;
+
+    if (!areas[area]) {
+      const collapsed = (area in localCollapsed) ? localCollapsed[area] : sheetCollapsed;
+      areas[area] = { total: 0, done: 0, bosses: [], collapsed, isDLC: isDLC };
+    }
+
+    areas[area].total++;
+    if (done) areas[area].done++;
+    areas[area].bosses.push({ boss, done, deaths, pinned });
+  });
+
+  currentAreas = areas;
+
+  // ── GLOBAL PROGRESS ──
+  let totalBosses = 0, doneBosses = 0;
+  Object.values(areas).forEach(a => { totalBosses += a.total; doneBosses += a.done; });
+
+  if (prevDoneBosses !== null && doneBosses !== prevDoneBosses) {
+    pulseEl(document.getElementById("stat-bosses"));
+    pulseEl(document.getElementById("stat-percent"));
+  }
+  document.getElementById("val-bosses").textContent = `${doneBosses} / ${totalBosses}`;
+  const pct = totalBosses > 0 ? Math.round((doneBosses / totalBosses) * 100) : 0;
+  document.getElementById("val-percent").textContent = `${pct}%`;
+  prevDoneBosses = doneBosses;
+
+  renderAreas(areas);
+}
+
+function renderFromCache() {
+  if (Object.keys(currentAreas).length > 0) renderAreas(currentAreas);
+}
+
+// ═══════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════
+
+function renderAreas(areas) {
+  const grid = document.getElementById("areas-grid");
+
+  // Pinned
+  const allPinned = [];
+  Object.values(areas).forEach(a => a.bosses.forEach(b => { if (b.pinned) allPinned.push(b); }));
+  const pinnedSection = document.getElementById("pinned-section");
+  const pinnedList    = document.getElementById("pinned-list");
+  if (allPinned.length > 0) {
+    pinnedSection.style.display = "block";
+    pinnedList.innerHTML = "";
+    allPinned.forEach(b => {
+      const isMain = MAIN_BOSSES.has(b.boss);
+      const card = document.createElement("div");
+      card.className = "pinned-card" + (b.done ? " done" : "");
+      card.innerHTML = `
+        <span class="pinned-deaths">📌 ${b.deaths > 0 ? b.deaths : "–"}</span>
+        <span class="pinned-name${isMain ? " main-boss" : ""}">${escHtml(b.boss)}</span>
+      `;
+      pinnedList.appendChild(card);
+    });
+  } else {
+    pinnedSection.style.display = "none";
+  }
+
+  // Re-use existing cards when possible to avoid full re-render flicker
+  const existingCards = {};
+  grid.querySelectorAll(".area-card[data-area]").forEach(el => {
+    existingCards[el.dataset.area] = el;
+  });
+
+  const newKeys = Object.keys(areas);
+
+  // Remove old areas no longer in data
+  Object.keys(existingCards).forEach(k => {
+    if (!areas[k]) existingCards[k].remove();
+  });
+
+  newKeys.forEach((areaName, idx) => {
+    const data = areas[areaName];
+    let card = existingCards[areaName];
+
+    if (!card) {
+      card = document.createElement("div");
+      card.className = "area-card";
+      card.dataset.area = areaName;
+    }
+
+    // Update collapsed state
+    if (!(areaName in localCollapsed)) localCollapsed[areaName] = data.collapsed;
+    const collapsed = localCollapsed[areaName];
+    card.classList.toggle("collapsed", collapsed);
+
+    const pct = data.total > 0 ? (data.done / data.total) * 100 : 0;
+    const complete = data.done === data.total && data.total > 0;
+
+    card.innerHTML = `
+      <div class="area-header" onclick="toggleArea('${escAttr(areaName)}')">
+        <div class="area-header-left">
+          <span class="area-toggle-icon">▼</span>
+          <span class="area-name">${escHtml(areaName)}${data.isDLC ? ' <span style="font-size:11px;color:var(--gold-dim);font-family:Crimson Pro,serif;font-style:italic;">DLC</span>' : ''}</span>
+        </div>
+        <div class="area-progress-wrap">
+          <span class="area-fraction">${data.done}/${data.total}</span>
+          <div class="area-progress-bar">
+            <div class="area-progress-fill${complete ? " complete" : ""}" style="width:${pct}%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="boss-list">
+        ${data.bosses.map(b => renderBossRow(b)).join("")}
+      </div>
+    `;
+
+    // Insert in correct order
+    const children = Array.from(grid.children);
+    const currentIndex = children.indexOf(card);
+    if (currentIndex !== idx) {
+      if (idx >= grid.children.length) {
+        grid.appendChild(card);
+      } else {
+        grid.insertBefore(card, grid.children[idx]);
+      }
+    }
+    if (!existingCards[areaName]) {
+      // freshly created, already inserted above
+    }
+  });
+}
+
+function renderBossRow(b) {
+  const isMain = MAIN_BOSSES.has(b.boss);
+  const deathClass = b.deaths === 0 ? " boss-deaths-zero" : "";
+  return `
+    <div class="boss-row${b.done ? " done" : ""}">
+      <span class="boss-deaths${deathClass}">${b.deaths > 0 ? "†" + b.deaths : "†–"}</span>
+      <span class="boss-name${isMain ? " main" : ""}">${escHtml(b.boss)}</span>
+      <span class="boss-check">✓</span>
+    </div>
+  `;
+}
+
+function toggleArea(areaName) {
+  localCollapsed[areaName] = !localCollapsed[areaName];
+  const card = document.querySelector(`.area-card[data-area="${CSS.escape(areaName)}"]`);
+  if (card) card.classList.toggle("collapsed", localCollapsed[areaName]);
+}
+
+// ═══════════════════════════════════════════════════════════
+// ESCAPE HELPERS
+// ═══════════════════════════════════════════════════════════
+
+function escHtml(str) {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function escAttr(str) {
+  return str.replace(/'/g, "\\'").replace(/"/g, '\\"');
+}
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+
+loadData();
+setInterval(loadData, 5000);
+startTimerTick();
+
+</script>
+</body>
+</html>
