@@ -1319,30 +1319,28 @@ function renderClipCard(clip, index) {
   const parsed   = parseTwitchClip(clip.url);
   const embedUrl = buildEmbedUrl(parsed);
   const linkUrl  = clip.url;
+  const cardId   = `clip-card-${index}`;
 
-  let embedHtml;
-  if (embedUrl) {
-    embedHtml = `
+  const embedAttr = embedUrl ? escAttr(embedUrl) : "";
+
+  return `
+    <div class="clip-card" id="${cardId}">
       <div class="clip-embed-wrapper">
-        <iframe
-          src="${escAttr(embedUrl)}"
-          allowfullscreen
-          scrolling="no"
-          allow="autoplay; fullscreen"
-          title="Clip ${index + 1}"
-        ></iframe>
-      </div>
-    `;
-  } else {
-    embedHtml = `
-      <div class="clip-embed-wrapper">
-        <div class="clip-placeholder" onclick="window.open('${escAttr(linkUrl)}','_blank')">
+        <div class="clip-placeholder" onclick="loadClip('${cardId}', '${embedAttr}', '${escAttr(linkUrl)}')">
           <span class="clip-placeholder-icon">▶️</span>
-          <span class="clip-placeholder-text">Clip öffnen</span>
+          <span class="clip-placeholder-text">Clip ${String(index + 1).padStart(2, "0")} laden</span>
         </div>
       </div>
-    `;
-  }
+      <div class="clip-card-footer">
+        <span class="clip-number">Clip ${String(index + 1).padStart(2, "0")}</span>
+        <a href="${escAttr(linkUrl)}" target="_blank" rel="noopener" class="clip-open-link">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42L17.59 5H14V3zM5 5h6v2H7v10h10v-4h2v6H5V5z"/></svg>
+          Auf Twitch
+        </a>
+      </div>
+    </div>
+  `;
+}
 
   return `
     <div class="clip-card">
@@ -1356,6 +1354,25 @@ function renderClipCard(clip, index) {
       </div>
     </div>
   `;
+}
+
+  function loadClip(cardId, embedUrl, linkUrl) {
+  const card    = document.getElementById(cardId);
+  const wrapper = card?.querySelector(".clip-embed-wrapper");
+  if (!wrapper) return;
+
+  if (embedUrl) {
+    wrapper.innerHTML = `
+      <iframe
+        src="${embedUrl}"
+        allowfullscreen
+        scrolling="no"
+        allow="autoplay; fullscreen"
+      ></iframe>
+    `;
+  } else {
+    window.open(linkUrl, "_blank");
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
