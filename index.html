@@ -24,6 +24,8 @@
   --border-bright: rgba(201, 164, 74, 0.6);
   --shadow-gold: 0 0 30px rgba(201, 164, 74, 0.12);
   --radius: 6px;
+  --twitch: #9146ff;
+  --twitch-dim: rgba(145,70,255,0.15);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -139,9 +141,7 @@ body::before {
   transition: all 0.3s ease;
 }
 
-.stat-chip .icon {
-  font-size: 18px;
-}
+.stat-chip .icon { font-size: 18px; }
 
 .stat-chip.deaths-chip {
   border-color: rgba(180, 60, 50, 0.4);
@@ -154,9 +154,7 @@ body::before {
 }
 
 /* ─── TIMER ─── */
-#timer-chip {
-  display: none;
-}
+#timer-chip { display: none; }
 
 #timer-chip .timer-value {
   font-family: 'Crimson Pro', serif;
@@ -232,6 +230,34 @@ body::before {
   box-shadow: 0 0 8px var(--gold);
 }
 
+/* Twitch button variant */
+.toggle-btn.twitch-btn {
+  border-color: rgba(145, 70, 255, 0.35);
+  color: rgba(180, 140, 255, 0.85);
+}
+
+.toggle-btn.twitch-btn .dot {
+  background: rgba(145, 70, 255, 0.5);
+}
+
+.toggle-btn.twitch-btn:hover {
+  border-color: var(--twitch);
+  color: #b89cff;
+  background: var(--twitch-dim);
+}
+
+.toggle-btn.twitch-btn.active {
+  border-color: var(--twitch);
+  color: #c4a8ff;
+  background: var(--twitch-dim);
+  box-shadow: 0 0 16px rgba(145,70,255,0.25);
+}
+
+.toggle-btn.twitch-btn.active .dot {
+  background: var(--twitch);
+  box-shadow: 0 0 8px var(--twitch);
+}
+
 .divider {
   width: 1px;
   height: 28px;
@@ -277,10 +303,7 @@ body::before {
 }
 
 /* ─── PINNED BOSSES ─── */
-#pinned-section {
-  display: none;
-  margin-bottom: 30px;
-}
+#pinned-section { display: none; margin-bottom: 30px; }
 
 .pinned-header {
   font-family: 'Cinzel', serif;
@@ -293,11 +316,7 @@ body::before {
   border-bottom: 1px solid var(--border);
 }
 
-.pinned-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
+.pinned-list { display: flex; flex-wrap: wrap; gap: 10px; }
 
 .pinned-card {
   display: flex;
@@ -315,10 +334,7 @@ body::before {
   50% { box-shadow: 0 0 20px rgba(201,164,74,0.35); }
 }
 
-.pinned-card.done {
-  opacity: 0.45;
-  animation: none;
-}
+.pinned-card.done { opacity: 0.45; animation: none; }
 
 .pinned-name {
   font-family: 'Crimson Pro', serif;
@@ -326,16 +342,8 @@ body::before {
   color: var(--parchment);
 }
 
-.pinned-name.main-boss {
-  color: var(--gold-light);
-  font-weight: 600;
-}
-
-.pinned-deaths {
-  font-family: 'Cinzel', serif;
-  font-size: 13px;
-  color: var(--gold);
-}
+.pinned-name.main-boss { color: var(--gold-light); font-weight: 600; }
+.pinned-deaths { font-family: 'Cinzel', serif; font-size: 13px; color: var(--gold); }
 
 /* ─── AREA GRID ─── */
 .areas-grid {
@@ -370,16 +378,9 @@ body::before {
   gap: 10px;
 }
 
-.area-header:hover {
-  background: rgba(201,164,74,0.04);
-}
+.area-header:hover { background: rgba(201,164,74,0.04); }
 
-.area-header-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-}
+.area-header-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
 
 .area-toggle-icon {
   font-size: 10px;
@@ -388,9 +389,7 @@ body::before {
   transition: transform 0.25s ease;
 }
 
-.area-card.collapsed .area-toggle-icon {
-  transform: rotate(-90deg);
-}
+.area-card.collapsed .area-toggle-icon { transform: rotate(-90deg); }
 
 .area-name {
   font-family: 'Cinzel', serif;
@@ -402,27 +401,10 @@ body::before {
   text-overflow: ellipsis;
 }
 
-.area-progress-wrap {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-}
+.area-progress-wrap { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.area-fraction { font-family: 'Crimson Pro', serif; font-size: 13px; color: var(--parchment-dim); white-space: nowrap; }
 
-.area-fraction {
-  font-family: 'Crimson Pro', serif;
-  font-size: 13px;
-  color: var(--parchment-dim);
-  white-space: nowrap;
-}
-
-.area-progress-bar {
-  width: 60px;
-  height: 3px;
-  background: rgba(255,255,255,0.07);
-  border-radius: 2px;
-  overflow: hidden;
-}
+.area-progress-bar { width: 60px; height: 3px; background: rgba(255,255,255,0.07); border-radius: 2px; overflow: hidden; }
 
 .area-progress-fill {
   height: 100%;
@@ -431,20 +413,11 @@ body::before {
   transition: width 0.6s ease;
 }
 
-.area-progress-fill.complete {
-  background: linear-gradient(to right, #4a7c4a, #6ab86a);
-}
+.area-progress-fill.complete { background: linear-gradient(to right, #4a7c4a, #6ab86a); }
 
 /* ─── BOSS LIST ─── */
-.boss-list {
-  overflow: hidden;
-  max-height: 2000px;
-  transition: max-height 0.35s ease;
-}
-
-.area-card.collapsed .boss-list {
-  max-height: 0;
-}
+.boss-list { overflow: hidden; max-height: 2000px; transition: max-height 0.35s ease; }
+.area-card.collapsed .boss-list { max-height: 0; }
 
 .boss-row {
   display: flex;
@@ -458,18 +431,8 @@ body::before {
 .boss-row:last-child { border-bottom: none; }
 .boss-row:hover { background: rgba(201,164,74,0.04); }
 
-.boss-deaths {
-  font-family: 'Cinzel', serif;
-  font-size: 12px;
-  color: var(--red-bright);
-  min-width: 40px;
-  flex-shrink: 0;
-  opacity: 0.8;
-}
-
-.boss-deaths-zero {
-  opacity: 0.3;
-}
+.boss-deaths { font-family: 'Cinzel', serif; font-size: 12px; color: var(--red-bright); min-width: 40px; flex-shrink: 0; opacity: 0.8; }
+.boss-deaths-zero { opacity: 0.3; }
 
 .boss-name {
   font-family: 'Crimson Pro', serif;
@@ -483,33 +446,13 @@ body::before {
   transition: color 0.3s ease, opacity 0.3s ease;
 }
 
-.boss-name.main {
-  color: var(--gold-light);
-  font-weight: 600;
-}
+.boss-name.main { color: var(--gold-light); font-weight: 600; }
 
-.boss-row.done .boss-name {
-  opacity: 0.3;
-  text-decoration: line-through;
-  text-decoration-color: rgba(201,164,74,0.3);
-}
+.boss-row.done .boss-name { opacity: 0.3; text-decoration: line-through; text-decoration-color: rgba(201,164,74,0.3); }
+.boss-row.done .boss-deaths { opacity: 0.2; }
 
-.boss-row.done .boss-deaths {
-  opacity: 0.2;
-}
-
-.boss-check {
-  font-size: 14px;
-  flex-shrink: 0;
-  margin-left: 8px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  color: #6ab86a;
-}
-
-.boss-row.done .boss-check {
-  opacity: 0.7;
-}
+.boss-check { font-size: 14px; flex-shrink: 0; margin-left: 8px; opacity: 0; transition: opacity 0.3s ease; color: #6ab86a; }
+.boss-row.done .boss-check { opacity: 0.7; }
 
 /* ─── FLASH ANIMATIONS ─── */
 @keyframes deathFlash {
@@ -518,9 +461,7 @@ body::before {
   100% { background: transparent; }
 }
 
-.death-flash {
-  animation: deathFlash 0.8s ease-out;
-}
+.death-flash { animation: deathFlash 0.8s ease-out; }
 
 @keyframes bossComplete {
   0%   { background: transparent; }
@@ -528,9 +469,7 @@ body::before {
   100% { background: transparent; }
 }
 
-.boss-complete-flash {
-  animation: bossComplete 1.5s ease-out;
-}
+.boss-complete-flash { animation: bossComplete 1.5s ease-out; }
 
 /* ─── COMPLETION TOAST ─── */
 .toast {
@@ -553,10 +492,7 @@ body::before {
   transition: all 0.4s ease;
 }
 
-.toast.show {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 /* ─── LOADING STATE ─── */
 .loading-overlay {
@@ -591,9 +527,7 @@ body::before {
   100% { transform: scale(1); }
 }
 
-.stat-pulse {
-  animation: statPulse 0.6s ease-out;
-}
+.stat-pulse { animation: statPulse 0.6s ease-out; }
 
 /* ─── SCROLLBAR ─── */
 ::-webkit-scrollbar { width: 6px; }
@@ -620,6 +554,362 @@ body::before {
   opacity: 0.5;
 }
 
+/* ═══════════════════════════════════════════════════════════
+   CLIP GALLERY MODAL
+═══════════════════════════════════════════════════════════ */
+
+.clip-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 4, 2, 0.88);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 500;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+
+.clip-modal-backdrop.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.clip-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 501;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+  transform: translateY(30px);
+  opacity: 0;
+  transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.clip-modal.open {
+  pointer-events: all;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.clip-modal-inner {
+  display: flex;
+  flex-direction: column;
+  max-width: 1260px;
+  width: 100%;
+  margin: auto;
+  height: calc(100vh - 48px);
+  max-height: 900px;
+  background:
+    radial-gradient(ellipse 70% 40% at 50% 0%, rgba(145,70,255,0.06) 0%, transparent 60%),
+    linear-gradient(170deg, rgba(18,14,8,0.98) 0%, rgba(10,9,7,0.99) 100%);
+  border: 1px solid rgba(145,70,255,0.28);
+  border-radius: 10px;
+  box-shadow:
+    0 0 80px rgba(145,70,255,0.12),
+    0 30px 80px rgba(0,0,0,0.7);
+  overflow: hidden;
+}
+
+/* Modal header */
+.clip-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 28px;
+  border-bottom: 1px solid rgba(145,70,255,0.2);
+  flex-shrink: 0;
+  background: rgba(12,9,6,0.6);
+}
+
+.clip-modal-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.clip-modal-title h2 {
+  font-family: 'Cinzel', serif;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--gold-light);
+  text-shadow: 0 0 20px rgba(201,164,74,0.3);
+}
+
+.clip-modal-title .twitch-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: rgba(145,70,255,0.15);
+  border: 1px solid rgba(145,70,255,0.3);
+  border-radius: 20px;
+  font-family: 'Crimson Pro', serif;
+  font-size: 13px;
+  color: #b89cff;
+  letter-spacing: 0.04em;
+}
+
+.clip-modal-title .twitch-badge .clip-count {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--twitch);
+}
+
+.clip-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--parchment-dim);
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.clip-close-btn:hover {
+  border-color: var(--gold-dim);
+  color: var(--gold);
+  background: rgba(201,164,74,0.08);
+}
+
+/* Category tabs */
+.clip-tabs {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  border-bottom: 1px solid rgba(145,70,255,0.15);
+  flex-shrink: 0;
+  background: rgba(8,6,4,0.5);
+  scrollbar-width: none;
+}
+
+.clip-tabs::-webkit-scrollbar { display: none; }
+
+.clip-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 22px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--parchment-dim);
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.clip-tab:hover {
+  color: var(--parchment);
+  background: rgba(145,70,255,0.05);
+}
+
+.clip-tab.active {
+  color: #c4a8ff;
+  border-bottom-color: var(--twitch);
+  background: rgba(145,70,255,0.08);
+}
+
+.clip-tab .tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 18px;
+  padding: 0 5px;
+  background: rgba(145,70,255,0.18);
+  border-radius: 10px;
+  font-size: 11px;
+  color: #9b72ff;
+  font-family: 'Crimson Pro', serif;
+  font-style: normal;
+  font-weight: 400;
+}
+
+.clip-tab.active .tab-count {
+  background: rgba(145,70,255,0.3);
+  color: #c4a8ff;
+}
+
+/* Clip grid */
+.clip-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 28px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(145,70,255,0.3) transparent;
+}
+
+.clip-body::-webkit-scrollbar { width: 5px; }
+.clip-body::-webkit-scrollbar-track { background: transparent; }
+.clip-body::-webkit-scrollbar-thumb { background: rgba(145,70,255,0.3); border-radius: 3px; }
+
+.clip-category-section { display: none; }
+.clip-category-section.active { display: block; }
+
+.clip-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 20px;
+}
+
+/* Individual clip card */
+.clip-card {
+  background: rgba(14,11,7,0.8);
+  border: 1px solid rgba(145,70,255,0.15);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.clip-card:hover {
+  border-color: rgba(145,70,255,0.45);
+  box-shadow: 0 4px 30px rgba(145,70,255,0.1), 0 0 0 1px rgba(145,70,255,0.08);
+  transform: translateY(-2px);
+}
+
+.clip-embed-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 */
+  background: #070507;
+}
+
+.clip-embed-wrapper iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+/* Placeholder shown before iframe loads */
+.clip-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: rgba(10,7,14,0.9);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.clip-placeholder:hover { background: rgba(18,12,24,0.9); }
+
+.clip-placeholder-icon {
+  font-size: 38px;
+  line-height: 1;
+  opacity: 0.7;
+}
+
+.clip-placeholder-text {
+  font-family: 'Crimson Pro', serif;
+  font-size: 13px;
+  color: var(--parchment-dim);
+  letter-spacing: 0.04em;
+}
+
+.clip-card-footer {
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.clip-number {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: rgba(145,70,255,0.5);
+}
+
+.clip-open-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  background: rgba(145,70,255,0.1);
+  border: 1px solid rgba(145,70,255,0.25);
+  border-radius: 4px;
+  color: #b89cff;
+  font-family: 'Crimson Pro', serif;
+  font-size: 13px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.clip-open-link:hover {
+  background: rgba(145,70,255,0.2);
+  border-color: rgba(145,70,255,0.5);
+  color: #c9b5ff;
+}
+
+/* Empty state */
+.clip-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  gap: 12px;
+  color: var(--parchment-dim);
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 16px;
+  opacity: 0.5;
+}
+
+.clip-empty-icon { font-size: 40px; opacity: 0.4; }
+
+/* Loading state inside modal */
+.clip-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  gap: 14px;
+  color: rgba(145,70,255,0.6);
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+}
+
+.clip-loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 2px solid rgba(145,70,255,0.12);
+  border-top-color: var(--twitch);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@media (max-width: 600px) {
+  .clip-modal-inner { height: 100vh; max-height: none; border-radius: 0; margin: 0; }
+  .clip-grid { grid-template-columns: 1fr; }
+  .clip-modal-header { padding: 14px 16px; }
+  .clip-body { padding: 16px; }
+  .clip-modal-title h2 { font-size: 16px; }
+}
 </style>
 </head>
 <body>
@@ -685,6 +975,15 @@ body::before {
       Alle zuklappen
     </button>
 
+    <div class="divider"></div>
+
+    <!-- CLIPS BUTTON -->
+    <button class="toggle-btn twitch-btn" id="btn-clips" onclick="openClipModal()">
+      <span class="dot"></span>
+      🎬 Clip-Sammlung
+      <span id="btn-clips-count" style="font-family:'Crimson Pro',serif;font-size:12px;opacity:0.6;"></span>
+    </button>
+
     <div class="refresh-indicator" id="refresh-indicator">
       <span class="refresh-dot" id="refresh-dot"></span>
       <span id="refresh-text">Verbunden</span>
@@ -715,6 +1014,41 @@ body::before {
 <footer class="site-footer">
   Daten werden alle 5 Sekunden aus Google Sheets geladen &bull; Elden Ring Boss Tracker
 </footer>
+
+<!-- ═══════════════════════════════════════════════
+     CLIP GALLERY MODAL
+═══════════════════════════════════════════════ -->
+<div class="clip-modal-backdrop" id="clip-backdrop" onclick="closeClipModal()"></div>
+
+<div class="clip-modal" id="clip-modal" role="dialog" aria-modal="true" aria-label="Clip-Sammlung">
+  <div class="clip-modal-inner">
+
+    <!-- Modal Header -->
+    <div class="clip-modal-header">
+      <div class="clip-modal-title">
+        <h2>Clip&#8209;Sammlung</h2>
+        <div class="twitch-badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#9146ff"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>
+          <span>Twitch</span>
+          <span class="clip-count" id="modal-clip-count">0</span> Clips
+        </div>
+      </div>
+      <button class="clip-close-btn" onclick="closeClipModal()" title="Schließen">✕</button>
+    </div>
+
+    <!-- Category Tabs -->
+    <div class="clip-tabs" id="clip-tabs"></div>
+
+    <!-- Clip Content -->
+    <div class="clip-body" id="clip-body">
+      <div class="clip-loading" id="clip-modal-loading">
+        <div class="clip-loading-spinner"></div>
+        <span>Clips werden geladen…</span>
+      </div>
+    </div>
+
+  </div>
+</div>
 
 <script>
 // ═══════════════════════════════════════════════════════════
@@ -756,18 +1090,21 @@ const MAIN_BOSSES = new Set([
 // STATE
 // ═══════════════════════════════════════════════════════════
 
-let localCollapsed    = {};   // area → true/false (local override)
+let localCollapsed    = {};
 let showBase          = true;
 let showDLC           = true;
 let previousBossStates = {};
 let prevDeaths        = null;
 let prevDoneBosses    = null;
 
-// Timer state
 let timerStartTs   = 0;
 let timerElapsed   = 0;
 let timerVisible   = false;
 let timerInterval  = null;
+
+// Clips state
+let clipsData      = [];   // [{url, category}]
+let activeCategory = null;
 
 // ═══════════════════════════════════════════════════════════
 // UTILS
@@ -805,17 +1142,11 @@ function pulseEl(el) {
 function updateTimerDisplay() {
   const timerChip = document.getElementById("timer-chip");
   if (!timerChip) return;
-
-  if (!timerVisible) {
-    timerChip.style.display = "none";
-    return;
-  }
+  if (!timerVisible) { timerChip.style.display = "none"; return; }
   timerChip.style.display = "flex";
-
   const elapsed = timerStartTs > 0
     ? timerElapsed + (Date.now() - timerStartTs)
     : timerElapsed;
-
   document.getElementById("val-timer").textContent = fmtTime(elapsed);
 }
 
@@ -842,6 +1173,189 @@ function toggleFlag(flag) {
 function setAllCollapsed(val) {
   Object.keys(currentAreas).forEach(k => localCollapsed[k] = val);
   renderAreas(currentAreas);
+}
+
+// ═══════════════════════════════════════════════════════════
+// CLIP HELPERS
+// ═══════════════════════════════════════════════════════════
+
+/**
+ * Extract Twitch clip slug from a URL.
+ * Handles:
+ *   https://clips.twitch.tv/SLUG
+ *   https://www.twitch.tv/channel/clip/SLUG
+ *   https://www.twitch.tv/videos/XXXXX  (VOD – embed as VOD)
+ *   bare slug (no http)
+ */
+function parseTwitchClip(url) {
+  if (!url || typeof url !== "string") return null;
+  url = url.trim();
+
+  // clips.twitch.tv/SLUG
+  let m = url.match(/clips\.twitch\.tv\/([A-Za-z0-9_\-]+)/);
+  if (m) return { type: "clip", slug: m[1], original: url };
+
+  // twitch.tv/*/clip/SLUG
+  m = url.match(/twitch\.tv\/[^/]+\/clip\/([A-Za-z0-9_\-]+)/);
+  if (m) return { type: "clip", slug: m[1], original: url };
+
+  // twitch.tv/videos/ID
+  m = url.match(/twitch\.tv\/videos\/(\d+)/);
+  if (m) return { type: "vod", id: m[1], original: url };
+
+  // bare slug (no slashes, no protocol)
+  if (!url.includes("/") && url.length > 4) return { type: "clip", slug: url, original: url };
+
+  // fallback: just a link
+  return { type: "link", original: url };
+}
+
+function buildEmbedUrl(parsed) {
+  const parent = window.location.hostname || "localhost";
+  if (!parsed) return null;
+  if (parsed.type === "clip") {
+    return `https://clips.twitch.tv/embed?clip=${parsed.slug}&parent=${parent}&autoplay=false`;
+  }
+  if (parsed.type === "vod") {
+    return `https://player.twitch.tv/?video=${parsed.id}&parent=${parent}&autoplay=false`;
+  }
+  return null;
+}
+
+// ═══════════════════════════════════════════════════════════
+// CLIP MODAL
+// ═══════════════════════════════════════════════════════════
+
+function openClipModal() {
+  document.getElementById("clip-backdrop").classList.add("open");
+  document.getElementById("clip-modal").classList.add("open");
+  document.body.style.overflow = "hidden";
+  renderClipModal();
+}
+
+function closeClipModal() {
+  document.getElementById("clip-backdrop").classList.remove("open");
+  document.getElementById("clip-modal").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+// Close on Escape
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") closeClipModal();
+});
+
+function renderClipModal() {
+  const tabsEl  = document.getElementById("clip-tabs");
+  const bodyEl  = document.getElementById("clip-body");
+  const loadEl  = document.getElementById("clip-modal-loading");
+
+  if (clipsData.length === 0) {
+    loadEl.style.display = "flex";
+    tabsEl.innerHTML = "";
+    bodyEl.innerHTML = `
+      <div class="clip-empty">
+        <span class="clip-empty-icon">🎬</span>
+        <span>Noch keine Clips vorhanden.</span>
+      </div>`;
+    return;
+  }
+
+  loadEl.style.display = "none";
+
+  // Group by category
+  const categories = {};
+  clipsData.forEach(c => {
+    const cat = c.category || "Sonstige";
+    if (!categories[cat]) categories[cat] = [];
+    categories[cat].push(c);
+  });
+
+  const catNames = Object.keys(categories);
+  if (!activeCategory || !categories[activeCategory]) {
+    activeCategory = catNames[0];
+  }
+
+  // Build tabs
+  tabsEl.innerHTML = catNames.map(cat => `
+    <button
+      class="clip-tab${cat === activeCategory ? " active" : ""}"
+      onclick="switchClipTab('${escAttr(cat)}')"
+    >
+      ${escHtml(cat)}
+      <span class="tab-count">${categories[cat].length}</span>
+    </button>
+  `).join("");
+
+  // Build sections
+  let sectionsHtml = catNames.map(cat => `
+    <div class="clip-category-section${cat === activeCategory ? " active" : ""}" data-category="${escAttr(cat)}">
+      <div class="clip-grid">
+        ${categories[cat].map((c, i) => renderClipCard(c, i)).join("")}
+      </div>
+    </div>
+  `).join("");
+
+  bodyEl.innerHTML = sectionsHtml;
+}
+
+function switchClipTab(cat) {
+  activeCategory = cat;
+
+  // Update tabs
+  document.querySelectorAll(".clip-tab").forEach(btn => {
+    btn.classList.toggle("active", btn.textContent.trim().startsWith(cat));
+  });
+
+  // Update sections
+  document.querySelectorAll(".clip-category-section").forEach(sec => {
+    sec.classList.toggle("active", sec.dataset.category === cat);
+  });
+
+  // Scroll body to top
+  document.getElementById("clip-body").scrollTop = 0;
+}
+
+function renderClipCard(clip, index) {
+  const parsed   = parseTwitchClip(clip.url);
+  const embedUrl = buildEmbedUrl(parsed);
+  const linkUrl  = clip.url;
+
+  let embedHtml;
+  if (embedUrl) {
+    embedHtml = `
+      <div class="clip-embed-wrapper">
+        <iframe
+          src="${escAttr(embedUrl)}"
+          allowfullscreen
+          scrolling="no"
+          allow="autoplay; fullscreen"
+          title="Clip ${index + 1}"
+        ></iframe>
+      </div>
+    `;
+  } else {
+    embedHtml = `
+      <div class="clip-embed-wrapper">
+        <div class="clip-placeholder" onclick="window.open('${escAttr(linkUrl)}','_blank')">
+          <span class="clip-placeholder-icon">▶️</span>
+          <span class="clip-placeholder-text">Clip öffnen</span>
+        </div>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="clip-card">
+      ${embedHtml}
+      <div class="clip-card-footer">
+        <span class="clip-number">Clip ${String(index + 1).padStart(2, "0")}</span>
+        <a href="${escAttr(linkUrl)}" target="_blank" rel="noopener" class="clip-open-link">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42L17.59 5H14V3zM5 5h6v2H7v10h10v-4h2v6H5V5z"/></svg>
+          Auf Twitch
+        </a>
+      </div>
+    </div>
+  `;
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -889,8 +1403,6 @@ function processData(rows) {
   const baseGameFlag = isTrue(rows[0]?.c[15]?.v);
   const dlcFlag      = isTrue(rows[1]?.c[15]?.v);
 
-  // Keep Sheet-flags as initial state; local toggles override
-  // (first load only)
   if (prevDeaths === null) {
     showBase = baseGameFlag;
     showDLC  = dlcFlag;
@@ -923,6 +1435,35 @@ function processData(rows) {
   document.getElementById("val-deaths").textContent = globalDeaths.toLocaleString("de-DE");
   prevDeaths = globalDeaths;
 
+  // ── CLIPS (V10:W45 → rows[9] bis rows[44], c[21]=V, c[22]=W) ──
+  const newClips = [];
+  for (let i = 9; i <= 44; i++) {
+    const row = rows[i];
+    if (!row) continue;
+    const url      = row.c[21]?.v?.toString().trim();
+    const category = row.c[22]?.v?.toString().trim() || "Sonstige";
+    if (url) newClips.push({ url, category });
+  }
+
+  // Update clips only if changed (avoid re-rendering modal while open)
+  const clipsChanged = JSON.stringify(newClips) !== JSON.stringify(clipsData);
+  if (clipsChanged) {
+    clipsData = newClips;
+
+    // Update button count
+    const countEl = document.getElementById("btn-clips-count");
+    if (countEl) countEl.textContent = clipsData.length > 0 ? `(${clipsData.length})` : "";
+
+    // Update modal count badge
+    const modalCount = document.getElementById("modal-clip-count");
+    if (modalCount) modalCount.textContent = clipsData.length;
+
+    // Re-render modal if it is currently open
+    if (document.getElementById("clip-modal").classList.contains("open")) {
+      renderClipModal();
+    }
+  }
+
   // ── BOSS ROWS ──
   const separatorIndex = rows.findIndex(r => r.c[1]?.v?.trim() === "SHADOW OF THE ERDTREE DLC");
   const areas = {};
@@ -945,7 +1486,6 @@ function processData(rows) {
     const sheetCollapsed = isTrue(r.c[5]?.v);
     const key     = area + "|" + boss;
 
-    // victory detection
     if (!(key in previousBossStates)) {
       previousBossStates[key] = done;
     } else if (!previousBossStates[key] && done) {
@@ -986,7 +1526,7 @@ function renderFromCache() {
 }
 
 // ═══════════════════════════════════════════════════════════
-// RENDER
+// RENDER AREAS
 // ═══════════════════════════════════════════════════════════
 
 function renderAreas(areas) {
@@ -1014,15 +1554,12 @@ function renderAreas(areas) {
     pinnedSection.style.display = "none";
   }
 
-  // Re-use existing cards when possible to avoid full re-render flicker
   const existingCards = {};
   grid.querySelectorAll(".area-card[data-area]").forEach(el => {
     existingCards[el.dataset.area] = el;
   });
 
   const newKeys = Object.keys(areas);
-
-  // Remove old areas no longer in data
   Object.keys(existingCards).forEach(k => {
     if (!areas[k]) existingCards[k].remove();
   });
@@ -1037,7 +1574,6 @@ function renderAreas(areas) {
       card.dataset.area = areaName;
     }
 
-    // Update collapsed state
     if (!(areaName in localCollapsed)) localCollapsed[areaName] = data.collapsed;
     const collapsed = localCollapsed[areaName];
     card.classList.toggle("collapsed", collapsed);
@@ -1063,7 +1599,6 @@ function renderAreas(areas) {
       </div>
     `;
 
-    // Insert in correct order
     const children = Array.from(grid.children);
     const currentIndex = children.indexOf(card);
     if (currentIndex !== idx) {
@@ -1072,9 +1607,6 @@ function renderAreas(areas) {
       } else {
         grid.insertBefore(card, grid.children[idx]);
       }
-    }
-    if (!existingCards[areaName]) {
-      // freshly created, already inserted above
     }
   });
 }
@@ -1120,7 +1652,6 @@ function escAttr(str) {
 loadData();
 setInterval(loadData, 5000);
 startTimerTick();
-
 </script>
 </body>
 </html>
