@@ -657,7 +657,7 @@ const SHEET_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID + "
 // Durch die separate select-Abfrage gibt gviz immer c[0]=V und c[1]=W zurück,
 // unabhängig davon wie viele andere Spalten belegt sind.
 const CLIPS_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
-  + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&tq=select%20Col22%2CCol23%20limit%2036%20offset%208";
+  + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&tq=select%20Col22%2CCol23%20where%20Col22%20is%20not%20null";
 
 const MAIN_BOSSES = new Set([
   "Margit, das Grausame Mal",
@@ -936,8 +936,12 @@ function loadClips() {
   fetch(CLIPS_URL + "&nocache=" + Date.now())
     .then(function(res) { return res.text(); })
     .then(function(text) {
+      console.log("[Clips] Raw (erste 300 Zeichen):", text.substring(0, 300));
       var json = JSON.parse(text.substring(47).slice(0, -2));
       var rows = json.table.rows;
+      console.log("[Clips] Anzahl Zeilen:", rows ? rows.length : "null");
+      if (rows && rows.length > 0) console.log("[Clips] Zeile 0:", JSON.stringify(rows[0]));
+      if (rows && rows.length > 1) console.log("[Clips] Zeile 1:", JSON.stringify(rows[1]));
       var newClips = [];
 
       rows.forEach(function(row) {
@@ -948,7 +952,7 @@ function loadClips() {
         if (url) newClips.push({ url: url, category: category });
       });
 
-      console.log("[Clips] Geladen:", newClips.length, newClips);
+      console.log("[Clips] Gefunden:", newClips.length, newClips);
 
       var clipsChanged = JSON.stringify(newClips) !== JSON.stringify(clipsData);
       if (clipsChanged) {
