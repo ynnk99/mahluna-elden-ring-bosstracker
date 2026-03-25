@@ -1057,7 +1057,6 @@ body::before {
 
 const SPREADSHEET_ID = "1r9BzZJYFrk4rQLlMn4ZPBBUuc8u_peqwThTi1UTCQcE";
 const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json`;
-const CLIPS_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&tq=select%20V%2CW%20limit%2036%20offset%209`;
 
 const MAIN_BOSSES = new Set([
   "Margit, das Grausame Mal",
@@ -1382,42 +1381,6 @@ async function loadData() {
   }
 }
 
-async function loadClips() {
-  try {
-    const res  = await fetch(CLIPS_URL + "&t=" + Date.now());
-    const text = await res.text();
-    const json = JSON.parse(text.substring(47).slice(0, -2));
-    const rows = json.table.rows;
-
-    const newClips = [];
-    rows.forEach(row => {
-      if (!row?.c) return;
-      const url      = row.c[0]?.v?.toString().trim();  // Spalte V = Index 0 in dieser Abfrage
-      const category = row.c[1]?.v?.toString().trim();  // Spalte W = Index 1 in dieser Abfrage
-      if (url) newClips.push({ url, category: category || "Sonstige" });
-    });
-
-    console.log("Clips geladen:", newClips.length, newClips); // debug, später entfernen
-
-    const clipsChanged = JSON.stringify(newClips) !== JSON.stringify(clipsData);
-    if (clipsChanged) {
-      clipsData = newClips;
-
-      const countEl = document.getElementById("btn-clips-count");
-      if (countEl) countEl.textContent = clipsData.length > 0 ? `(${clipsData.length})` : "";
-
-      const modalCount = document.getElementById("modal-clip-count");
-      if (modalCount) modalCount.textContent = clipsData.length;
-
-      if (document.getElementById("clip-modal").classList.contains("open")) {
-        renderClipModal();
-      }
-    }
-  } catch (err) {
-    console.error("Fehler beim Laden der Clips:", err);
-  }
-}
-
 function setRefreshState(state) {
   const dot  = document.getElementById("refresh-dot");
   const text = document.getElementById("refresh-text");
@@ -1472,7 +1435,15 @@ function processData(rows) {
   document.getElementById("val-deaths").textContent = globalDeaths.toLocaleString("de-DE");
   prevDeaths = globalDeaths;
 
-  // Clips werden separat über loadClips() geladen
+  // ── CLIPS (V10:W45 → rows[9] bis rows[44], c[21]=V, c[22]=W) ──
+  const newClips = [];
+  for (let i = 9; i <= 44; i++) {
+    const row = rows[i];
+    if (!row) continue;
+    const url      = row.c[21]?.v?.toString().trim();
+    const category = row.c[22]?.v?.toString().trim() || "Sonstige";
+    if (url) newClips.push({ url, category });
+  }
 
   // Update clips only if changed (avoid re-rendering modal while open)
   const clipsChanged = JSON.stringify(newClips) !== JSON.stringify(clipsData);
@@ -1679,9 +1650,7 @@ function escAttr(str) {
 // ═══════════════════════════════════════════════════════════
 
 loadData();
-loadClips();
 setInterval(loadData, 5000);
-setInterval(loadClips, 15000); // Clips seltener refreshen reicht
 startTimerTick();
 </script>
 </body>
