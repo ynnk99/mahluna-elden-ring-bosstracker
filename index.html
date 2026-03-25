@@ -46,7 +46,6 @@ body {
   min-height: 100vh;
 }
 
-/* ─── NOISE TEXTURE OVERLAY ─── */
 body::before {
   content: "";
   position: fixed;
@@ -57,7 +56,6 @@ body::before {
   opacity: 0.35;
 }
 
-/* ─── LAYOUT ─── */
 .page-wrapper {
   position: relative;
   z-index: 1;
@@ -66,7 +64,6 @@ body::before {
   padding: 0 20px 60px;
 }
 
-/* ─── HEADER ─── */
 .site-header {
   padding: 40px 0 0;
   text-align: center;
@@ -115,7 +112,6 @@ body::before {
   color: var(--gold-dim);
 }
 
-/* ─── STATS BAR ─── */
 .stats-bar {
   display: flex;
   flex-wrap: wrap;
@@ -142,20 +138,10 @@ body::before {
 }
 
 .stat-chip .icon { font-size: 18px; }
+.stat-chip.deaths-chip { border-color: rgba(180, 60, 50, 0.4); color: var(--gold); }
+.stat-chip .value { font-weight: 700; font-size: 17px; }
 
-.stat-chip.deaths-chip {
-  border-color: rgba(180, 60, 50, 0.4);
-  color: var(--gold);
-}
-
-.stat-chip .value {
-  font-weight: 700;
-  font-size: 17px;
-}
-
-/* ─── TIMER ─── */
 #timer-chip { display: none; }
-
 #timer-chip .timer-value {
   font-family: 'Crimson Pro', serif;
   font-size: 18px;
@@ -163,7 +149,6 @@ body::before {
   font-variant-numeric: tabular-nums;
 }
 
-/* ─── CONTROLS ─── */
 .controls-bar {
   display: flex;
   flex-wrap: wrap;
@@ -203,130 +188,60 @@ body::before {
   overflow: hidden;
 }
 
-.toggle-btn:hover {
-  border-color: var(--gold-dim);
-  color: var(--parchment);
-  background: rgba(201,164,74,0.06);
-}
-
-.toggle-btn.active {
-  border-color: var(--gold);
-  color: var(--gold);
-  background: rgba(201,164,74,0.1);
-  box-shadow: 0 0 12px rgba(201,164,74,0.15);
-}
+.toggle-btn:hover { border-color: var(--gold-dim); color: var(--parchment); background: rgba(201,164,74,0.06); }
+.toggle-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(201,164,74,0.1); box-shadow: 0 0 12px rgba(201,164,74,0.15); }
 
 .toggle-btn .dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--gold-dim);
-  flex-shrink: 0;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--gold-dim); flex-shrink: 0;
   transition: background 0.25s ease, box-shadow 0.25s ease;
 }
 
-.toggle-btn.active .dot {
-  background: var(--gold);
-  box-shadow: 0 0 8px var(--gold);
-}
+.toggle-btn.active .dot { background: var(--gold); box-shadow: 0 0 8px var(--gold); }
 
-/* Twitch button variant */
-.toggle-btn.twitch-btn {
-  border-color: rgba(145, 70, 255, 0.35);
-  color: rgba(180, 140, 255, 0.85);
-}
+.toggle-btn.twitch-btn { border-color: rgba(145, 70, 255, 0.35); color: rgba(180, 140, 255, 0.85); }
+.toggle-btn.twitch-btn .dot { background: rgba(145, 70, 255, 0.5); }
+.toggle-btn.twitch-btn:hover { border-color: var(--twitch); color: #b89cff; background: var(--twitch-dim); }
+.toggle-btn.twitch-btn.active { border-color: var(--twitch); color: #c4a8ff; background: var(--twitch-dim); box-shadow: 0 0 16px rgba(145,70,255,0.25); }
+.toggle-btn.twitch-btn.active .dot { background: var(--twitch); box-shadow: 0 0 8px var(--twitch); }
 
-.toggle-btn.twitch-btn .dot {
-  background: rgba(145, 70, 255, 0.5);
-}
-
-.toggle-btn.twitch-btn:hover {
-  border-color: var(--twitch);
-  color: #b89cff;
-  background: var(--twitch-dim);
-}
-
-.toggle-btn.twitch-btn.active {
-  border-color: var(--twitch);
-  color: #c4a8ff;
-  background: var(--twitch-dim);
-  box-shadow: 0 0 16px rgba(145,70,255,0.25);
-}
-
-.toggle-btn.twitch-btn.active .dot {
-  background: var(--twitch);
-  box-shadow: 0 0 8px var(--twitch);
-}
-
-.divider {
-  width: 1px;
-  height: 28px;
-  background: var(--border);
-  flex-shrink: 0;
-}
+.divider { width: 1px; height: 28px; background: var(--border); flex-shrink: 0; }
 
 .refresh-indicator {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-family: 'Crimson Pro', serif;
-  font-style: italic;
-  font-size: 13px;
-  color: var(--parchment-dim);
-  margin-left: auto;
+  display: flex; align-items: center; gap: 6px;
+  font-family: 'Crimson Pro', serif; font-style: italic; font-size: 13px;
+  color: var(--parchment-dim); margin-left: auto;
 }
 
 .refresh-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #4a8c4a;
-  box-shadow: 0 0 6px #4a8c4a;
-  animation: pulse-green 2.5s ease-in-out infinite;
-  flex-shrink: 0;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #4a8c4a; box-shadow: 0 0 6px #4a8c4a;
+  animation: pulse-green 2.5s ease-in-out infinite; flex-shrink: 0;
 }
 
-@keyframes pulse-green {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
-}
+@keyframes pulse-green { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
 .refresh-dot.loading {
-  background: var(--gold);
-  box-shadow: 0 0 6px var(--gold);
+  background: var(--gold); box-shadow: 0 0 6px var(--gold);
   animation: pulse-gold 0.6s ease-in-out infinite;
 }
 
-@keyframes pulse-gold {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.2; }
-}
+@keyframes pulse-gold { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
 
-/* ─── PINNED BOSSES ─── */
 #pinned-section { display: none; margin-bottom: 30px; }
 
 .pinned-header {
-  font-family: 'Cinzel', serif;
-  font-size: 13px;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--gold-dim);
-  margin-bottom: 10px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border);
+  font-family: 'Cinzel', serif; font-size: 13px; letter-spacing: 0.15em;
+  text-transform: uppercase; color: var(--gold-dim); margin-bottom: 10px;
+  padding-bottom: 8px; border-bottom: 1px solid var(--border);
 }
 
 .pinned-list { display: flex; flex-wrap: wrap; gap: 10px; }
 
 .pinned-card {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 16px;
-  background: var(--bg-card);
-  border: 1px solid rgba(201,164,74,0.3);
-  border-radius: var(--radius);
-  animation: pinnedGlow 2.5s ease-in-out infinite;
+  display: flex; align-items: center; gap: 10px; padding: 10px 16px;
+  background: var(--bg-card); border: 1px solid rgba(201,164,74,0.3);
+  border-radius: var(--radius); animation: pinnedGlow 2.5s ease-in-out infinite;
 }
 
 @keyframes pinnedGlow {
@@ -335,97 +250,54 @@ body::before {
 }
 
 .pinned-card.done { opacity: 0.45; animation: none; }
-
-.pinned-name {
-  font-family: 'Crimson Pro', serif;
-  font-size: 15px;
-  color: var(--parchment);
-}
-
+.pinned-name { font-family: 'Crimson Pro', serif; font-size: 15px; color: var(--parchment); }
 .pinned-name.main-boss { color: var(--gold-light); font-weight: 600; }
 .pinned-deaths { font-family: 'Cinzel', serif; font-size: 13px; color: var(--gold); }
 
-/* ─── AREA GRID ─── */
-.areas-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 16px;
-}
+.areas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
 
-/* ─── AREA CARD ─── */
 .area-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.area-card:hover {
-  border-color: rgba(201,164,74,0.4);
-  box-shadow: 0 4px 30px rgba(0,0,0,0.4), 0 0 20px rgba(201,164,74,0.05);
-}
+.area-card:hover { border-color: rgba(201,164,74,0.4); box-shadow: 0 4px 30px rgba(0,0,0,0.4), 0 0 20px rgba(201,164,74,0.05); }
 
 .area-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 16px;
-  cursor: pointer;
-  user-select: none;
-  border-bottom: 1px solid var(--border);
-  transition: background 0.2s ease;
-  gap: 10px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px; cursor: pointer; user-select: none;
+  border-bottom: 1px solid var(--border); transition: background 0.2s ease; gap: 10px;
 }
 
 .area-header:hover { background: rgba(201,164,74,0.04); }
-
 .area-header-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
 
-.area-toggle-icon {
-  font-size: 10px;
-  color: var(--gold-dim);
-  flex-shrink: 0;
-  transition: transform 0.25s ease;
-}
-
+.area-toggle-icon { font-size: 10px; color: var(--gold-dim); flex-shrink: 0; transition: transform 0.25s ease; }
 .area-card.collapsed .area-toggle-icon { transform: rotate(-90deg); }
 
 .area-name {
-  font-family: 'Cinzel', serif;
-  font-size: 14px;
-  letter-spacing: 0.05em;
-  color: var(--gold-light);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-family: 'Cinzel', serif; font-size: 14px; letter-spacing: 0.05em;
+  color: var(--gold-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
 .area-progress-wrap { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .area-fraction { font-family: 'Crimson Pro', serif; font-size: 13px; color: var(--parchment-dim); white-space: nowrap; }
-
 .area-progress-bar { width: 60px; height: 3px; background: rgba(255,255,255,0.07); border-radius: 2px; overflow: hidden; }
 
 .area-progress-fill {
-  height: 100%;
-  background: linear-gradient(to right, var(--gold-dim), var(--gold));
-  border-radius: 2px;
-  transition: width 0.6s ease;
+  height: 100%; background: linear-gradient(to right, var(--gold-dim), var(--gold));
+  border-radius: 2px; transition: width 0.6s ease;
 }
 
 .area-progress-fill.complete { background: linear-gradient(to right, #4a7c4a, #6ab86a); }
 
-/* ─── BOSS LIST ─── */
 .boss-list { overflow: hidden; max-height: 2000px; transition: max-height 0.35s ease; }
 .area-card.collapsed .boss-list { max-height: 0; }
 
 .boss-row {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  padding: 7px 16px;
-  border-bottom: 1px solid rgba(201,164,74,0.06);
-  transition: background 0.15s ease;
+  display: flex; align-items: center; gap: 0; padding: 7px 16px;
+  border-bottom: 1px solid rgba(201,164,74,0.06); transition: background 0.15s ease;
 }
 
 .boss-row:last-child { border-bottom: none; }
@@ -435,32 +307,23 @@ body::before {
 .boss-deaths-zero { opacity: 0.3; }
 
 .boss-name {
-  font-family: 'Crimson Pro', serif;
-  font-size: 15px;
-  color: var(--parchment);
-  flex: 1;
-  min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-family: 'Crimson Pro', serif; font-size: 15px; color: var(--parchment);
+  flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   transition: color 0.3s ease, opacity 0.3s ease;
 }
 
 .boss-name.main { color: var(--gold-light); font-weight: 600; }
-
 .boss-row.done .boss-name { opacity: 0.3; text-decoration: line-through; text-decoration-color: rgba(201,164,74,0.3); }
 .boss-row.done .boss-deaths { opacity: 0.2; }
 
 .boss-check { font-size: 14px; flex-shrink: 0; margin-left: 8px; opacity: 0; transition: opacity 0.3s ease; color: #6ab86a; }
 .boss-row.done .boss-check { opacity: 0.7; }
 
-/* ─── FLASH ANIMATIONS ─── */
 @keyframes deathFlash {
   0%   { background: transparent; }
   20%  { background: rgba(196, 74, 58, 0.2); }
   100% { background: transparent; }
 }
-
 .death-flash { animation: deathFlash 0.8s ease-out; }
 
 @keyframes bossComplete {
@@ -468,73 +331,45 @@ body::before {
   20%  { background: rgba(201, 164, 74, 0.25); }
   100% { background: transparent; }
 }
-
 .boss-complete-flash { animation: bossComplete 1.5s ease-out; }
 
-/* ─── COMPLETION TOAST ─── */
 .toast {
-  position: fixed;
-  bottom: 30px;
-  left: 50%;
+  position: fixed; bottom: 30px; left: 50%;
   transform: translateX(-50%) translateY(20px);
   background: linear-gradient(135deg, rgba(20,17,10,0.97), rgba(12,10,6,0.97));
-  border: 1px solid var(--gold);
-  border-radius: var(--radius);
-  padding: 14px 28px;
-  font-family: 'Cinzel', serif;
-  font-size: 16px;
-  color: var(--gold-light);
-  letter-spacing: 0.08em;
+  border: 1px solid var(--gold); border-radius: var(--radius);
+  padding: 14px 28px; font-family: 'Cinzel', serif; font-size: 16px;
+  color: var(--gold-light); letter-spacing: 0.08em;
   box-shadow: 0 0 40px rgba(201,164,74,0.3), 0 8px 30px rgba(0,0,0,0.6);
-  z-index: 999;
-  opacity: 0;
-  pointer-events: none;
-  transition: all 0.4s ease;
+  z-index: 999; opacity: 0; pointer-events: none; transition: all 0.4s ease;
 }
-
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-/* ─── LOADING STATE ─── */
 .loading-overlay {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 300px;
-  gap: 16px;
-  color: var(--gold-dim);
-  font-family: 'Cinzel', serif;
-  font-size: 15px;
-  letter-spacing: 0.1em;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 300px; gap: 16px; color: var(--gold-dim); font-family: 'Cinzel', serif;
+  font-size: 15px; letter-spacing: 0.1em;
 }
 
 .loading-spinner {
-  width: 36px;
-  height: 36px;
-  border: 2px solid rgba(201,164,74,0.15);
-  border-top-color: var(--gold);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+  width: 36px; height: 36px; border: 2px solid rgba(201,164,74,0.15);
+  border-top-color: var(--gold); border-radius: 50%; animation: spin 1s linear infinite;
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ─── STAT PULSE ─── */
 @keyframes statPulse {
   0%   { transform: scale(1); }
   30%  { transform: scale(1.18); }
   60%  { transform: scale(0.96); }
   100% { transform: scale(1); }
 }
-
 .stat-pulse { animation: statPulse 0.6s ease-out; }
 
-/* ─── SCROLLBAR ─── */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg-deep); }
 ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
 
-/* ─── RESPONSIVE ─── */
 @media (max-width: 600px) {
   .areas-grid { grid-template-columns: 1fr; }
   .controls-bar { flex-direction: column; align-items: flex-start; }
@@ -542,218 +377,98 @@ body::before {
   .divider { display: none; }
 }
 
-/* ─── FOOTER ─── */
 .site-footer {
-  text-align: center;
-  margin-top: 60px;
-  padding: 20px 0;
-  border-top: 1px solid var(--border);
-  font-family: 'Crimson Pro', serif;
-  font-size: 13px;
-  color: var(--parchment-dim);
-  opacity: 0.5;
+  text-align: center; margin-top: 60px; padding: 20px 0;
+  border-top: 1px solid var(--border); font-family: 'Crimson Pro', serif;
+  font-size: 13px; color: var(--parchment-dim); opacity: 0.5;
 }
 
-/* ═══════════════════════════════════════════════════════════
-   CLIP GALLERY MODAL
-═══════════════════════════════════════════════════════════ */
-
+/* ── CLIP MODAL ── */
 .clip-modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(5, 4, 2, 0.88);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  z-index: 500;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.35s ease;
+  position: fixed; inset: 0; background: rgba(5, 4, 2, 0.88);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  z-index: 500; opacity: 0; pointer-events: none; transition: opacity 0.35s ease;
 }
-
-.clip-modal-backdrop.open {
-  opacity: 1;
-  pointer-events: all;
-}
+.clip-modal-backdrop.open { opacity: 1; pointer-events: all; }
 
 .clip-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 501;
-  display: flex;
-  flex-direction: column;
-  pointer-events: none;
-  transform: translateY(30px);
-  opacity: 0;
+  position: fixed; inset: 0; z-index: 501; display: flex; flex-direction: column;
+  pointer-events: none; transform: translateY(30px); opacity: 0;
   transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
-
-.clip-modal.open {
-  pointer-events: all;
-  opacity: 1;
-  transform: translateY(0);
-}
+.clip-modal.open { pointer-events: all; opacity: 1; transform: translateY(0); }
 
 .clip-modal-inner {
-  display: flex;
-  flex-direction: column;
-  max-width: 1260px;
-  width: 100%;
-  margin: auto;
-  height: calc(100vh - 48px);
-  max-height: 900px;
+  display: flex; flex-direction: column; max-width: 1260px; width: 100%;
+  margin: auto; height: calc(100vh - 48px); max-height: 900px;
   background:
     radial-gradient(ellipse 70% 40% at 50% 0%, rgba(145,70,255,0.06) 0%, transparent 60%),
     linear-gradient(170deg, rgba(18,14,8,0.98) 0%, rgba(10,9,7,0.99) 100%);
-  border: 1px solid rgba(145,70,255,0.28);
-  border-radius: 10px;
-  box-shadow:
-    0 0 80px rgba(145,70,255,0.12),
-    0 30px 80px rgba(0,0,0,0.7);
+  border: 1px solid rgba(145,70,255,0.28); border-radius: 10px;
+  box-shadow: 0 0 80px rgba(145,70,255,0.12), 0 30px 80px rgba(0,0,0,0.7);
   overflow: hidden;
 }
 
-/* Modal header */
 .clip-modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 18px 28px;
-  border-bottom: 1px solid rgba(145,70,255,0.2);
-  flex-shrink: 0;
-  background: rgba(12,9,6,0.6);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 28px; border-bottom: 1px solid rgba(145,70,255,0.2);
+  flex-shrink: 0; background: rgba(12,9,6,0.6);
 }
 
-.clip-modal-title {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
+.clip-modal-title { display: flex; align-items: center; gap: 14px; }
 
 .clip-modal-title h2 {
-  font-family: 'Cinzel', serif;
-  font-size: 20px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  color: var(--gold-light);
-  text-shadow: 0 0 20px rgba(201,164,74,0.3);
+  font-family: 'Cinzel', serif; font-size: 20px; font-weight: 600;
+  letter-spacing: 0.1em; color: var(--gold-light); text-shadow: 0 0 20px rgba(201,164,74,0.3);
 }
 
 .clip-modal-title .twitch-badge {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
-  background: rgba(145,70,255,0.15);
-  border: 1px solid rgba(145,70,255,0.3);
-  border-radius: 20px;
-  font-family: 'Crimson Pro', serif;
-  font-size: 13px;
-  color: #b89cff;
-  letter-spacing: 0.04em;
+  display: flex; align-items: center; gap: 6px; padding: 4px 12px;
+  background: rgba(145,70,255,0.15); border: 1px solid rgba(145,70,255,0.3);
+  border-radius: 20px; font-family: 'Crimson Pro', serif; font-size: 13px;
+  color: #b89cff; letter-spacing: 0.04em;
 }
 
 .clip-modal-title .twitch-badge .clip-count {
-  font-family: 'Cinzel', serif;
-  font-weight: 600;
-  font-size: 14px;
-  color: var(--twitch);
+  font-family: 'Cinzel', serif; font-weight: 600; font-size: 14px; color: var(--twitch);
 }
 
 .clip-close-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  color: var(--parchment-dim);
-  font-size: 18px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; background: transparent; border: 1px solid var(--border);
+  border-radius: var(--radius); color: var(--parchment-dim); font-size: 18px;
+  cursor: pointer; transition: all 0.2s ease; flex-shrink: 0;
 }
+.clip-close-btn:hover { border-color: var(--gold-dim); color: var(--gold); background: rgba(201,164,74,0.08); }
 
-.clip-close-btn:hover {
-  border-color: var(--gold-dim);
-  color: var(--gold);
-  background: rgba(201,164,74,0.08);
-}
-
-/* Category tabs */
 .clip-tabs {
-  display: flex;
-  gap: 0;
-  overflow-x: auto;
-  border-bottom: 1px solid rgba(145,70,255,0.15);
-  flex-shrink: 0;
-  background: rgba(8,6,4,0.5);
-  scrollbar-width: none;
+  display: flex; gap: 0; overflow-x: auto; border-bottom: 1px solid rgba(145,70,255,0.15);
+  flex-shrink: 0; background: rgba(8,6,4,0.5); scrollbar-width: none;
 }
-
 .clip-tabs::-webkit-scrollbar { display: none; }
 
 .clip-tab {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 11px 22px;
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid transparent;
-  color: var(--parchment-dim);
-  font-family: 'Cinzel', serif;
-  font-size: 12px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
+  display: flex; align-items: center; gap: 8px; padding: 11px 22px;
+  background: transparent; border: none; border-bottom: 2px solid transparent;
+  color: var(--parchment-dim); font-family: 'Cinzel', serif; font-size: 12px;
+  letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer;
+  white-space: nowrap; transition: all 0.2s ease; flex-shrink: 0;
 }
-
-.clip-tab:hover {
-  color: var(--parchment);
-  background: rgba(145,70,255,0.05);
-}
-
-.clip-tab.active {
-  color: #c4a8ff;
-  border-bottom-color: var(--twitch);
-  background: rgba(145,70,255,0.08);
-}
+.clip-tab:hover { color: var(--parchment); background: rgba(145,70,255,0.05); }
+.clip-tab.active { color: #c4a8ff; border-bottom-color: var(--twitch); background: rgba(145,70,255,0.08); }
 
 .clip-tab .tab-count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 20px;
-  height: 18px;
-  padding: 0 5px;
-  background: rgba(145,70,255,0.18);
-  border-radius: 10px;
-  font-size: 11px;
-  color: #9b72ff;
-  font-family: 'Crimson Pro', serif;
-  font-style: normal;
-  font-weight: 400;
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 20px; height: 18px; padding: 0 5px; background: rgba(145,70,255,0.18);
+  border-radius: 10px; font-size: 11px; color: #9b72ff;
+  font-family: 'Crimson Pro', serif; font-style: normal; font-weight: 400;
 }
+.clip-tab.active .tab-count { background: rgba(145,70,255,0.3); color: #c4a8ff; }
 
-.clip-tab.active .tab-count {
-  background: rgba(145,70,255,0.3);
-  color: #c4a8ff;
-}
-
-/* Clip grid */
 .clip-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: 24px 28px;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(145,70,255,0.3) transparent;
+  flex: 1; overflow-y: auto; padding: 24px 28px;
+  scrollbar-width: thin; scrollbar-color: rgba(145,70,255,0.3) transparent;
 }
-
 .clip-body::-webkit-scrollbar { width: 5px; }
 .clip-body::-webkit-scrollbar-track { background: transparent; }
 .clip-body::-webkit-scrollbar-thumb { background: rgba(145,70,255,0.3); border-radius: 3px; }
@@ -761,146 +476,54 @@ body::before {
 .clip-category-section { display: none; }
 .clip-category-section.active { display: block; }
 
-.clip-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 20px;
-}
+.clip-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
 
-/* Individual clip card */
 .clip-card {
-  background: rgba(14,11,7,0.8);
-  border: 1px solid rgba(145,70,255,0.15);
-  border-radius: var(--radius);
-  overflow: hidden;
+  background: rgba(14,11,7,0.8); border: 1px solid rgba(145,70,255,0.15);
+  border-radius: var(--radius); overflow: hidden;
   transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
 }
+.clip-card:hover { border-color: rgba(145,70,255,0.45); box-shadow: 0 4px 30px rgba(145,70,255,0.1), 0 0 0 1px rgba(145,70,255,0.08); transform: translateY(-2px); }
 
-.clip-card:hover {
-  border-color: rgba(145,70,255,0.45);
-  box-shadow: 0 4px 30px rgba(145,70,255,0.1), 0 0 0 1px rgba(145,70,255,0.08);
-  transform: translateY(-2px);
-}
+.clip-embed-wrapper { position: relative; width: 100%; padding-top: 56.25%; background: #070507; }
+.clip-embed-wrapper iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; display: block; }
 
-.clip-embed-wrapper {
-  position: relative;
-  width: 100%;
-  padding-top: 56.25%; /* 16:9 */
-  background: #070507;
-}
-
-.clip-embed-wrapper iframe {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  border: none;
-  display: block;
-}
-
-/* Placeholder shown before iframe loads */
 .clip-placeholder {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  background: rgba(10,7,14,0.9);
-  cursor: pointer;
-  transition: background 0.2s ease;
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 10px;
+  background: rgba(10,7,14,0.9); cursor: pointer; transition: background 0.2s ease;
 }
-
 .clip-placeholder:hover { background: rgba(18,12,24,0.9); }
+.clip-placeholder-icon { font-size: 38px; line-height: 1; opacity: 0.7; }
+.clip-placeholder-text { font-family: 'Crimson Pro', serif; font-size: 13px; color: var(--parchment-dim); letter-spacing: 0.04em; }
 
-.clip-placeholder-icon {
-  font-size: 38px;
-  line-height: 1;
-  opacity: 0.7;
-}
-
-.clip-placeholder-text {
-  font-family: 'Crimson Pro', serif;
-  font-size: 13px;
-  color: var(--parchment-dim);
-  letter-spacing: 0.04em;
-}
-
-.clip-card-footer {
-  padding: 10px 14px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.clip-number {
-  font-family: 'Cinzel', serif;
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  color: rgba(145,70,255,0.5);
-}
+.clip-card-footer { padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.clip-number { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 0.08em; color: rgba(145,70,255,0.5); }
 
 .clip-open-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 4px 12px;
-  background: rgba(145,70,255,0.1);
-  border: 1px solid rgba(145,70,255,0.25);
-  border-radius: 4px;
-  color: #b89cff;
-  font-family: 'Crimson Pro', serif;
-  font-size: 13px;
-  text-decoration: none;
-  transition: all 0.2s ease;
+  display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px;
+  background: rgba(145,70,255,0.1); border: 1px solid rgba(145,70,255,0.25);
+  border-radius: 4px; color: #b89cff; font-family: 'Crimson Pro', serif;
+  font-size: 13px; text-decoration: none; transition: all 0.2s ease;
 }
+.clip-open-link:hover { background: rgba(145,70,255,0.2); border-color: rgba(145,70,255,0.5); color: #c9b5ff; }
 
-.clip-open-link:hover {
-  background: rgba(145,70,255,0.2);
-  border-color: rgba(145,70,255,0.5);
-  color: #c9b5ff;
-}
-
-/* Empty state */
 .clip-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 200px;
-  gap: 12px;
-  color: var(--parchment-dim);
-  font-family: 'Crimson Pro', serif;
-  font-style: italic;
-  font-size: 16px;
-  opacity: 0.5;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 200px; gap: 12px; color: var(--parchment-dim); font-family: 'Crimson Pro', serif;
+  font-style: italic; font-size: 16px; opacity: 0.5;
 }
-
 .clip-empty-icon { font-size: 40px; opacity: 0.4; }
 
-/* Loading state inside modal */
 .clip-loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 200px;
-  gap: 14px;
-  color: rgba(145,70,255,0.6);
-  font-family: 'Cinzel', serif;
-  font-size: 14px;
-  letter-spacing: 0.1em;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 200px; gap: 14px; color: rgba(145,70,255,0.6);
+  font-family: 'Cinzel', serif; font-size: 14px; letter-spacing: 0.1em;
 }
 
 .clip-loading-spinner {
-  width: 32px;
-  height: 32px;
-  border: 2px solid rgba(145,70,255,0.12);
-  border-top-color: var(--twitch);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+  width: 32px; height: 32px; border: 2px solid rgba(145,70,255,0.12);
+  border-top-color: var(--twitch); border-radius: 50%; animation: spin 1s linear infinite;
 }
 
 @media (max-width: 600px) {
@@ -916,7 +539,6 @@ body::before {
 
 <div class="page-wrapper">
 
-  <!-- HEADER -->
   <header class="site-header">
     <h1>Elden Ring</h1>
     <p class="subtitle">Boss Tracker &amp; Fortschrittsübersicht</p>
@@ -925,7 +547,6 @@ body::before {
     </div>
   </header>
 
-  <!-- STATS BAR -->
   <div class="stats-bar">
     <div class="stat-chip deaths-chip" id="stat-deaths">
       <span class="icon">💀</span>
@@ -949,54 +570,38 @@ body::before {
     </div>
   </div>
 
-  <!-- CONTROLS -->
   <div class="controls-bar">
     <span class="ctrl-label">Anzeige:</span>
-
     <button class="toggle-btn" id="btn-basegame" onclick="toggleFlag('base')">
-      <span class="dot"></span>
-      Base Game
+      <span class="dot"></span> Base Game
     </button>
-
     <button class="toggle-btn" id="btn-dlc" onclick="toggleFlag('dlc')">
-      <span class="dot"></span>
-      Shadow of the Erdtree DLC
+      <span class="dot"></span> Shadow of the Erdtree DLC
     </button>
-
     <div class="divider"></div>
-
     <button class="toggle-btn" id="btn-expand-all" onclick="setAllCollapsed(false)">
-      <span class="dot"></span>
-      Alle aufklappen
+      <span class="dot"></span> Alle aufklappen
     </button>
-
     <button class="toggle-btn" id="btn-collapse-all" onclick="setAllCollapsed(true)">
-      <span class="dot"></span>
-      Alle zuklappen
+      <span class="dot"></span> Alle zuklappen
     </button>
-
     <div class="divider"></div>
-
-    <!-- CLIPS BUTTON -->
     <button class="toggle-btn twitch-btn" id="btn-clips" onclick="openClipModal()">
       <span class="dot"></span>
       🎬 Clip-Sammlung
       <span id="btn-clips-count" style="font-family:'Crimson Pro',serif;font-size:12px;opacity:0.6;"></span>
     </button>
-
     <div class="refresh-indicator" id="refresh-indicator">
       <span class="refresh-dot" id="refresh-dot"></span>
       <span id="refresh-text">Verbunden</span>
     </div>
   </div>
 
-  <!-- PINNED BOSSES -->
   <section id="pinned-section">
     <div class="pinned-header">📌 Angepinnte Bosse</div>
     <div class="pinned-list" id="pinned-list"></div>
   </section>
 
-  <!-- MAIN CONTENT -->
   <main id="main-content">
     <div class="loading-overlay" id="loading-overlay">
       <div class="loading-spinner"></div>
@@ -1007,23 +612,16 @@ body::before {
 
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- FOOTER -->
 <footer class="site-footer">
   Daten werden alle 5 Sekunden aus Google Sheets geladen &bull; Elden Ring Boss Tracker
 </footer>
 
-<!-- ═══════════════════════════════════════════════
-     CLIP GALLERY MODAL
-═══════════════════════════════════════════════ -->
 <div class="clip-modal-backdrop" id="clip-backdrop" onclick="closeClipModal()"></div>
 
 <div class="clip-modal" id="clip-modal" role="dialog" aria-modal="true" aria-label="Clip-Sammlung">
   <div class="clip-modal-inner">
-
-    <!-- Modal Header -->
     <div class="clip-modal-header">
       <div class="clip-modal-title">
         <h2>Clip&#8209;Sammlung</h2>
@@ -1035,18 +633,13 @@ body::before {
       </div>
       <button class="clip-close-btn" onclick="closeClipModal()" title="Schließen">✕</button>
     </div>
-
-    <!-- Category Tabs -->
     <div class="clip-tabs" id="clip-tabs"></div>
-
-    <!-- Clip Content -->
     <div class="clip-body" id="clip-body">
       <div class="clip-loading" id="clip-modal-loading">
         <div class="clip-loading-spinner"></div>
         <span>Clips werden geladen…</span>
       </div>
     </div>
-
   </div>
 </div>
 
@@ -1056,7 +649,15 @@ body::before {
 // ═══════════════════════════════════════════════════════════
 
 const SPREADSHEET_ID = "1r9BzZJYFrk4rQLlMn4ZPBBUuc8u_peqwThTi1UTCQcE";
-const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json`;
+
+// Haupt-Sheet (Bosse, Deaths, etc.)
+const SHEET_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json";
+
+// Separate Abfrage NUR für Clips – Spalten V (Col22) und W (Col23), Zeilen 10–45 (offset 9, limit 36)
+// Durch die separate select-Abfrage gibt gviz immer c[0]=V und c[1]=W zurück,
+// unabhängig davon wie viele andere Spalten belegt sind.
+const CLIPS_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
+  + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&tq=select%20Col22%2CCol23%20limit%2036%20offset%209";
 
 const MAIN_BOSSES = new Set([
   "Margit, das Grausame Mal",
@@ -1090,42 +691,44 @@ const MAIN_BOSSES = new Set([
 // STATE
 // ═══════════════════════════════════════════════════════════
 
-let localCollapsed    = {};
-let showBase          = true;
-let showDLC           = true;
-let previousBossStates = {};
-let prevDeaths        = null;
-let prevDoneBosses    = null;
+var localCollapsed      = {};
+var showBase            = true;
+var showDLC             = true;
+var previousBossStates  = {};
+var prevDeaths          = null;
+var prevDoneBosses      = null;
 
-let timerStartTs   = 0;
-let timerElapsed   = 0;
-let timerVisible   = false;
-let timerInterval  = null;
+var timerStartTs  = 0;
+var timerElapsed  = 0;
+var timerVisible  = false;
+var timerInterval = null;
 
-// Clips state
-let clipsData      = [];   // [{url, category}]
-let activeCategory = null;
+var clipsData      = [];
+var activeCategory = null;
+var currentAreas   = {};
 
 // ═══════════════════════════════════════════════════════════
 // UTILS
 // ═══════════════════════════════════════════════════════════
 
-const isTrue = v => [true, "TRUE", "WAHR", 1, "1", "true", "wahr"].includes(v);
-const normalize = s => s.trim().toLowerCase().replace(/\s+/g, " ");
-
-function fmtTime(ms) {
-  const s = Math.floor(ms / 1000);
-  const h = String(Math.floor(s / 3600)).padStart(2, "0");
-  const m = String(Math.floor((s % 3600) / 60)).padStart(2, "0");
-  const sec = String(s % 60).padStart(2, "0");
-  return `${h}:${m}:${sec}`;
+function isTrue(v) {
+  return [true, "TRUE", "WAHR", 1, "1", "true", "wahr"].indexOf(v) !== -1;
 }
 
-function showToast(msg, duration = 3500) {
-  const el = document.getElementById("toast");
+function fmtTime(ms) {
+  var s   = Math.floor(ms / 1000);
+  var h   = String(Math.floor(s / 3600)).padStart(2, "0");
+  var m   = String(Math.floor((s % 3600) / 60)).padStart(2, "0");
+  var sec = String(s % 60).padStart(2, "0");
+  return h + ":" + m + ":" + sec;
+}
+
+function showToast(msg, duration) {
+  duration = duration || 3500;
+  var el = document.getElementById("toast");
   el.textContent = msg;
   el.classList.add("show");
-  setTimeout(() => el.classList.remove("show"), duration);
+  setTimeout(function() { el.classList.remove("show"); }, duration);
 }
 
 function pulseEl(el) {
@@ -1135,16 +738,28 @@ function pulseEl(el) {
   el.classList.add("stat-pulse");
 }
 
+function escHtml(str) {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function escAttr(str) {
+  return str.replace(/'/g, "\\'").replace(/"/g, '\\"');
+}
+
 // ═══════════════════════════════════════════════════════════
 // TIMER
 // ═══════════════════════════════════════════════════════════
 
 function updateTimerDisplay() {
-  const timerChip = document.getElementById("timer-chip");
+  var timerChip = document.getElementById("timer-chip");
   if (!timerChip) return;
   if (!timerVisible) { timerChip.style.display = "none"; return; }
   timerChip.style.display = "flex";
-  const elapsed = timerStartTs > 0
+  var elapsed = timerStartTs > 0
     ? timerElapsed + (Date.now() - timerStartTs)
     : timerElapsed;
   document.getElementById("val-timer").textContent = fmtTime(elapsed);
@@ -1160,7 +775,7 @@ function startTimerTick() {
 // ═══════════════════════════════════════════════════════════
 
 function toggleFlag(flag) {
-  if (flag === 'base') {
+  if (flag === "base") {
     showBase = !showBase;
     document.getElementById("btn-basegame").classList.toggle("active", showBase);
   } else {
@@ -1171,7 +786,7 @@ function toggleFlag(flag) {
 }
 
 function setAllCollapsed(val) {
-  Object.keys(currentAreas).forEach(k => localCollapsed[k] = val);
+  Object.keys(currentAreas).forEach(function(k) { localCollapsed[k] = val; });
   renderAreas(currentAreas);
 }
 
@@ -1179,45 +794,32 @@ function setAllCollapsed(val) {
 // CLIP HELPERS
 // ═══════════════════════════════════════════════════════════
 
-/**
- * Extract Twitch clip slug from a URL.
- * Handles:
- *   https://clips.twitch.tv/SLUG
- *   https://www.twitch.tv/channel/clip/SLUG
- *   https://www.twitch.tv/videos/XXXXX  (VOD – embed as VOD)
- *   bare slug (no http)
- */
 function parseTwitchClip(url) {
   if (!url || typeof url !== "string") return null;
   url = url.trim();
 
-  // clips.twitch.tv/SLUG
-  let m = url.match(/clips\.twitch\.tv\/([A-Za-z0-9_\-]+)/);
+  var m = url.match(/clips\.twitch\.tv\/([A-Za-z0-9_\-]+)/);
   if (m) return { type: "clip", slug: m[1], original: url };
 
-  // twitch.tv/*/clip/SLUG
   m = url.match(/twitch\.tv\/[^/]+\/clip\/([A-Za-z0-9_\-]+)/);
   if (m) return { type: "clip", slug: m[1], original: url };
 
-  // twitch.tv/videos/ID
   m = url.match(/twitch\.tv\/videos\/(\d+)/);
   if (m) return { type: "vod", id: m[1], original: url };
 
-  // bare slug (no slashes, no protocol)
   if (!url.includes("/") && url.length > 4) return { type: "clip", slug: url, original: url };
 
-  // fallback: just a link
   return { type: "link", original: url };
 }
 
 function buildEmbedUrl(parsed) {
-  const parent = window.location.hostname || "localhost";
+  var parent = window.location.hostname || "localhost";
   if (!parsed) return null;
   if (parsed.type === "clip") {
-    return `https://clips.twitch.tv/embed?clip=${parsed.slug}&parent=${parent}&autoplay=false`;
+    return "https://clips.twitch.tv/embed?clip=" + parsed.slug + "&parent=" + parent + "&autoplay=false";
   }
   if (parsed.type === "vod") {
-    return `https://player.twitch.tv/?video=${parsed.id}&parent=${parent}&autoplay=false`;
+    return "https://player.twitch.tv/?video=" + parsed.id + "&parent=" + parent + "&autoplay=false";
   }
   return null;
 }
@@ -1239,169 +841,177 @@ function closeClipModal() {
   document.body.style.overflow = "";
 }
 
-// Close on Escape
-document.addEventListener("keydown", e => {
+document.addEventListener("keydown", function(e) {
   if (e.key === "Escape") closeClipModal();
 });
 
 function renderClipModal() {
-  const tabsEl  = document.getElementById("clip-tabs");
-  const bodyEl  = document.getElementById("clip-body");
-  const loadEl  = document.getElementById("clip-modal-loading");
+  var tabsEl = document.getElementById("clip-tabs");
+  var bodyEl = document.getElementById("clip-body");
+  var loadEl = document.getElementById("clip-modal-loading");
 
   if (clipsData.length === 0) {
-    loadEl.style.display = "flex";
+    if (loadEl) loadEl.style.display = "flex";
     tabsEl.innerHTML = "";
-    bodyEl.innerHTML = `
-      <div class="clip-empty">
-        <span class="clip-empty-icon">🎬</span>
-        <span>Noch keine Clips vorhanden.</span>
-      </div>`;
+    bodyEl.innerHTML = '<div class="clip-empty"><span class="clip-empty-icon">🎬</span><span>Noch keine Clips vorhanden.</span></div>';
     return;
   }
 
-  loadEl.style.display = "none";
+  if (loadEl) loadEl.style.display = "none";
 
-  // Group by category
-  const categories = {};
-  clipsData.forEach(c => {
-    const cat = c.category || "Sonstige";
+  // Gruppieren nach Kategorie
+  var categories = {};
+  clipsData.forEach(function(c) {
+    var cat = c.category || "Sonstige";
     if (!categories[cat]) categories[cat] = [];
     categories[cat].push(c);
   });
 
-  const catNames = Object.keys(categories);
+  var catNames = Object.keys(categories);
   if (!activeCategory || !categories[activeCategory]) {
     activeCategory = catNames[0];
   }
 
-  // Build tabs
-  tabsEl.innerHTML = catNames.map(cat => `
-    <button
-      class="clip-tab${cat === activeCategory ? " active" : ""}"
-      onclick="switchClipTab('${escAttr(cat)}')"
-    >
-      ${escHtml(cat)}
-      <span class="tab-count">${categories[cat].length}</span>
-    </button>
-  `).join("");
+  tabsEl.innerHTML = catNames.map(function(cat) {
+    return '<button class="clip-tab' + (cat === activeCategory ? " active" : "") + '"'
+      + ' onclick="switchClipTab(\'' + escAttr(cat) + '\')">'
+      + escHtml(cat)
+      + '<span class="tab-count">' + categories[cat].length + '</span>'
+      + '</button>';
+  }).join("");
 
-  // Build sections
-  let sectionsHtml = catNames.map(cat => `
-    <div class="clip-category-section${cat === activeCategory ? " active" : ""}" data-category="${escAttr(cat)}">
-      <div class="clip-grid">
-        ${categories[cat].map((c, i) => renderClipCard(c, i)).join("")}
-      </div>
-    </div>
-  `).join("");
-
-  bodyEl.innerHTML = sectionsHtml;
+  bodyEl.innerHTML = catNames.map(function(cat) {
+    return '<div class="clip-category-section' + (cat === activeCategory ? " active" : "") + '" data-category="' + escAttr(cat) + '">'
+      + '<div class="clip-grid">'
+      + categories[cat].map(function(c, i) { return renderClipCard(c, i); }).join("")
+      + '</div></div>';
+  }).join("");
 }
 
 function switchClipTab(cat) {
   activeCategory = cat;
-
-  // Update tabs
-  document.querySelectorAll(".clip-tab").forEach(btn => {
-    btn.classList.toggle("active", btn.textContent.trim().startsWith(cat));
+  document.querySelectorAll(".clip-tab").forEach(function(btn) {
+    var label = btn.childNodes[0] ? btn.childNodes[0].textContent.trim() : "";
+    btn.classList.toggle("active", label === cat);
   });
-
-  // Update sections
-  document.querySelectorAll(".clip-category-section").forEach(sec => {
+  document.querySelectorAll(".clip-category-section").forEach(function(sec) {
     sec.classList.toggle("active", sec.dataset.category === cat);
   });
-
-  // Scroll body to top
   document.getElementById("clip-body").scrollTop = 0;
 }
 
 function renderClipCard(clip, index) {
-  const parsed   = parseTwitchClip(clip.url);
-  const embedUrl = buildEmbedUrl(parsed);
-  const linkUrl  = clip.url;
+  var parsed   = parseTwitchClip(clip.url);
+  var embedUrl = buildEmbedUrl(parsed);
+  var linkUrl  = clip.url;
+  var embedHtml;
 
-  let embedHtml;
   if (embedUrl) {
-    embedHtml = `
-      <div class="clip-embed-wrapper">
-        <iframe
-          src="${escAttr(embedUrl)}"
-          allowfullscreen
-          scrolling="no"
-          allow="autoplay; fullscreen"
-          title="Clip ${index + 1}"
-        ></iframe>
-      </div>
-    `;
+    embedHtml = '<div class="clip-embed-wrapper">'
+      + '<iframe src="' + escAttr(embedUrl) + '" allowfullscreen scrolling="no" allow="autoplay; fullscreen" title="Clip ' + (index + 1) + '"></iframe>'
+      + '</div>';
   } else {
-    embedHtml = `
-      <div class="clip-embed-wrapper">
-        <div class="clip-placeholder" onclick="window.open('${escAttr(linkUrl)}','_blank')">
-          <span class="clip-placeholder-icon">▶️</span>
-          <span class="clip-placeholder-text">Clip öffnen</span>
-        </div>
-      </div>
-    `;
+    embedHtml = '<div class="clip-embed-wrapper">'
+      + '<div class="clip-placeholder" onclick="window.open(\'' + escAttr(linkUrl) + '\',\'_blank\')">'
+      + '<span class="clip-placeholder-icon">▶️</span>'
+      + '<span class="clip-placeholder-text">Clip öffnen</span>'
+      + '</div></div>';
   }
 
-  return `
-    <div class="clip-card">
-      ${embedHtml}
-      <div class="clip-card-footer">
-        <span class="clip-number">Clip ${String(index + 1).padStart(2, "0")}</span>
-        <a href="${escAttr(linkUrl)}" target="_blank" rel="noopener" class="clip-open-link">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42L17.59 5H14V3zM5 5h6v2H7v10h10v-4h2v6H5V5z"/></svg>
-          Auf Twitch
-        </a>
-      </div>
-    </div>
-  `;
+  return '<div class="clip-card">'
+    + embedHtml
+    + '<div class="clip-card-footer">'
+    + '<span class="clip-number">Clip ' + String(index + 1).padStart(2, "0") + '</span>'
+    + '<a href="' + escAttr(linkUrl) + '" target="_blank" rel="noopener" class="clip-open-link">'
+    + '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42L17.59 5H14V3zM5 5h6v2H7v10h10v-4h2v6H5V5z"/></svg>'
+    + 'Auf Twitch</a>'
+    + '</div></div>';
 }
 
 // ═══════════════════════════════════════════════════════════
-// MAIN DATA FETCH
+// CLIPS LADEN (separate Abfrage – Col22=V, Col23=W)
 // ═══════════════════════════════════════════════════════════
 
-let currentAreas = {};
+function loadClips() {
+  fetch(CLIPS_URL + "&nocache=" + Date.now())
+    .then(function(res) { return res.text(); })
+    .then(function(text) {
+      var json = JSON.parse(text.substring(47).slice(0, -2));
+      var rows = json.table.rows;
+      var newClips = [];
 
-async function loadData() {
-  setRefreshState("loading");
-  try {
-    const res  = await fetch(SHEET_URL + "&t=" + Date.now());
-    const text = await res.text();
-    const json = JSON.parse(text.substring(47).slice(0, -2));
-    const rows = json.table.rows;
-    processData(rows);
-    setRefreshState("ok");
-    document.getElementById("loading-overlay").style.display = "none";
-    document.getElementById("areas-grid").style.display = "grid";
-  } catch (err) {
-    console.error("Fehler beim Laden:", err);
-    setRefreshState("error");
-  }
+      rows.forEach(function(row) {
+        if (!row || !row.c) return;
+        // c[0] = Spalte V (URL), c[1] = Spalte W (Kategorie)
+        var url      = row.c[0] && row.c[0].v ? String(row.c[0].v).trim() : "";
+        var category = row.c[1] && row.c[1].v ? String(row.c[1].v).trim() : "Sonstige";
+        if (url) newClips.push({ url: url, category: category });
+      });
+
+      console.log("[Clips] Geladen:", newClips.length, newClips);
+
+      var clipsChanged = JSON.stringify(newClips) !== JSON.stringify(clipsData);
+      if (clipsChanged) {
+        clipsData = newClips;
+
+        var countEl = document.getElementById("btn-clips-count");
+        if (countEl) countEl.textContent = clipsData.length > 0 ? "(" + clipsData.length + ")" : "";
+
+        var modalCount = document.getElementById("modal-clip-count");
+        if (modalCount) modalCount.textContent = clipsData.length;
+
+        if (document.getElementById("clip-modal").classList.contains("open")) {
+          renderClipModal();
+        }
+      }
+    })
+    .catch(function(err) {
+      console.error("[Clips] Fehler:", err);
+    });
 }
+
+// ═══════════════════════════════════════════════════════════
+// HAUPT-DATEN LADEN
+// ═══════════════════════════════════════════════════════════
 
 function setRefreshState(state) {
-  const dot  = document.getElementById("refresh-dot");
-  const text = document.getElementById("refresh-text");
+  var dot  = document.getElementById("refresh-dot");
+  var text = document.getElementById("refresh-text");
   if (state === "loading") {
-    dot.className  = "refresh-dot loading";
+    dot.className = "refresh-dot loading";
     text.textContent = "Lade…";
   } else if (state === "ok") {
-    dot.className  = "refresh-dot";
-    const now = new Date();
-    text.textContent = `Zuletzt: ${now.toLocaleTimeString("de-DE", {hour:"2-digit",minute:"2-digit",second:"2-digit"})}`;
+    dot.className = "refresh-dot";
+    var now = new Date();
+    text.textContent = "Zuletzt: " + now.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
   } else {
     dot.style.background = "#c44a3a";
     text.textContent = "Verbindungsfehler";
   }
 }
 
-function processData(rows) {
+function loadData() {
+  setRefreshState("loading");
+  fetch(SHEET_URL + "&nocache=" + Date.now())
+    .then(function(res) { return res.text(); })
+    .then(function(text) {
+      var json = JSON.parse(text.substring(47).slice(0, -2));
+      var rows = json.table.rows;
+      processData(rows);
+      setRefreshState("ok");
+      document.getElementById("loading-overlay").style.display = "none";
+      document.getElementById("areas-grid").style.display = "grid";
+    })
+    .catch(function(err) {
+      console.error("[Main] Fehler beim Laden:", err);
+      setRefreshState("error");
+    });
+}
 
-  // ── FLAGS ──
-  const baseGameFlag = isTrue(rows[0]?.c[15]?.v);
-  const dlcFlag      = isTrue(rows[1]?.c[15]?.v);
+function processData(rows) {
+  // FLAGS
+  var baseGameFlag = isTrue(rows[0] && rows[0].c[15] ? rows[0].c[15].v : false);
+  var dlcFlag      = isTrue(rows[1] && rows[1].c[15] ? rows[1].c[15].v : false);
 
   if (prevDeaths === null) {
     showBase = baseGameFlag;
@@ -1410,24 +1020,23 @@ function processData(rows) {
     document.getElementById("btn-dlc").classList.toggle("active", showDLC);
   }
 
-  // ── TIMER ──
-  timerStartTs  = Number(rows[0]?.c[21]?.v) || 0;
-  timerElapsed  = Number(rows[2]?.c[21]?.v) || 0;
-  timerVisible  = isTrue(rows[0]?.c[12]?.v);
+  // TIMER
+  timerStartTs = Number(rows[0] && rows[0].c[21] ? rows[0].c[21].v : 0) || 0;
+  timerElapsed = Number(rows[2] && rows[2].c[21] ? rows[2].c[21].v : 0) || 0;
+  timerVisible = isTrue(rows[0] && rows[0].c[12] ? rows[0].c[12].v : false);
   updateTimerDisplay();
 
-  // ── DEATHS ──
-  const baseDeaths = Number(rows[1]?.c[9]?.v)   || 0;
-  const dlcDeaths  = Number(rows[168]?.c[9]?.v) || 0;
-
-  let globalDeaths = 0;
-  if (showBase && showDLC) globalDeaths = baseDeaths + dlcDeaths;
-  else if (showBase)        globalDeaths = baseDeaths;
-  else if (showDLC)         globalDeaths = dlcDeaths;
+  // DEATHS
+  var baseDeaths = Number(rows[1] && rows[1].c[9] ? rows[1].c[9].v : 0) || 0;
+  var dlcDeaths  = Number(rows[168] && rows[168].c[9] ? rows[168].c[9].v : 0) || 0;
+  var globalDeaths = 0;
+  if (showBase && showDLC)  globalDeaths = baseDeaths + dlcDeaths;
+  else if (showBase)         globalDeaths = baseDeaths;
+  else if (showDLC)          globalDeaths = dlcDeaths;
 
   if (prevDeaths !== null && globalDeaths !== prevDeaths) {
     pulseEl(document.getElementById("stat-deaths"));
-    const el = document.getElementById("stat-deaths");
+    var el = document.getElementById("stat-deaths");
     el.classList.remove("death-flash");
     void el.offsetWidth;
     el.classList.add("death-flash");
@@ -1435,87 +1044,66 @@ function processData(rows) {
   document.getElementById("val-deaths").textContent = globalDeaths.toLocaleString("de-DE");
   prevDeaths = globalDeaths;
 
-  // ── CLIPS (V10:W45 → rows[9] bis rows[44], c[21]=V, c[22]=W) ──
-  const newClips = [];
-  for (let i = 9; i <= 44; i++) {
-    const row = rows[i];
-    if (!row) continue;
-    const url      = row.c[21]?.v?.toString().trim();
-    const category = row.c[22]?.v?.toString().trim() || "Sonstige";
-    if (url) newClips.push({ url, category });
-  }
-
-  // Update clips only if changed (avoid re-rendering modal while open)
-  const clipsChanged = JSON.stringify(newClips) !== JSON.stringify(clipsData);
-  if (clipsChanged) {
-    clipsData = newClips;
-
-    // Update button count
-    const countEl = document.getElementById("btn-clips-count");
-    if (countEl) countEl.textContent = clipsData.length > 0 ? `(${clipsData.length})` : "";
-
-    // Update modal count badge
-    const modalCount = document.getElementById("modal-clip-count");
-    if (modalCount) modalCount.textContent = clipsData.length;
-
-    // Re-render modal if it is currently open
-    if (document.getElementById("clip-modal").classList.contains("open")) {
-      renderClipModal();
+  // BOSS ROWS
+  var separatorIndex = -1;
+  for (var si = 0; si < rows.length; si++) {
+    if (rows[si] && rows[si].c[1] && rows[si].c[1].v && rows[si].c[1].v.trim() === "SHADOW OF THE ERDTREE DLC") {
+      separatorIndex = si;
+      break;
     }
   }
 
-  // ── BOSS ROWS ──
-  const separatorIndex = rows.findIndex(r => r.c[1]?.v?.trim() === "SHADOW OF THE ERDTREE DLC");
-  const areas = {};
+  var areas = {};
 
-  rows.forEach((r, index) => {
-    const area = r.c[0]?.v?.trim();
-    const boss = r.c[1]?.v?.trim();
+  rows.forEach(function(r, index) {
+    if (!r || !r.c) return;
+    var area = r.c[0] && r.c[0].v ? r.c[0].v.trim() : "";
+    var boss = r.c[1] && r.c[1].v ? r.c[1].v.trim() : "";
     if (!area || !boss) return;
     if (area === "Gebiet" && boss === "Boss") return;
     if (boss === "SHADOW OF THE ERDTREE DLC") return;
 
-    const isBaseGame = separatorIndex === -1 || index < separatorIndex;
-    const isDLC      = separatorIndex !== -1  && index > separatorIndex;
+    var isBaseGame = separatorIndex === -1 || index < separatorIndex;
+    var isDLC      = separatorIndex !== -1  && index > separatorIndex;
     if (isBaseGame && !showBase) return;
     if (isDLC      && !showDLC)  return;
 
-    const done    = isTrue(r.c[2]?.v);
-    const pinned  = isTrue(r.c[4]?.v);
-    const deaths  = Number(r.c[3]?.v) || 0;
-    const sheetCollapsed = isTrue(r.c[5]?.v);
-    const key     = area + "|" + boss;
+    var done    = isTrue(r.c[2] ? r.c[2].v : false);
+    var pinned  = isTrue(r.c[4] ? r.c[4].v : false);
+    var deaths  = Number(r.c[3] ? r.c[3].v : 0) || 0;
+    var sheetCollapsed = isTrue(r.c[5] ? r.c[5].v : false);
+    var key = area + "|" + boss;
 
     if (!(key in previousBossStates)) {
       previousBossStates[key] = done;
     } else if (!previousBossStates[key] && done) {
-      if (MAIN_BOSSES.has(boss)) showToast(`✔ ${boss} besiegt!`);
+      if (MAIN_BOSSES.has(boss)) showToast("✔ " + boss + " besiegt!");
     }
     previousBossStates[key] = done;
 
     if (!areas[area]) {
-      const collapsed = (area in localCollapsed) ? localCollapsed[area] : sheetCollapsed;
-      areas[area] = { total: 0, done: 0, bosses: [], collapsed, isDLC: isDLC };
+      var collapsed = (area in localCollapsed) ? localCollapsed[area] : sheetCollapsed;
+      areas[area] = { total: 0, done: 0, bosses: [], collapsed: collapsed, isDLC: isDLC };
     }
 
     areas[area].total++;
     if (done) areas[area].done++;
-    areas[area].bosses.push({ boss, done, deaths, pinned });
+    areas[area].bosses.push({ boss: boss, done: done, deaths: deaths, pinned: pinned });
   });
 
   currentAreas = areas;
 
-  // ── GLOBAL PROGRESS ──
-  let totalBosses = 0, doneBosses = 0;
-  Object.values(areas).forEach(a => { totalBosses += a.total; doneBosses += a.done; });
+  // GLOBAL PROGRESS
+  var totalBosses = 0, doneBosses = 0;
+  Object.values(areas).forEach(function(a) { totalBosses += a.total; doneBosses += a.done; });
 
   if (prevDoneBosses !== null && doneBosses !== prevDoneBosses) {
     pulseEl(document.getElementById("stat-bosses"));
     pulseEl(document.getElementById("stat-percent"));
   }
-  document.getElementById("val-bosses").textContent = `${doneBosses} / ${totalBosses}`;
-  const pct = totalBosses > 0 ? Math.round((doneBosses / totalBosses) * 100) : 0;
-  document.getElementById("val-percent").textContent = `${pct}%`;
+  document.getElementById("val-bosses").textContent = doneBosses + " / " + totalBosses;
+  var pct = totalBosses > 0 ? Math.round((doneBosses / totalBosses) * 100) : 0;
+  document.getElementById("val-percent").textContent = pct + "%";
   prevDoneBosses = doneBosses;
 
   renderAreas(areas);
@@ -1530,43 +1118,43 @@ function renderFromCache() {
 // ═══════════════════════════════════════════════════════════
 
 function renderAreas(areas) {
-  const grid = document.getElementById("areas-grid");
+  var grid = document.getElementById("areas-grid");
 
   // Pinned
-  const allPinned = [];
-  Object.values(areas).forEach(a => a.bosses.forEach(b => { if (b.pinned) allPinned.push(b); }));
-  const pinnedSection = document.getElementById("pinned-section");
-  const pinnedList    = document.getElementById("pinned-list");
+  var allPinned = [];
+  Object.values(areas).forEach(function(a) {
+    a.bosses.forEach(function(b) { if (b.pinned) allPinned.push(b); });
+  });
+  var pinnedSection = document.getElementById("pinned-section");
+  var pinnedList    = document.getElementById("pinned-list");
   if (allPinned.length > 0) {
     pinnedSection.style.display = "block";
     pinnedList.innerHTML = "";
-    allPinned.forEach(b => {
-      const isMain = MAIN_BOSSES.has(b.boss);
-      const card = document.createElement("div");
+    allPinned.forEach(function(b) {
+      var isMain = MAIN_BOSSES.has(b.boss);
+      var card = document.createElement("div");
       card.className = "pinned-card" + (b.done ? " done" : "");
-      card.innerHTML = `
-        <span class="pinned-deaths">📌 ${b.deaths > 0 ? b.deaths : "–"}</span>
-        <span class="pinned-name${isMain ? " main-boss" : ""}">${escHtml(b.boss)}</span>
-      `;
+      card.innerHTML = '<span class="pinned-deaths">📌 ' + (b.deaths > 0 ? b.deaths : "–") + '</span>'
+        + '<span class="pinned-name' + (isMain ? " main-boss" : "") + '">' + escHtml(b.boss) + '</span>';
       pinnedList.appendChild(card);
     });
   } else {
     pinnedSection.style.display = "none";
   }
 
-  const existingCards = {};
-  grid.querySelectorAll(".area-card[data-area]").forEach(el => {
+  var existingCards = {};
+  grid.querySelectorAll(".area-card[data-area]").forEach(function(el) {
     existingCards[el.dataset.area] = el;
   });
 
-  const newKeys = Object.keys(areas);
-  Object.keys(existingCards).forEach(k => {
+  var newKeys = Object.keys(areas);
+  Object.keys(existingCards).forEach(function(k) {
     if (!areas[k]) existingCards[k].remove();
   });
 
-  newKeys.forEach((areaName, idx) => {
-    const data = areas[areaName];
-    let card = existingCards[areaName];
+  newKeys.forEach(function(areaName, idx) {
+    var data = areas[areaName];
+    var card = existingCards[areaName];
 
     if (!card) {
       card = document.createElement("div");
@@ -1575,32 +1163,29 @@ function renderAreas(areas) {
     }
 
     if (!(areaName in localCollapsed)) localCollapsed[areaName] = data.collapsed;
-    const collapsed = localCollapsed[areaName];
+    var collapsed = localCollapsed[areaName];
     card.classList.toggle("collapsed", collapsed);
 
-    const pct = data.total > 0 ? (data.done / data.total) * 100 : 0;
-    const complete = data.done === data.total && data.total > 0;
+    var pct      = data.total > 0 ? (data.done / data.total) * 100 : 0;
+    var complete = data.done === data.total && data.total > 0;
+    var dlcLabel = data.isDLC ? ' <span style="font-size:11px;color:var(--gold-dim);font-family:\'Crimson Pro\',serif;font-style:italic;">DLC</span>' : "";
 
-    card.innerHTML = `
-      <div class="area-header" onclick="toggleArea('${escAttr(areaName)}')">
-        <div class="area-header-left">
-          <span class="area-toggle-icon">▼</span>
-          <span class="area-name">${escHtml(areaName)}${data.isDLC ? ' <span style="font-size:11px;color:var(--gold-dim);font-family:Crimson Pro,serif;font-style:italic;">DLC</span>' : ''}</span>
-        </div>
-        <div class="area-progress-wrap">
-          <span class="area-fraction">${data.done}/${data.total}</span>
-          <div class="area-progress-bar">
-            <div class="area-progress-fill${complete ? " complete" : ""}" style="width:${pct}%"></div>
-          </div>
-        </div>
-      </div>
-      <div class="boss-list">
-        ${data.bosses.map(b => renderBossRow(b)).join("")}
-      </div>
-    `;
+    card.innerHTML = '<div class="area-header" onclick="toggleArea(\'' + escAttr(areaName) + '\')">'
+      + '<div class="area-header-left">'
+      + '<span class="area-toggle-icon">▼</span>'
+      + '<span class="area-name">' + escHtml(areaName) + dlcLabel + '</span>'
+      + '</div>'
+      + '<div class="area-progress-wrap">'
+      + '<span class="area-fraction">' + data.done + '/' + data.total + '</span>'
+      + '<div class="area-progress-bar">'
+      + '<div class="area-progress-fill' + (complete ? " complete" : "") + '" style="width:' + pct + '%"></div>'
+      + '</div></div></div>'
+      + '<div class="boss-list">'
+      + data.bosses.map(function(b) { return renderBossRow(b); }).join("")
+      + '</div>';
 
-    const children = Array.from(grid.children);
-    const currentIndex = children.indexOf(card);
+    var children     = Array.from(grid.children);
+    var currentIndex = children.indexOf(card);
     if (currentIndex !== idx) {
       if (idx >= grid.children.length) {
         grid.appendChild(card);
@@ -1612,37 +1197,19 @@ function renderAreas(areas) {
 }
 
 function renderBossRow(b) {
-  const isMain = MAIN_BOSSES.has(b.boss);
-  const deathClass = b.deaths === 0 ? " boss-deaths-zero" : "";
-  return `
-    <div class="boss-row${b.done ? " done" : ""}">
-      <span class="boss-deaths${deathClass}">${b.deaths > 0 ? "†" + b.deaths : "†–"}</span>
-      <span class="boss-name${isMain ? " main" : ""}">${escHtml(b.boss)}</span>
-      <span class="boss-check">✓</span>
-    </div>
-  `;
+  var isMain      = MAIN_BOSSES.has(b.boss);
+  var deathClass  = b.deaths === 0 ? " boss-deaths-zero" : "";
+  return '<div class="boss-row' + (b.done ? " done" : "") + '">'
+    + '<span class="boss-deaths' + deathClass + '">' + (b.deaths > 0 ? "†" + b.deaths : "†–") + '</span>'
+    + '<span class="boss-name' + (isMain ? " main" : "") + '">' + escHtml(b.boss) + '</span>'
+    + '<span class="boss-check">✓</span>'
+    + '</div>';
 }
 
 function toggleArea(areaName) {
   localCollapsed[areaName] = !localCollapsed[areaName];
-  const card = document.querySelector(`.area-card[data-area="${CSS.escape(areaName)}"]`);
+  var card = document.querySelector('.area-card[data-area="' + CSS.escape(areaName) + '"]');
   if (card) card.classList.toggle("collapsed", localCollapsed[areaName]);
-}
-
-// ═══════════════════════════════════════════════════════════
-// ESCAPE HELPERS
-// ═══════════════════════════════════════════════════════════
-
-function escHtml(str) {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
-
-function escAttr(str) {
-  return str.replace(/'/g, "\\'").replace(/"/g, '\\"');
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1650,7 +1217,9 @@ function escAttr(str) {
 // ═══════════════════════════════════════════════════════════
 
 loadData();
-setInterval(loadData, 5000);
+loadClips();
+setInterval(loadData,  5000);
+setInterval(loadClips, 15000);
 startTimerTick();
 </script>
 </body>
