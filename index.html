@@ -656,8 +656,9 @@ const SHEET_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID + "
 // Separate Abfrage NUR für Clips – Spalten V (Col22) und W (Col23), Zeilen 10–45 (offset 9, limit 36)
 // Durch die separate select-Abfrage gibt gviz immer c[0]=V und c[1]=W zurück,
 // unabhängig davon wie viele andere Spalten belegt sind.
+// range=V10:W45 fetcht direkt nur diese Zellen – kein Col22-Problem, c[0]=URL, c[1]=Kategorie
 const CLIPS_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
-  + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&tq=select%20Col22%2CCol23%20where%20Col22%20is%20not%20null";
+  + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&range=V10:W45";
 
 const MAIN_BOSSES = new Set([
   "Margit, das Grausame Mal",
