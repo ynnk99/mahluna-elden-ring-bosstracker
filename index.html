@@ -211,9 +211,17 @@ body::before {
 .divider { width: 1px; height: 28px; background: var(--border); flex-shrink: 0; }
 
 .refresh-indicator {
-  display: flex; align-items: center; gap: 6px;
-  font-family: 'Crimson Pro', serif; font-style: italic; font-size: 13px;
-  color: var(--parchment-dim); margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: flex-end;        /* rechtsbündig */
+  margin-top: -8px;                 /* nah an die Controls-Bar */
+  margin-bottom: 8px;
+  padding-right: 4px;
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--parchment-dim);
 }
 
 .refresh-dot {
@@ -874,10 +882,11 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
       🎬 Clip-Sammlung
       <span id="btn-clips-count" style="font-family:'Crimson Pro',serif;font-size:12px;opacity:0.6;"></span>
     </button>
-    <div class="refresh-indicator" id="refresh-indicator">
-      <span class="refresh-dot" id="refresh-dot"></span>
-      <span id="refresh-text">Verbunden</span>
-    </div>
+  </div>
+
+  <div class="refresh-indicator" id="refresh-indicator">
+  <span class="refresh-dot" id="refresh-dot"></span>
+  <span id="refresh-text">Verbunden</span>
   </div>
 
   <!-- SEARCH BAR -->
