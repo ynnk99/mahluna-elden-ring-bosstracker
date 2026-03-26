@@ -1032,6 +1032,8 @@ var currentAreas   = {};
 // Search state
 var searchQuery = "";
 
+var prevRankingSnapshot = "";
+
 // ═══════════════════════════════════════════════════════════
 // UTILS
 // ═══════════════════════════════════════════════════════════
@@ -1587,8 +1589,10 @@ function processData(rows) {
   document.getElementById("val-percent").textContent = pct + "%";
   prevDoneBosses = doneBosses;
 
-  // RANKING + AVG
-  renderRanking(allBosses);
+  // RANKING + AVG – nur neu rendern wenn sich Daten geändert haben
+  var rankingSnapshot = allBosses.map(function(b) {
+    return b.boss + ":" + b.deaths;
+  }).join("|");
 
   renderAreas(areas);
 }
