@@ -1239,8 +1239,10 @@ function renderRanking(allBosses) {
   // Subtitle
   var subtitle = document.getElementById("ranking-subtitle");
   if (subtitle) {
+    var doneBossCount = allBosses.filter(function(b) { return b.done; }).length;
+    
     subtitle.textContent = top.length > 0
-      ? "— Top " + top.length + " von " + allBosses.length + " Bossen"
+      ? "— Top " + top.length + " von " + doneBossCount + " erledigten Bossen"
       : "— noch keine Tode verzeichnet";
   }
 
