@@ -141,7 +141,6 @@ body::before {
 .stat-chip.deaths-chip { border-color: rgba(180, 60, 50, 0.4); color: var(--gold); }
 .stat-chip .value { font-weight: 700; font-size: 17px; }
 
-/* avg deaths chip – subtle orange tint */
 .stat-chip.avg-chip { border-color: rgba(201,120,50,0.35); }
 
 #timer-chip { display: none; }
@@ -214,8 +213,8 @@ body::before {
   display: flex;
   align-items: center;
   gap: 6px;
-  justify-content: flex-end;        /* rechtsbündig */
-  margin-top: -8px;                 /* nah an die Controls-Bar */
+  justify-content: flex-end;
+  margin-top: -8px;
   margin-bottom: 8px;
   padding-right: 4px;
   font-family: 'Crimson Pro', serif;
@@ -238,10 +237,6 @@ body::before {
 }
 
 @keyframes pulse-gold { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
-
-/* ══════════════════════════════════════════
-   SEARCH BAR
-══════════════════════════════════════════ */
 
 .search-bar {
   display: flex;
@@ -313,7 +308,6 @@ body::before {
 }
 .search-result-count.visible { opacity: 1; }
 
-/* Search highlight in boss names */
 .boss-name mark {
   background: transparent;
   color: var(--gold-light);
@@ -323,20 +317,13 @@ body::before {
   text-underline-offset: 2px;
 }
 
-/* Search mode – hide non-matching areas */
 .area-card.search-hidden { display: none; }
 
-/* In search mode force-expand all areas */
 body.searching .area-card .boss-list { max-height: 2000px !important; }
 body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none; }
 
-/* Non-matching boss rows */
 .boss-row.search-nomatch { display: none; }
 
-
-/* ══════════════════════════════════════════
-   RANKING PANEL
-══════════════════════════════════════════ */
 
 .ranking-panel {
   background: var(--bg-card);
@@ -509,10 +496,6 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
   opacity: 0.5;
 }
 
-
-/* ══════════════════════════════════════════
-   existing styles (unchanged)
-══════════════════════════════════════════ */
 
 #pinned-section { display: none; margin-bottom: 30px; }
 
@@ -783,7 +766,32 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 .clip-placeholder-icon { font-size: 38px; line-height: 1; opacity: 0.7; }
 .clip-placeholder-text { font-family: 'Crimson Pro', serif; font-size: 13px; color: var(--parchment-dim); letter-spacing: 0.04em; }
 
-.clip-card-footer { padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+/* ── CLIP FOOTER (neu: mit Titel) ── */
+.clip-card-footer {
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.clip-card-footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.clip-title {
+  font-family: 'Crimson Pro', serif;
+  font-size: 14px;
+  color: var(--parchment);
+  line-height: 1.35;
+  /* allow wrapping so long titles are fully readable */
+  word-break: break-word;
+}
+
+.clip-title:empty { display: none; }
+
 .clip-number { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 0.08em; color: rgba(145,70,255,0.5); }
 
 .clip-open-link {
@@ -791,6 +799,7 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
   background: rgba(145,70,255,0.1); border: 1px solid rgba(145,70,255,0.25);
   border-radius: 4px; color: #b89cff; font-family: 'Crimson Pro', serif;
   font-size: 13px; text-decoration: none; transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 .clip-open-link:hover { background: rgba(145,70,255,0.2); border-color: rgba(145,70,255,0.5); color: #c9b5ff; }
 
@@ -975,10 +984,10 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 const SPREADSHEET_ID = "1r9BzZJYFrk4rQLlMn4ZPBBUuc8u_peqwThTi1UTCQcE";
 
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json";
+// Range V:X  →  V=URL, W=Kategorie, X=Titel
 const CLIPS_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
   + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&range=V10:X100";
 
-// Anzahl Einträge im Ranking
 const RANKING_TOP_N = 10;
 
 const MAIN_BOSSES = new Set([
@@ -1029,7 +1038,6 @@ var clipsData      = [];
 var activeCategory = null;
 var currentAreas   = {};
 
-// Search state
 var searchQuery = "";
 
 var prevRankingSnapshot = "";
@@ -1123,13 +1131,9 @@ function setAllCollapsed(val) {
 
 function onSearchInput(val) {
   searchQuery = val.trim().toLowerCase();
-
-  var clearBtn   = document.getElementById("search-clear");
-  var countEl    = document.getElementById("search-result-count");
-
+  var clearBtn = document.getElementById("search-clear");
   clearBtn.classList.toggle("visible", searchQuery.length > 0);
   document.body.classList.toggle("searching", searchQuery.length > 0);
-
   applySearch();
 }
 
@@ -1161,7 +1165,6 @@ function applySearch() {
   var totalMatches = 0;
 
   grid.querySelectorAll(".area-card[data-area]").forEach(function(card) {
-    var areaName   = card.dataset.area || "";
     var rows       = card.querySelectorAll(".boss-row[data-boss]");
     var areaMatches = 0;
 
@@ -1172,19 +1175,13 @@ function applySearch() {
 
       if (matches) {
         areaMatches++;
-        // Update highlighted name
         var nameEl = row.querySelector(".boss-name");
         if (nameEl) {
-          var isMain = nameEl.classList.contains("main");
-          nameEl.innerHTML = highlightMatch(bossName, query)
-            + (isMain ? "" : "");
-          // preserve mark inside spans
+          nameEl.innerHTML = highlightMatch(bossName, query);
         }
       } else {
-        // restore plain text
         var nameEl = row.querySelector(".boss-name");
-        if (nameEl && !nameEl.querySelector("mark")) {/* already plain */}
-        else if (nameEl) nameEl.innerHTML = escHtml(bossName);
+        if (nameEl) nameEl.innerHTML = escHtml(bossName);
       }
     });
 
@@ -1199,7 +1196,6 @@ function applySearch() {
   } else {
     countEl.classList.remove("visible");
     countEl.textContent = "";
-    // restore all highlights
     grid.querySelectorAll(".boss-row[data-boss]").forEach(function(row) {
       var nameEl  = row.querySelector(".boss-name");
       var bossName = row.dataset.boss || "";
@@ -1220,27 +1216,21 @@ function toggleRanking() {
 }
 
 function renderRanking(allBosses) {
-  // allBosses: [{boss, deaths, done, area}]
-  // Filter: nur Bosse mit ≥1 Tod
   var withDeaths = allBosses.filter(function(b) { return b.deaths > 0; });
   withDeaths.sort(function(a, b) { return b.deaths - a.deaths; });
   var top = withDeaths.slice(0, RANKING_TOP_N);
 
   var maxDeaths = top.length > 0 ? top[0].deaths : 1;
 
-  // Avg deaths (all bosses that have been attempted = deaths > 0)
-  var totalDeaths   = allBosses.reduce(function(s, b) { return s + b.deaths; }, 0);
+  var totalDeaths     = allBosses.reduce(function(s, b) { return s + b.deaths; }, 0);
   var bossesAttempted = allBosses.filter(function(b) { return b.deaths > 0; }).length;
   var avgDeaths = bossesAttempted > 0 ? (totalDeaths / bossesAttempted).toFixed(1) : "–";
 
-  // Update avg chip
   document.getElementById("val-avg").textContent = avgDeaths === "–" ? "–" : avgDeaths + " †";
 
-  // Subtitle
   var subtitle = document.getElementById("ranking-subtitle");
   if (subtitle) {
     var doneBossCount = allBosses.filter(function(b) { return b.done; }).length;
-    
     subtitle.textContent = top.length > 0
       ? "— Top " + top.length + " von " + doneBossCount + " erledigten Bossen"
       : "— noch keine Tode verzeichnet";
@@ -1402,18 +1392,25 @@ function renderClipCard(clip, index) {
       + '</div></div>';
   }
 
+  // Titel aus Spalte X – nur anzeigen wenn vorhanden
+  var titleHtml = clip.title
+    ? '<p class="clip-title">' + escHtml(clip.title) + '</p>'
+    : '';
+
   return '<div class="clip-card">'
     + embedHtml
     + '<div class="clip-card-footer">'
+    + titleHtml
+    + '<div class="clip-card-footer-row">'
     + '<span class="clip-number">Clip ' + String(index + 1).padStart(2, "0") + '</span>'
     + '<a href="' + escAttr(linkUrl) + '" target="_blank" rel="noopener" class="clip-open-link">'
     + '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42L17.59 5H14V3zM5 5h6v2H7v10h10v-4h2v6H5V5z"/></svg>'
     + 'Auf Twitch</a>'
-    + '</div></div>';
+    + '</div></div></div>';
 }
 
 // ═══════════════════════════════════════════════════════════
-// CLIPS LADEN
+// CLIPS LADEN  (V=URL, W=Kategorie, X=Titel)
 // ═══════════════════════════════════════════════════════════
 
 function loadClips() {
@@ -1428,7 +1425,9 @@ function loadClips() {
         if (!row || !row.c) return;
         var url      = row.c[0] && row.c[0].v ? String(row.c[0].v).trim() : "";
         var category = row.c[1] && row.c[1].v ? String(row.c[1].v).trim() : "Sonstige";
-        if (url) newClips.push({ url: url, category: category });
+        // Spalte X = Index 2
+        var title    = row.c[2] && row.c[2].v ? String(row.c[2].v).trim() : "";
+        if (url) newClips.push({ url: url, category: category, title: title });
       });
 
       var clipsChanged = JSON.stringify(newClips) !== JSON.stringify(clipsData);
@@ -1490,7 +1489,6 @@ function loadData() {
 }
 
 function processData(rows) {
-  // FLAGS
   var baseGameFlag = isTrue(rows[0] && rows[0].c[15] ? rows[0].c[15].v : false);
   var dlcFlag      = isTrue(rows[1] && rows[1].c[15] ? rows[1].c[15].v : false);
 
@@ -1501,13 +1499,11 @@ function processData(rows) {
     document.getElementById("btn-dlc").classList.toggle("active", showDLC);
   }
 
-  // TIMER
   timerStartTs = Number(rows[0] && rows[0].c[21] ? rows[0].c[21].v : 0) || 0;
   timerElapsed = Number(rows[2] && rows[2].c[21] ? rows[2].c[21].v : 0) || 0;
   timerVisible = isTrue(rows[0] && rows[0].c[12] ? rows[0].c[12].v : false);
   updateTimerDisplay();
 
-  // DEATHS
   var baseDeaths = Number(rows[1] && rows[1].c[9] ? rows[1].c[9].v : 0) || 0;
   var dlcDeaths  = Number(rows[168] && rows[168].c[9] ? rows[168].c[9].v : 0) || 0;
   var globalDeaths = 0;
@@ -1525,7 +1521,6 @@ function processData(rows) {
   document.getElementById("val-deaths").textContent = globalDeaths.toLocaleString("de-DE");
   prevDeaths = globalDeaths;
 
-  // BOSS ROWS
   var separatorIndex = -1;
   for (var si = 0; si < rows.length; si++) {
     if (rows[si] && rows[si].c[1] && rows[si].c[1].v && rows[si].c[1].v.trim() === "SHADOW OF THE ERDTREE DLC") {
@@ -1535,7 +1530,7 @@ function processData(rows) {
   }
 
   var areas    = {};
-  var allBosses = []; // for ranking
+  var allBosses = [];
 
   rows.forEach(function(r, index) {
     if (!r || !r.c) return;
@@ -1572,13 +1567,11 @@ function processData(rows) {
     if (done) areas[area].done++;
     areas[area].bosses.push({ boss: boss, done: done, deaths: deaths, pinned: pinned });
 
-    // Collect for ranking
     allBosses.push({ boss: boss, deaths: deaths, done: done, area: area });
   });
 
   currentAreas = areas;
 
-  // GLOBAL PROGRESS
   var totalBosses = 0, doneBosses = 0;
   Object.values(areas).forEach(function(a) { totalBosses += a.total; doneBosses += a.done; });
 
@@ -1591,11 +1584,11 @@ function processData(rows) {
   document.getElementById("val-percent").textContent = pct + "%";
   prevDoneBosses = doneBosses;
 
-  // RANKING + AVG – nur neu rendern wenn sich Daten geändert haben
   var rankingSnapshot = allBosses.map(function(b) {
     return b.boss + ":" + b.deaths;
   }).join("|");
 
+  renderRanking(allBosses);
   renderAreas(areas);
 }
 
@@ -1610,7 +1603,6 @@ function renderFromCache() {
 function renderAreas(areas) {
   var grid = document.getElementById("areas-grid");
 
-  // Pinned
   var allPinned = [];
   Object.values(areas).forEach(function(a) {
     a.bosses.forEach(function(b) { if (b.pinned) allPinned.push(b); });
@@ -1685,14 +1677,12 @@ function renderAreas(areas) {
     }
   });
 
-  // Re-apply active search after re-render
   if (searchQuery) applySearch();
 }
 
 function renderBossRow(b) {
   var isMain      = MAIN_BOSSES.has(b.boss);
   var deathClass  = b.deaths === 0 ? " boss-deaths-zero" : "";
-  // data-boss attribute used by search
   return '<div class="boss-row' + (b.done ? " done" : "") + '" data-boss="' + escAttr(b.boss) + '">'
     + '<span class="boss-deaths' + deathClass + '">' + (b.deaths > 0 ? "†" + b.deaths : "†–") + '</span>'
     + '<span class="boss-name' + (isMain ? " main" : "") + '">' + escHtml(b.boss) + '</span>'
