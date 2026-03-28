@@ -523,7 +523,7 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 .pinned-name.main-boss { color: var(--gold-light); font-weight: 600; }
 .pinned-deaths { font-family: 'Cinzel', serif; font-size: 13px; color: var(--gold); }
 
-.areas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+.areas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; align-items: start; }
 
 .area-card {
   background: var(--bg-card); border: 1px solid var(--border);
@@ -1693,7 +1693,18 @@ function renderBossRow(b) {
 function toggleArea(areaName) {
   localCollapsed[areaName] = !localCollapsed[areaName];
   var card = document.querySelector('.area-card[data-area="' + CSS.escape(areaName) + '"]');
-  if (card) card.classList.toggle("collapsed", localCollapsed[areaName]);
+  if (card) {
+    card.classList.toggle("collapsed", localCollapsed[areaName]);
+  }
+  reorderGrid();
+}
+
+function reorderGrid() {
+  var grid = document.getElementById("areas-grid");
+  var cards = Array.from(grid.querySelectorAll(".area-card"));
+  var open = cards.filter(function(c) { return !c.classList.contains("collapsed"); });
+  var closed = cards.filter(function(c) { return c.classList.contains("collapsed"); });
+  open.concat(closed).forEach(function(c) { grid.appendChild(c); });
 }
 
 // ═══════════════════════════════════════════════════════════
