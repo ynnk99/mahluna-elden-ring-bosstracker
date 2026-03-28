@@ -523,17 +523,12 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 .pinned-name.main-boss { color: var(--gold-light); font-weight: 600; }
 .pinned-deaths { font-family: 'Cinzel', serif; font-size: 13px; color: var(--gold); }
 
-.areas-grid {
-  columns: 3;
-  column-gap: 16px;
-  gap: 16px;
-}
+.areas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
 
 .area-card {
-  break-inside: avoid;
-  margin-bottom: 16px;
-  display: inline-block;
-  width: 100%;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .area-card:hover { border-color: rgba(201,164,74,0.4); box-shadow: 0 4px 30px rgba(0,0,0,0.4), 0 0 20px rgba(201,164,74,0.05); }
@@ -566,8 +561,8 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 
 .area-progress-fill.complete { background: linear-gradient(to right, #4a7c4a, #6ab86a); }
 
-.boss-list { overflow: hidden; }
-.area-card.collapsed .boss-list { display: none; }
+.boss-list { overflow: hidden; max-height: 2000px; transition: max-height 0.35s ease; }
+.area-card.collapsed .boss-list { max-height: 0; }
 
 .boss-row {
   display: flex; align-items: center; gap: 0; padding: 7px 16px;
@@ -645,7 +640,7 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
 
 @media (max-width: 600px) {
-  .areas-grid { columns: 1; }
+  .areas-grid { grid-template-columns: 1fr; }
   .controls-bar { flex-direction: column; align-items: flex-start; }
   .refresh-indicator { margin-left: 0; }
   .divider { display: none; }
