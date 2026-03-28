@@ -523,12 +523,17 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 .pinned-name.main-boss { color: var(--gold-light); font-weight: 600; }
 .pinned-deaths { font-family: 'Cinzel', serif; font-size: 13px; color: var(--gold); }
 
-.areas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; align-items: start; }
+.areas-grid {
+  columns: 3;
+  column-gap: 16px;
+  gap: 16px;
+}
 
 .area-card {
-  background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: var(--radius); overflow: hidden;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  break-inside: avoid;
+  margin-bottom: 16px;
+  display: inline-block;
+  width: 100%;
 }
 
 .area-card:hover { border-color: rgba(201,164,74,0.4); box-shadow: 0 4px 30px rgba(0,0,0,0.4), 0 0 20px rgba(201,164,74,0.05); }
@@ -640,7 +645,7 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
 
 @media (max-width: 600px) {
-  .areas-grid { grid-template-columns: 1fr; }
+  .areas-grid { columns: 1; }
   .controls-bar { flex-direction: column; align-items: flex-start; }
   .refresh-indicator { margin-left: 0; }
   .divider { display: none; }
@@ -1693,18 +1698,7 @@ function renderBossRow(b) {
 function toggleArea(areaName) {
   localCollapsed[areaName] = !localCollapsed[areaName];
   var card = document.querySelector('.area-card[data-area="' + CSS.escape(areaName) + '"]');
-  if (card) {
-    card.classList.toggle("collapsed", localCollapsed[areaName]);
-  }
-  reorderGrid();
-}
-
-function reorderGrid() {
-  var grid = document.getElementById("areas-grid");
-  var cards = Array.from(grid.querySelectorAll(".area-card"));
-  var open = cards.filter(function(c) { return !c.classList.contains("collapsed"); });
-  var closed = cards.filter(function(c) { return c.classList.contains("collapsed"); });
-  open.concat(closed).forEach(function(c) { grid.appendChild(c); });
+  if (card) card.classList.toggle("collapsed", localCollapsed[areaName]);
 }
 
 // ═══════════════════════════════════════════════════════════
