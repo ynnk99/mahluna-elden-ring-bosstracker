@@ -523,26 +523,12 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 .pinned-name.main-boss { color: var(--gold-light); font-weight: 600; }
 .pinned-deaths { font-family: 'Cinzel', serif; font-size: 13px; color: var(--gold); }
 
-/* ── AREAS GRID: CSS columns statt CSS Grid ─────────────────────
-   Damit rutschen eingeklappte Karten sofort zusammen, weil jede
-   Spalte unabhängig fließt – kein gemeinsames Zeilengitter mehr.  */
-.areas-grid {
-  columns: 3 320px;
-  column-gap: 16px;
-}
+.areas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
 
 .area-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  /* Verhindert, dass eine Karte über eine Spaltengrenze bricht */
-  break-inside: avoid;
-  /* Abstand zwischen den Karten (ersetzt den gap-Wert) */
-  margin-bottom: 16px;
-  /* display:block nötig, damit break-inside greift */
-  display: block;
 }
 
 .area-card:hover { border-color: rgba(201,164,74,0.4); box-shadow: 0 4px 30px rgba(0,0,0,0.4), 0 0 20px rgba(201,164,74,0.05); }
@@ -654,7 +640,7 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
 
 @media (max-width: 600px) {
-  .areas-grid { columns: 1; }
+  .areas-grid { grid-template-columns: 1fr; }
   .controls-bar { flex-direction: column; align-items: flex-start; }
   .refresh-indicator { margin-left: 0; }
   .divider { display: none; }
@@ -780,6 +766,7 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 .clip-placeholder-icon { font-size: 38px; line-height: 1; opacity: 0.7; }
 .clip-placeholder-text { font-family: 'Crimson Pro', serif; font-size: 13px; color: var(--parchment-dim); letter-spacing: 0.04em; }
 
+/* ── CLIP FOOTER (neu: mit Titel) ── */
 .clip-card-footer {
   padding: 10px 14px;
   display: flex;
@@ -799,6 +786,7 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
   font-size: 14px;
   color: var(--parchment);
   line-height: 1.35;
+  /* allow wrapping so long titles are fully readable */
   word-break: break-word;
 }
 
@@ -996,6 +984,7 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 const SPREADSHEET_ID = "1r9BzZJYFrk4rQLlMn4ZPBBUuc8u_peqwThTi1UTCQcE";
 
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json";
+// Range V:X  →  V=URL, W=Kategorie, X=Titel
 const CLIPS_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
   + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&range=V10:X100";
 
@@ -1403,6 +1392,7 @@ function renderClipCard(clip, index) {
       + '</div></div>';
   }
 
+  // Titel aus Spalte X – nur anzeigen wenn vorhanden
   var titleHtml = clip.title
     ? '<p class="clip-title">' + escHtml(clip.title) + '</p>'
     : '';
@@ -1420,7 +1410,7 @@ function renderClipCard(clip, index) {
 }
 
 // ═══════════════════════════════════════════════════════════
-// CLIPS LADEN
+// CLIPS LADEN  (V=URL, W=Kategorie, X=Titel)
 // ═══════════════════════════════════════════════════════════
 
 function loadClips() {
@@ -1435,6 +1425,7 @@ function loadClips() {
         if (!row || !row.c) return;
         var url      = row.c[0] && row.c[0].v ? String(row.c[0].v).trim() : "";
         var category = row.c[1] && row.c[1].v ? String(row.c[1].v).trim() : "Sonstige";
+        // Spalte X = Index 2
         var title    = row.c[2] && row.c[2].v ? String(row.c[2].v).trim() : "";
         if (url) newClips.push({ url: url, category: category, title: title });
       });
@@ -1489,7 +1480,7 @@ function loadData() {
       processData(rows);
       setRefreshState("ok");
       document.getElementById("loading-overlay").style.display = "none";
-      document.getElementById("areas-grid").style.display = "block"; /* block statt grid für columns-Layout */
+      document.getElementById("areas-grid").style.display = "grid";
     })
     .catch(function(err) {
       console.error("[Main] Fehler beim Laden:", err);
@@ -1592,6 +1583,10 @@ function processData(rows) {
   var pct = totalBosses > 0 ? Math.round((doneBosses / totalBosses) * 100) : 0;
   document.getElementById("val-percent").textContent = pct + "%";
   prevDoneBosses = doneBosses;
+
+  var rankingSnapshot = allBosses.map(function(b) {
+    return b.boss + ":" + b.deaths;
+  }).join("|");
 
   renderRanking(allBosses);
   renderAreas(areas);
