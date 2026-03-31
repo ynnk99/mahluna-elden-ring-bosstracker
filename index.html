@@ -17,7 +17,7 @@
   --parchment-dim: #a89880;
   --bg-deep:     #0a0907;
   --bg-mid:      #111008;
-  --bg-panel:    rgba(12, 10, 6, 0.92);
+  --bg-panel:    rgba(12, 10, 6, 0.98);
   --bg-card:     rgba(20, 17, 10, 0.85);
   --red:         #c44a3a;
   --red-bright:  #e05a4f;
@@ -27,8 +27,6 @@
   --radius: 6px;
   --twitch: #9146ff;
   --twitch-dim: rgba(145,70,255,0.15);
-  --green: #4a8c4a;
-  --green-bright: #6ab86a;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -67,7 +65,6 @@ body::before {
   padding: 0 20px 60px;
 }
 
-/* ─── HEADER ─── */
 .site-header {
   padding: 40px 0 0;
   text-align: center;
@@ -116,144 +113,6 @@ body::before {
   color: var(--gold-dim);
 }
 
-/* ─── TWITCH LOGIN WIDGET ─── */
-.login-widget {
-  position: absolute;
-  top: 40px;
-  right: 0;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.twitch-login-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 9px 18px;
-  background: rgba(145,70,255,0.12);
-  border: 1px solid rgba(145,70,255,0.35);
-  border-radius: var(--radius);
-  color: #c4a8ff;
-  font-family: 'Cinzel', serif;
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  text-transform: uppercase;
-}
-
-.twitch-login-btn:hover {
-  background: rgba(145,70,255,0.22);
-  border-color: var(--twitch);
-  color: #d8c4ff;
-  box-shadow: 0 0 18px rgba(145,70,255,0.25);
-}
-
-.twitch-login-btn svg { flex-shrink: 0; }
-
-.user-widget {
-  display: none;
-  align-items: center;
-  gap: 10px;
-}
-
-.user-widget.visible { display: flex; }
-
-.user-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 1px solid rgba(145,70,255,0.4);
-  object-fit: cover;
-  background: rgba(145,70,255,0.15);
-}
-
-.user-avatar-placeholder {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 1px solid rgba(145,70,255,0.4);
-  background: rgba(145,70,255,0.15);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  color: #b89cff;
-  font-family: 'Cinzel', serif;
-  font-weight: 600;
-  flex-shrink: 0;
-}
-
-.user-name-wrap {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.user-name {
-  font-family: 'Cinzel', serif;
-  font-size: 13px;
-  color: #c4a8ff;
-  letter-spacing: 0.05em;
-}
-
-.user-role-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-family: 'Crimson Pro', serif;
-  font-size: 11px;
-  letter-spacing: 0.04em;
-}
-
-.user-role-badge.editor {
-  color: var(--gold);
-}
-
-.user-role-badge.viewer {
-  color: var(--parchment-dim);
-  opacity: 0.6;
-}
-
-.user-logout-btn {
-  padding: 5px 10px;
-  background: transparent;
-  border: 1px solid rgba(201,164,74,0.2);
-  border-radius: 4px;
-  color: var(--parchment-dim);
-  font-family: 'Crimson Pro', serif;
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.user-logout-btn:hover {
-  border-color: var(--gold-dim);
-  color: var(--parchment);
-  background: rgba(201,164,74,0.06);
-}
-
-/* ─── AUTH NOTICE BANNER ─── */
-.auth-notice {
-  display: none;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 18px;
-  background: rgba(145,70,255,0.08);
-  border: 1px solid rgba(145,70,255,0.2);
-  border-radius: var(--radius);
-  margin-bottom: 14px;
-  font-family: 'Crimson Pro', serif;
-  font-size: 14px;
-  color: rgba(180,150,255,0.8);
-  font-style: italic;
-}
-
-.auth-notice.visible { display: flex; }
-.auth-notice .notice-icon { font-size: 16px; }
-
-/* ─── STATS BAR ─── */
 .stats-bar {
   display: flex;
   flex-wrap: wrap;
@@ -282,6 +141,7 @@ body::before {
 .stat-chip .icon { font-size: 18px; }
 .stat-chip.deaths-chip { border-color: rgba(180, 60, 50, 0.4); color: var(--gold); }
 .stat-chip .value { font-weight: 700; font-size: 17px; }
+
 .stat-chip.avg-chip { border-color: rgba(201,120,50,0.35); }
 
 #timer-chip { display: none; }
@@ -292,7 +152,6 @@ body::before {
   font-variant-numeric: tabular-nums;
 }
 
-/* ─── CONTROLS ─── */
 .controls-bar {
   display: flex;
   flex-wrap: wrap;
@@ -328,6 +187,8 @@ body::before {
   font-size: 15px;
   cursor: pointer;
   transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .toggle-btn:hover { border-color: var(--gold-dim); color: var(--parchment); background: rgba(201,164,74,0.06); }
@@ -349,7 +210,6 @@ body::before {
 
 .divider { width: 1px; height: 28px; background: var(--border); flex-shrink: 0; }
 
-/* ─── REFRESH ─── */
 .refresh-indicator {
   display: flex;
   align-items: center;
@@ -379,7 +239,6 @@ body::before {
 
 @keyframes pulse-gold { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
 
-/* ─── SEARCH ─── */
 .search-bar {
   display: flex;
   align-items: center;
@@ -397,7 +256,12 @@ body::before {
   box-shadow: 0 0 20px rgba(201,164,74,0.08);
 }
 
-.search-icon { font-size: 16px; color: var(--gold-dim); flex-shrink: 0; pointer-events: none; }
+.search-icon {
+  font-size: 16px;
+  color: var(--gold-dim);
+  flex-shrink: 0;
+  pointer-events: none;
+}
 
 .search-input {
   flex: 1;
@@ -410,7 +274,11 @@ body::before {
   letter-spacing: 0.03em;
 }
 
-.search-input::placeholder { color: var(--parchment-dim); opacity: 0.5; font-style: italic; }
+.search-input::placeholder {
+  color: var(--parchment-dim);
+  opacity: 0.5;
+  font-style: italic;
+}
 
 .search-clear {
   display: none;
@@ -426,7 +294,6 @@ body::before {
   flex-shrink: 0;
   transition: all 0.2s ease;
 }
-
 .search-clear:hover { background: rgba(201,164,74,0.2); color: var(--gold); }
 .search-clear.visible { display: flex; }
 
@@ -452,11 +319,13 @@ body::before {
 }
 
 .area-card.search-hidden { display: none; }
+
 body.searching .area-card .boss-list { max-height: 2000px !important; }
 body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none; }
+
 .boss-row.search-nomatch { display: none; }
 
-/* ─── RANKING ─── */
+
 .ranking-panel {
   background: var(--bg-card);
   border: 1px solid var(--border);
@@ -481,9 +350,16 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 }
 
 .ranking-header:hover { background: rgba(201,164,74,0.04); }
-.ranking-panel:not(.collapsed) .ranking-header { border-bottom-color: var(--border); }
 
-.ranking-header-left { display: flex; align-items: center; gap: 10px; }
+.ranking-panel:not(.collapsed) .ranking-header {
+  border-bottom-color: var(--border);
+}
+
+.ranking-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
 .ranking-toggle-icon {
   font-size: 10px;
@@ -509,10 +385,20 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
   color: var(--parchment-dim);
 }
 
-.ranking-body { max-height: 1000px; overflow: hidden; transition: max-height 0.4s ease; }
+.ranking-body {
+  max-height: 1000px;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+
 .ranking-panel.collapsed .ranking-body { max-height: 0; }
 
-.ranking-list { padding: 16px 20px; display: flex; flex-direction: column; gap: 8px; }
+.ranking-list {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 
 .ranking-entry {
   display: flex;
@@ -533,28 +419,85 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
   to   { opacity: 1; transform: translateX(0); }
 }
 
-.rank-number { font-family: 'Cinzel', serif; font-size: 16px; letter-spacing: 0.06em; color: var(--gold-dim); min-width: 24px; flex-shrink: 0; text-align: right; }
+.rank-number {
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  letter-spacing: 0.06em;
+  color: var(--gold-dim);
+  min-width: 24px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
 .rank-number.top1 { color: #e3b873; font-size: 16px; }
 .rank-number.top2 { color: #c0c0c0; }
 .rank-number.top3 { color: #cd7f32; }
 
-.rank-bar-wrap { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.rank-bar-wrap {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
 
-.rank-boss-name { font-family: 'Crimson Pro', serif; font-size: 14px; color: var(--parchment); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rank-boss-name {
+  font-family: 'Crimson Pro', serif;
+  font-size: 14px;
+  color: var(--parchment);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .rank-boss-name.is-main { color: var(--gold-light); font-weight: 600; }
 
-.rank-bar-row { display: flex; align-items: center; gap: 8px; }
-.rank-bar-bg { flex: 1; height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px; overflow: hidden; }
-.rank-bar-fill { height: 100%; border-radius: 2px; background: linear-gradient(to right, var(--gold-dim), var(--gold)); transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1); }
+.rank-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rank-bar-bg {
+  flex: 1;
+  height: 4px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.rank-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(to right, var(--gold-dim), var(--gold));
+  transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 .rank-entry-1 .rank-bar-fill { background: linear-gradient(to right, #b8882a, #e3c86a); }
 .rank-entry-2 .rank-bar-fill { background: linear-gradient(to right, #8a6a3a, #c9a44a); }
 
-.rank-deaths { font-family: 'Cinzel', serif; font-size: 16px; color: var(--gold); flex-shrink: 0; min-width: 38px; text-align: right; letter-spacing: 0.04em; }
+.rank-deaths {
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  color: var(--gold);
+  flex-shrink: 0;
+  min-width: 38px;
+  text-align: right;
+  letter-spacing: 0.04em;
+}
+
 .rank-deaths .unit { font-size: 10px; color: var(--parchment-dim); }
 
-.ranking-empty { padding: 28px; text-align: center; font-family: 'Crimson Pro', serif; font-style: italic; color: var(--parchment-dim); opacity: 0.5; }
+.ranking-empty {
+  padding: 28px;
+  text-align: center;
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  color: var(--parchment-dim);
+  opacity: 0.5;
+}
 
-/* ─── PINNED ─── */
+
 #pinned-section { display: none; margin-bottom: 30px; }
 
 .pinned-header {
@@ -581,14 +524,11 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 .pinned-name.main-boss { color: var(--gold-light); font-weight: 600; }
 .pinned-deaths { font-family: 'Cinzel', serif; font-size: 13px; color: var(--gold); }
 
-/* ─── AREA CARDS ─── */
 .areas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
 
 .area-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -615,51 +555,48 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 .area-fraction { font-family: 'Crimson Pro', serif; font-size: 13px; color: var(--parchment-dim); white-space: nowrap; }
 .area-progress-bar { width: 60px; height: 3px; background: rgba(255,255,255,0.07); border-radius: 2px; overflow: hidden; }
 
-.area-progress-fill { height: 100%; background: linear-gradient(to right, var(--gold-dim), var(--gold)); border-radius: 2px; transition: width 0.6s ease; }
+.area-progress-fill {
+  height: 100%; background: linear-gradient(to right, var(--gold-dim), var(--gold));
+  border-radius: 2px; transition: width 0.6s ease;
+}
+
 .area-progress-fill.complete { background: linear-gradient(to right, #4a7c4a, #6ab86a); }
 
 .boss-list { overflow: hidden; max-height: 2000px; transition: max-height 0.35s ease; }
 .area-card.collapsed .boss-list { max-height: 0; }
 
-/* ─── BOSS ROWS ─── */
+/* ── BOSS ROW (mit edit-Indikator) ── */
 .boss-row {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  padding: 7px 16px;
+  display: flex; align-items: center; gap: 0; padding: 7px 16px;
   border-bottom: 1px solid rgba(201,164,74,0.06);
   transition: background 0.15s ease;
+  cursor: pointer;
   position: relative;
 }
 
 .boss-row:last-child { border-bottom: none; }
-.boss-row:hover { background: rgba(201,164,74,0.04); }
+.boss-row:hover { background: rgba(201,164,74,0.06); }
 
-/* Editable rows get a subtle cursor and hover state */
-.boss-row.editable { cursor: pointer; }
-.boss-row.editable:hover { background: rgba(201,164,74,0.07); }
-
-/* Edit hint icon — only visible on hover when user has edit rights */
-.boss-edit-hint {
-  display: none;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  margin-left: 6px;
-  opacity: 0;
+/* Subtiler Edit-Indikator rechts beim Hover */
+.boss-row::after {
+  content: "✎";
+  position: absolute;
+  right: 8px;
   font-size: 11px;
   color: var(--gold-dim);
+  opacity: 0;
   transition: opacity 0.2s ease;
-  flex-shrink: 0;
+  pointer-events: none;
 }
+.boss-row:hover::after { opacity: 0.5; }
+.boss-row.done:hover::after { right: 28px; }
 
-.boss-row.editable .boss-edit-hint { display: flex; }
-.boss-row.editable:hover .boss-edit-hint { opacity: 0.5; }
-
-/* Highlight row when menu is open for it */
-.boss-row.menu-open { background: rgba(201,164,74,0.10); }
-.boss-row.menu-open .boss-edit-hint { opacity: 1; }
+/* Aktive / gerade offene Zeile */
+.boss-row.menu-open {
+  background: rgba(201,164,74,0.1);
+  border-color: rgba(201,164,74,0.2);
+}
+.boss-row.menu-open::after { opacity: 0; }
 
 .boss-deaths { font-family: 'Cinzel', serif; font-size: 14px; color: var(--gold); min-width: 40px; flex-shrink: 0; opacity: 0.9; }
 .boss-deaths-zero { opacity: 0.9; }
@@ -677,195 +614,232 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 .boss-check { font-size: 14px; flex-shrink: 0; margin-left: 8px; opacity: 0; transition: opacity 0.3s ease; color: #6ab86a; }
 .boss-row.done .boss-check { opacity: 0.7; }
 
-/* Pending sync indicator */
-.boss-row.syncing::after {
-  content: "↑";
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 11px;
-  color: var(--gold-dim);
-  animation: syncPulse 1s ease-in-out infinite;
-}
-
-@keyframes syncPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
-
-/* ─── BOSS CONTEXT MENU ─── */
-.boss-menu {
+/* ── BOSS-MENÜ ── */
+.boss-menu-backdrop {
   position: fixed;
-  z-index: 200;
-  min-width: 240px;
-  background: linear-gradient(160deg, rgba(18,15,9,0.98) 0%, rgba(10,9,7,0.99) 100%);
-  border: 1px solid rgba(201,164,74,0.4);
-  border-radius: 8px;
-  box-shadow: 0 8px 40px rgba(0,0,0,0.7), 0 0 30px rgba(201,164,74,0.08);
-  overflow: hidden;
-  transform-origin: top left;
-  opacity: 0;
-  transform: scale(0.92) translateY(-4px);
-  transition: opacity 0.18s ease, transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+  inset: 0;
+  z-index: 300;
   pointer-events: none;
 }
+.boss-menu-backdrop.open { pointer-events: all; }
 
-.boss-menu.open {
-  opacity: 1;
-  transform: scale(1) translateY(0);
-  pointer-events: all;
+.boss-menu {
+  position: fixed;
+  z-index: 301;
+  min-width: 230px;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(201,164,74,0.06) 0%, transparent 70%),
+    var(--bg-panel);
+  border: 1px solid var(--border-bright);
+  border-radius: 8px;
+  box-shadow:
+    0 0 0 1px rgba(201,164,74,0.08),
+    0 12px 60px rgba(0,0,0,0.8),
+    0 0 30px rgba(201,164,74,0.12);
+  padding: 0;
+  overflow: hidden;
+  display: none;
+  flex-direction: column;
+  animation: bossMenuIn 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-origin: top left;
 }
 
-.boss-menu-header {
-  padding: 12px 16px 10px;
-  border-bottom: 1px solid rgba(201,164,74,0.15);
+.boss-menu.open { display: flex; }
+
+@keyframes bossMenuIn {
+  from { opacity: 0; transform: scale(0.94) translateY(-6px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.boss-menu-head {
+  padding: 11px 16px 10px;
+  border-bottom: 1px solid var(--border);
   background: rgba(201,164,74,0.04);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.boss-menu-bossname {
-  font-family: 'Cinzel', serif;
+.boss-menu-head-icon {
   font-size: 12px;
+  color: var(--gold-dim);
+  flex-shrink: 0;
+}
+
+.boss-menu-boss-name {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
   letter-spacing: 0.08em;
-  color: var(--gold-light);
+  color: var(--gold);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
 }
 
-.boss-menu-areaname {
-  font-family: 'Crimson Pro', serif;
-  font-style: italic;
-  font-size: 12px;
-  color: var(--parchment-dim);
-  margin-top: 2px;
-  opacity: 0.6;
-}
+.boss-menu-boss-name.main-name { color: var(--gold-light); }
 
 .boss-menu-body {
-  padding: 10px 12px;
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+}
+
+/* Tode-Zeile */
+.boss-menu-deaths-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .boss-menu-section-label {
   font-family: 'Cinzel', serif;
   font-size: 10px;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--gold-dim);
-  padding: 0 4px;
-  margin-top: 2px;
+  opacity: 0.7;
 }
 
-/* Deaths counter row */
 .boss-menu-deaths-row {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 8px;
-  background: rgba(0,0,0,0.25);
-  border-radius: 5px;
-  border: 1px solid rgba(201,164,74,0.1);
 }
 
-.boss-menu-deaths-btn {
+.bm-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 30px; height: 30px;
   background: transparent;
-  border: 1px solid rgba(201,164,74,0.25);
+  border: 1px solid var(--border);
   border-radius: 4px;
-  color: var(--gold);
-  font-size: 18px;
-  line-height: 1;
+  color: var(--parchment-dim);
+  font-family: 'Cinzel', serif;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.18s ease;
   flex-shrink: 0;
-  font-family: monospace;
+  line-height: 1;
+  user-select: none;
 }
 
-.boss-menu-deaths-btn:hover {
-  background: rgba(201,164,74,0.12);
-  border-color: rgba(201,164,74,0.5);
-  color: var(--gold-light);
+.bm-btn:hover {
+  border-color: var(--gold-dim);
+  color: var(--gold);
+  background: rgba(201,164,74,0.1);
 }
 
-.boss-menu-deaths-btn:active { transform: scale(0.92); }
-.boss-menu-deaths-btn.danger { color: var(--red); border-color: rgba(196,74,58,0.3); }
-.boss-menu-deaths-btn.danger:hover { background: rgba(196,74,58,0.1); border-color: var(--red); color: var(--red-bright); }
+.bm-btn:active {
+  transform: scale(0.93);
+  background: rgba(201,164,74,0.18);
+}
 
-.boss-menu-deaths-val {
+.bm-btn.death-btn {
+  width: 34px;
+  height: 34px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.bm-btn.death-btn.dec { border-color: rgba(180,60,50,0.3); color: rgba(196,74,58,0.8); }
+.bm-btn.death-btn.dec:hover { border-color: var(--red); color: var(--red-bright); background: rgba(196,74,58,0.1); }
+
+.bm-btn.death-btn.inc { border-color: rgba(201,164,74,0.3); }
+.bm-btn.death-btn.inc:hover { border-color: var(--gold); color: var(--gold-light); }
+
+.boss-menu-death-count {
+  font-family: 'Cinzel', serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--gold);
   flex: 1;
   text-align: center;
-  font-family: 'Cinzel', serif;
-  font-size: 20px;
-  color: var(--gold-light);
-  font-weight: 600;
   letter-spacing: 0.04em;
+  min-width: 60px;
+  transition: transform 0.15s ease, color 0.15s ease;
 }
 
-.boss-menu-deaths-label {
-  font-family: 'Crimson Pro', serif;
-  font-size: 11px;
-  color: var(--parchment-dim);
-  text-align: center;
-  opacity: 0.6;
+.boss-menu-death-count.bump {
+  animation: countBump 0.25s ease;
 }
 
-/* Toggle action buttons */
+@keyframes countBump {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.25); color: var(--gold-light); }
+  100% { transform: scale(1); }
+}
+
+/* Trennlinie */
+.boss-menu-sep {
+  height: 1px;
+  background: var(--border);
+  margin: 0 -2px;
+}
+
+/* Aktions-Buttons */
 .boss-menu-actions {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.boss-menu-action-btn {
+.bm-action-btn {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 9px 14px;
-  background: rgba(0,0,0,0.2);
-  border: 1px solid rgba(201,164,74,0.1);
+  padding: 9px 13px;
+  background: transparent;
+  border: 1px solid var(--border);
   border-radius: 5px;
-  color: var(--parchment);
+  color: var(--parchment-dim);
   font-family: 'Crimson Pro', serif;
   font-size: 14px;
+  letter-spacing: 0.03em;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.18s ease;
   text-align: left;
+  width: 100%;
 }
 
-.boss-menu-action-btn:hover {
-  background: rgba(201,164,74,0.08);
-  border-color: rgba(201,164,74,0.3);
+.bm-action-btn:hover {
+  border-color: var(--gold-dim);
   color: var(--parchment);
+  background: rgba(201,164,74,0.07);
 }
 
-.boss-menu-action-btn.active {
-  background: rgba(106,184,106,0.1);
-  border-color: rgba(106,184,106,0.3);
-  color: var(--green-bright);
+.bm-action-btn:active { transform: scale(0.98); }
+
+.bm-action-btn.done-btn { border-color: rgba(106,184,106,0.2); }
+.bm-action-btn.done-btn:hover { border-color: #6ab86a; color: #6ab86a; background: rgba(106,184,106,0.08); }
+.bm-action-btn.done-btn.is-done { border-color: rgba(106,184,106,0.5); color: #6ab86a; background: rgba(106,184,106,0.08); }
+.bm-action-btn.done-btn.is-done:hover { border-color: var(--red); color: var(--red-bright); background: rgba(196,74,58,0.08); }
+
+.bm-action-btn.pin-btn { border-color: rgba(201,164,74,0.15); }
+.bm-action-btn.pin-btn.is-pinned { border-color: rgba(201,164,74,0.45); color: var(--gold); background: rgba(201,164,74,0.07); }
+
+.bm-action-icon { font-size: 15px; flex-shrink: 0; width: 20px; text-align: center; }
+
+/* Schreib-Status Indikator unten im Menü */
+.boss-menu-status {
+  padding: 6px 14px 8px;
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--parchment-dim);
+  opacity: 0;
+  text-align: center;
+  transition: opacity 0.3s ease;
+  border-top: 1px solid rgba(201,164,74,0.08);
+  min-height: 26px;
 }
 
-.boss-menu-action-btn.active:hover {
-  background: rgba(106,184,106,0.15);
-}
+.boss-menu-status.visible { opacity: 0.7; }
+.boss-menu-status.ok { color: #6ab86a; opacity: 0.8; }
+.boss-menu-status.err { color: var(--red-bright); opacity: 0.9; }
 
-.boss-menu-action-btn.active-pin {
-  background: rgba(201,164,74,0.1);
-  border-color: rgba(201,164,74,0.35);
-  color: var(--gold);
-}
-
-.boss-menu-action-btn .action-icon { font-size: 16px; flex-shrink: 0; }
-
-.boss-menu-divider {
-  height: 1px;
-  background: rgba(201,164,74,0.1);
-  margin: 2px 0;
-}
-
-/* ─── ANIMATIONS ─── */
+/* ── ANIMATIONS ── */
 @keyframes deathFlash {
   0%   { background: transparent; }
   20%  { background: rgba(196, 74, 58, 0.2); }
@@ -880,7 +854,6 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 }
 .boss-complete-flash { animation: bossComplete 1.5s ease-out; }
 
-/* ─── TOAST ─── */
 .toast {
   position: fixed; bottom: 30px; left: 50%;
   transform: translateX(-50%) translateY(20px);
@@ -893,7 +866,6 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-/* ─── LOADING ─── */
 .loading-overlay {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   min-height: 300px; gap: 16px; color: var(--gold-dim); font-family: 'Cinzel', serif;
@@ -915,29 +887,25 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 }
 .stat-pulse { animation: statPulse 0.6s ease-out; }
 
-/* ─── SCROLLBAR ─── */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg-deep); }
 ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
 
-/* ─── RESPONSIVE ─── */
-@media (max-width: 700px) {
-  .login-widget { position: static; justify-content: flex-end; margin-bottom: 12px; }
-  .site-header { padding-top: 20px; }
+@media (max-width: 600px) {
   .areas-grid { grid-template-columns: 1fr; }
   .controls-bar { flex-direction: column; align-items: flex-start; }
   .refresh-indicator { margin-left: 0; }
   .divider { display: none; }
+  .boss-menu { min-width: 200px; }
 }
 
-/* ─── FOOTER ─── */
 .site-footer {
   text-align: center; margin-top: 60px; padding: 20px 0;
   border-top: 1px solid var(--border); font-family: 'Crimson Pro', serif;
   font-size: 13px; color: var(--parchment-dim); opacity: 0.5;
 }
 
-/* ─── CLIP MODAL ─── */
+/* ── CLIP MODAL ── */
 .clip-modal-backdrop {
   position: fixed; inset: 0; background: rgba(5, 4, 2, 0.88);
   backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
@@ -1051,15 +1019,28 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 .clip-placeholder-icon { font-size: 38px; line-height: 1; opacity: 0.7; }
 .clip-placeholder-text { font-family: 'Crimson Pro', serif; font-size: 13px; color: var(--parchment-dim); letter-spacing: 0.04em; }
 
-.clip-card-footer { padding: 10px 14px; display: flex; flex-direction: column; gap: 6px; }
+.clip-card-footer {
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 
 .clip-card-footer-row {
-  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
 }
 
 .clip-title {
-  font-family: 'Crimson Pro', serif; font-size: 14px; color: var(--parchment); line-height: 1.35; word-break: break-word;
+  font-family: 'Crimson Pro', serif;
+  font-size: 14px;
+  color: var(--parchment);
+  line-height: 1.35;
+  word-break: break-word;
 }
+
 .clip-title:empty { display: none; }
 
 .clip-number { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 0.08em; color: rgba(145,70,255,0.5); }
@@ -1068,7 +1049,8 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
   display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px;
   background: rgba(145,70,255,0.1); border: 1px solid rgba(145,70,255,0.25);
   border-radius: 4px; color: #b89cff; font-family: 'Crimson Pro', serif;
-  font-size: 13px; text-decoration: none; transition: all 0.2s ease; flex-shrink: 0;
+  font-size: 13px; text-decoration: none; transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 .clip-open-link:hover { background: rgba(145,70,255,0.2); border-color: rgba(145,70,255,0.5); color: #c9b5ff; }
 
@@ -1090,12 +1072,163 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
   border-top-color: var(--twitch); border-radius: 50%; animation: spin 1s linear infinite;
 }
 
+/* ── ADD-CLIP FORM ── */
+.add-clip-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  background: rgba(145,70,255,0.12);
+  border: 1px solid rgba(145,70,255,0.35);
+  border-radius: var(--radius);
+  color: #c4a8ff;
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+.add-clip-btn:hover {
+  background: rgba(145,70,255,0.22);
+  border-color: var(--twitch);
+  box-shadow: 0 0 14px rgba(145,70,255,0.2);
+}
+
+.clip-add-panel {
+  flex-shrink: 0;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.35s cubic-bezier(0.22,1,0.36,1), border-color 0.25s ease;
+  border-bottom: 1px solid transparent;
+  background: rgba(8,6,12,0.6);
+}
+
+.clip-add-panel.open {
+  max-height: 280px;
+  border-bottom-color: rgba(145,70,255,0.15);
+}
+
+.clip-add-inner {
+  padding: 18px 28px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.clip-add-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.clip-add-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+  min-width: 160px;
+}
+
+.clip-add-label {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(145,70,255,0.7);
+}
+
+.clip-add-input {
+  background: rgba(10,7,16,0.8);
+  border: 1px solid rgba(145,70,255,0.25);
+  border-radius: 5px;
+  padding: 9px 14px;
+  color: var(--parchment);
+  font-family: 'Crimson Pro', serif;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+}
+
+.clip-add-input:focus {
+  border-color: rgba(145,70,255,0.55);
+  box-shadow: 0 0 12px rgba(145,70,255,0.12);
+}
+
+.clip-add-input::placeholder {
+  color: var(--parchment-dim);
+  opacity: 0.4;
+  font-style: italic;
+}
+
+.clip-add-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.clip-add-submit {
+  padding: 9px 22px;
+  background: rgba(145,70,255,0.18);
+  border: 1px solid rgba(145,70,255,0.45);
+  border-radius: 5px;
+  color: #c4a8ff;
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.clip-add-submit:hover:not(:disabled) {
+  background: rgba(145,70,255,0.3);
+  border-color: var(--twitch);
+  box-shadow: 0 0 16px rgba(145,70,255,0.25);
+  color: #d8c4ff;
+}
+
+.clip-add-submit:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.clip-add-cancel {
+  padding: 9px 14px;
+  background: transparent;
+  border: 1px solid rgba(201,164,74,0.15);
+  border-radius: 5px;
+  color: var(--parchment-dim);
+  font-family: 'Crimson Pro', serif;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.clip-add-cancel:hover { border-color: var(--gold-dim); color: var(--parchment); }
+
+.clip-add-feedback {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 13px;
+  min-height: 18px;
+  transition: color 0.2s ease;
+}
+.clip-add-feedback.ok  { color: var(--green-bright); }
+.clip-add-feedback.err { color: var(--red-bright); }
+
 @media (max-width: 600px) {
   .clip-modal-inner { height: 100vh; max-height: none; border-radius: 0; margin: 0; }
   .clip-grid { grid-template-columns: 1fr; }
   .clip-modal-header { padding: 14px 16px; }
   .clip-body { padding: 16px; }
   .clip-modal-title h2 { font-size: 16px; }
+  .clip-add-inner { padding: 14px 16px 16px; }
+  .clip-add-row { flex-direction: column; }
 }
 </style>
 
@@ -1113,40 +1246,12 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 <div class="page-wrapper">
 
   <header class="site-header">
-
-    <!-- ── TWITCH LOGIN WIDGET ── -->
-    <div class="login-widget" id="login-widget">
-      <!-- Shown when not logged in -->
-      <button class="twitch-login-btn" id="twitch-login-btn" onclick="loginWithTwitch()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="#9146ff">
-          <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/>
-        </svg>
-        Mit Twitch anmelden
-      </button>
-      <!-- Shown when logged in -->
-      <div class="user-widget" id="user-widget">
-        <div class="user-avatar-placeholder" id="user-avatar-placeholder">?</div>
-        <img class="user-avatar" id="user-avatar" src="" alt="" style="display:none;">
-        <div class="user-name-wrap">
-          <span class="user-name" id="user-name">–</span>
-          <span class="user-role-badge" id="user-role-badge"></span>
-        </div>
-        <button class="user-logout-btn" onclick="logout()">Abmelden</button>
-      </div>
-    </div>
-
     <h1>Elden Ring</h1>
     <p class="subtitle">Boss Tracker &amp; Fortschrittsübersicht</p>
     <div class="header-ornament">
       <span class="ornament-rune">⚔</span>
     </div>
   </header>
-
-  <!-- Auth notice (shown to logged-in viewers without edit rights) -->
-  <div class="auth-notice" id="auth-notice">
-    <span class="notice-icon">👁</span>
-    <span id="auth-notice-text">Du bist als Zuschauer angemeldet. Bearbeitungsrechte müssen von einem Admin vergeben werden.</span>
-  </div>
 
   <div class="stats-bar">
     <div class="stat-chip deaths-chip" id="stat-deaths">
@@ -1249,43 +1354,44 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
     <div class="areas-grid" id="areas-grid" style="display:none;"></div>
   </main>
 
-</div><!-- /page-wrapper -->
+</div>
 
 <div class="toast" id="toast"></div>
 
-<footer class="site-footer">
-  Daten werden alle 5 Sekunden aus Google Sheets geladen &bull; Elden Ring Boss Tracker
-</footer>
+<!-- ── BOSS KONTEXTMENÜ ── -->
+<div class="boss-menu-backdrop" id="boss-menu-backdrop" onclick="closeBossMenu()"></div>
 
-<!-- ── BOSS CONTEXT MENU ── -->
-<div class="boss-menu" id="boss-menu" role="menu">
-  <div class="boss-menu-header">
-    <div class="boss-menu-bossname" id="menu-boss-name">–</div>
-    <div class="boss-menu-areaname" id="menu-area-name">–</div>
+<div class="boss-menu" id="boss-menu" role="dialog" aria-label="Boss bearbeiten">
+  <div class="boss-menu-head">
+    <span class="boss-menu-head-icon">⚔</span>
+    <span class="boss-menu-boss-name" id="bm-boss-name">–</span>
   </div>
   <div class="boss-menu-body">
-    <span class="boss-menu-section-label">Tode</span>
-    <div class="boss-menu-deaths-row">
-      <button class="boss-menu-deaths-btn danger" onclick="menuAdjustDeaths(-1)" title="−1 Tod">−</button>
-      <div>
-        <div class="boss-menu-deaths-val" id="menu-deaths-val">0</div>
-        <div class="boss-menu-deaths-label">Tode</div>
+    <!-- Tode Zähler -->
+    <div class="boss-menu-deaths-section">
+      <span class="boss-menu-section-label">Tode</span>
+      <div class="boss-menu-deaths-row">
+        <button class="bm-btn death-btn dec" onclick="menuDeaths(-1)" title="−1 Tod">−</button>
+        <span class="boss-menu-death-count" id="bm-death-count">†0</span>
+        <button class="bm-btn death-btn inc" onclick="menuDeaths(+1)" title="+1 Tod">+</button>
       </div>
-      <button class="boss-menu-deaths-btn" onclick="menuAdjustDeaths(1)" title="+1 Tod">+</button>
     </div>
-    <div class="boss-menu-divider"></div>
-    <span class="boss-menu-section-label">Aktionen</span>
+
+    <div class="boss-menu-sep"></div>
+
+    <!-- Aktions-Buttons -->
     <div class="boss-menu-actions">
-      <button class="boss-menu-action-btn" id="menu-done-btn" onclick="menuToggleDone()">
-        <span class="action-icon" id="menu-done-icon">☐</span>
-        <span id="menu-done-label">Als besiegt markieren</span>
+      <button class="bm-action-btn done-btn" id="bm-done-btn" onclick="menuToggleDone()">
+        <span class="bm-action-icon" id="bm-done-icon">☐</span>
+        <span id="bm-done-label">Als erledigt markieren</span>
       </button>
-      <button class="boss-menu-action-btn" id="menu-pin-btn" onclick="menuTogglePin()">
-        <span class="action-icon" id="menu-pin-icon">📌</span>
-        <span id="menu-pin-label">Anpinnen</span>
+      <button class="bm-action-btn pin-btn" id="bm-pin-btn" onclick="menuTogglePin()">
+        <span class="bm-action-icon" id="bm-pin-icon">📌</span>
+        <span id="bm-pin-label">Anpinnen</span>
       </button>
     </div>
   </div>
+  <div class="boss-menu-status" id="bm-status"></div>
 </div>
 
 <!-- ── CLIP MODAL ── -->
@@ -1302,8 +1408,50 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
           <span class="clip-count" id="modal-clip-count">0</span> Clips
         </div>
       </div>
-      <button class="clip-close-btn" onclick="closeClipModal()" title="Schließen">✕</button>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button class="add-clip-btn" id="add-clip-btn" style="display:none;" onclick="toggleAddClipPanel()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M19 11h-6V5h-2v6H5v2h6v6h2v-6h6z"/></svg>
+          Clip hinzufügen
+        </button>
+        <button class="clip-close-btn" onclick="closeClipModal()" title="Schließen">✕</button>
+      </div>
     </div>
+
+    <!-- Add-Clip Panel (nur für Editoren) -->
+    <div class="clip-add-panel" id="clip-add-panel">
+      <div class="clip-add-inner">
+        <div class="clip-add-row">
+          <div class="clip-add-field" style="flex:2;min-width:220px;">
+            <label class="clip-add-label">Twitch-Link</label>
+            <input class="clip-add-input" id="clip-add-url" type="text"
+              placeholder="https://clips.twitch.tv/… oder https://twitch.tv/…/clip/…"
+              autocomplete="off" spellcheck="false">
+          </div>
+          <div class="clip-add-field" style="flex:1;">
+            <label class="clip-add-label">Kategorie</label>
+            <input class="clip-add-input" id="clip-add-category" type="text"
+              placeholder="z.B. Malenia, Fails, …"
+              list="clip-category-suggestions"
+              autocomplete="off">
+            <datalist id="clip-category-suggestions"></datalist>
+          </div>
+          <div class="clip-add-field" style="flex:1.5;">
+            <label class="clip-add-label">Titel <span style="opacity:0.5;font-size:9px;">(optional)</span></label>
+            <input class="clip-add-input" id="clip-add-title" type="text"
+              placeholder="Kurze Beschreibung…"
+              autocomplete="off">
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+          <div class="clip-add-actions">
+            <button class="clip-add-submit" id="clip-add-submit" onclick="submitAddClip()">Hinzufügen</button>
+            <button class="clip-add-cancel" onclick="toggleAddClipPanel()">Abbrechen</button>
+          </div>
+          <span class="clip-add-feedback" id="clip-add-feedback"></span>
+        </div>
+      </div>
+    </div>
+
     <div class="clip-tabs" id="clip-tabs"></div>
     <div class="clip-body" id="clip-body">
       <div class="clip-loading" id="clip-modal-loading">
@@ -1315,52 +1463,20 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════════════════════════
-//  ██████╗ ██████╗ ███╗   ██╗███████╗██╗ ██████╗
-// ██╔════╝██╔═══██╗████╗  ██║██╔════╝██║██╔════╝
-// ██║     ██║   ██║██╔██╗ ██║█████╗  ██║██║  ███╗
-// ██║     ██║   ██║██║╚██╗██║██╔══╝  ██║██║   ██║
-// ╚██████╗╚██████╔╝██║ ╚████║██║     ██║╚██████╔╝
-//  ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝     ╚═╝ ╚═════╝
-// ═══════════════════════════════════════════════════════════════════════════
-//
-// ┌─────────────────────────────────────────────────────────────────────────┐
-// │  SETUP — Fülle diese drei Werte aus, bevor du die Seite hostest:         │
-// │                                                                           │
-// │  1. TWITCH_CLIENT_ID  → Twitch Developer Console                         │
-// │     https://dev.twitch.tv/console/apps/create                            │
-// │     App-Typ: "Web Application"                                            │
-// │     Redirect URI: genau die URL dieser Seite (z.B. https://meine-seite.de)│
-// │                                                                           │
-// │  2. TWITCH_REDIRECT_URI → URL dieser Seite (ohne Slash am Ende)          │
-// │                                                                           │
-// │  3. APPS_SCRIPT_URL → URL deines Google Apps Script Web App              │
-// │     (Anleitung am Ende dieser Datei als Kommentar)                        │
-// │                                                                           │
-// │  4. ALLOWED_USERS → Twitch-Usernamen (lowercase) mit Bearbeitungsrechten │
-// └─────────────────────────────────────────────────────────────────────────┘
-
-const TWITCH_CLIENT_ID   = "n3oqt780bnsi3lb2gzinxdbrrazork";
-const TWITCH_REDIRECT_URI = window.location.origin + window.location.pathname;
-const APPS_SCRIPT_URL    = "https://script.google.com/macros/s/AKfycby9jq8b48n69StAXcE56S9LSSJMV4okZjPyF9Ax_FlCgtfaX48FWkoiMaSF8M5vT9S-/exec";
-
-// Twitch-Usernamen (alles lowercase!) mit Bearbeitungsrechten
-const ALLOWED_USERS = [
-  "ynnk99",    
-  "mahluna",
-];
-
-// ═══════════════════════════════════════════════════════════════════════════
-// KONFIGURATION (unveränderlich)
-// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+// KONFIGURATION
+// ═══════════════════════════════════════════════════════════
 
 const SPREADSHEET_ID = "1r9BzZJYFrk4rQLlMn4ZPBBUuc8u_peqwThTi1UTCQcE";
 
-const SHEET_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
-  + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json";
-
-const CLIPS_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
+const SHEET_URL  = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json";
+const CLIPS_URL  = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
   + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&range=V10:X100";
+
+// ▼▼▼ HIER deine Apps Script Web App URL eintragen ▼▼▼
+// Anleitung: siehe apps-script.gs
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby9jq8b48n69StAXcE56S9LSSJMV4okZjPyF9Ax_FlCgtfaX48FWkoiMaSF8M5vT9S-/exec";
+// ▲▲▲
 
 const RANKING_TOP_N = 10;
 
@@ -1392,9 +1508,9 @@ const MAIN_BOSSES = new Set([
   "Radahn, versprochener Gemahl + Radahn, Miquellas Gemahl",
 ]);
 
-// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // STATE
-// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 
 var localCollapsed      = {};
 var showBase            = true;
@@ -1411,25 +1527,21 @@ var timerInterval = null;
 var clipsData      = [];
 var activeCategory = null;
 var currentAreas   = {};
-var searchQuery    = "";
-var prevRankingSnapshot = "";
 
-// Auth state
-var currentUser = null;  // { login, display_name, profile_image_url }
-var userIsEditor = false;
+var searchQuery = "";
 
-// Boss menu state
-var menuState = {
-  area: null,
-  boss: null,
-  deaths: 0,
-  done: false,
-  pinned: false
-};
+// ── BOSS-MENÜ STATE ──
+var activeMenuRow    = null;  // das aktuell geöffnete <div.boss-row>
+var menuCurrentArea  = "";
+var menuCurrentBoss  = "";
+var menuCurrentDeaths = 0;
+var menuCurrentDone  = false;
+var menuCurrentPinned = false;
+var menuWriteTimer    = null;
 
-// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // UTILS
-// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 
 function isTrue(v) {
   return [true, "TRUE", "WAHR", 1, "1", "true", "wahr"].indexOf(v) !== -1;
@@ -1459,7 +1571,7 @@ function pulseEl(el) {
 }
 
 function escHtml(str) {
-  return String(str)
+  return str
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
@@ -1467,377 +1579,12 @@ function escHtml(str) {
 }
 
 function escAttr(str) {
-  return String(str).replace(/'/g, "\\'").replace(/"/g, '\\"');
+  return str.replace(/'/g, "\\'").replace(/"/g, '\\"');
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// ████████╗██╗    ██╗██╗████████╗ ██████╗██╗  ██╗
-//    ██╔══╝██║    ██║██║╚══██╔══╝██╔════╝██║  ██║
-//    ██║   ██║ █╗ ██║██║   ██║   ██║     ███████║
-//    ██║   ██║███╗██║██║   ██║   ██║     ██╔══██║
-//    ██║   ╚███╔███╔╝██║   ██║   ╚██████╗██║  ██║
-//    ╚═╝    ╚══╝╚══╝ ╚═╝   ╚═╝    ╚═════╝╚═╝  ╚═╝
-//  AUTH / TWITCH OAUTH (Implicit Grant Flow)
-// ═══════════════════════════════════════════════════════════════════════════
-
-function loginWithTwitch() {
-  if (TWITCH_CLIENT_ID === "DEINE_TWITCH_CLIENT_ID_HIER") {
-    showToast("⚠ Twitch Client ID nicht konfiguriert!", 4000);
-    return;
-  }
-  var scope = "user:read:email";
-  var url   = "https://id.twitch.tv/oauth2/authorize"
-    + "?client_id="    + encodeURIComponent(TWITCH_CLIENT_ID)
-    + "&redirect_uri=" + encodeURIComponent(TWITCH_REDIRECT_URI)
-    + "&response_type=token"
-    + "&scope="        + encodeURIComponent(scope)
-    + "&force_verify=false";
-  window.location.href = url;
-}
-
-function logout() {
-  localStorage.removeItem("twitch_token");
-  localStorage.removeItem("twitch_user");
-  currentUser  = null;
-  userIsEditor = false;
-  updateLoginUI();
-  renderFromCache();
-}
-
-// Called on page load — handles OAuth callback hash AND restores saved session
-function checkAuthOnLoad() {
-  var hash = window.location.hash;
-  if (hash && hash.includes("access_token=")) {
-    var params = new URLSearchParams(hash.substring(1));
-    var token  = params.get("access_token");
-    if (token) {
-      // Clean URL
-      history.replaceState(null, "", window.location.pathname + window.location.search);
-      fetchTwitchUser(token);
-      return;
-    }
-  }
-
-  // Restore from localStorage
-  var savedToken = localStorage.getItem("twitch_token");
-  var savedUser  = localStorage.getItem("twitch_user");
-  if (savedToken && savedUser) {
-    try {
-      currentUser  = JSON.parse(savedUser);
-      userIsEditor = ALLOWED_USERS.indexOf(currentUser.login.toLowerCase()) !== -1;
-      updateLoginUI();
-    } catch (e) {
-      localStorage.removeItem("twitch_token");
-      localStorage.removeItem("twitch_user");
-    }
-  }
-}
-
-function fetchTwitchUser(token) {
-  fetch("https://api.twitch.tv/helix/users", {
-    headers: {
-      "Authorization": "Bearer " + token,
-      "Client-Id":     TWITCH_CLIENT_ID
-    }
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(data) {
-    if (!data.data || data.data.length === 0) { throw new Error("No user data"); }
-    var user = data.data[0];
-    currentUser = {
-      login:             user.login,
-      display_name:      user.display_name,
-      profile_image_url: user.profile_image_url
-    };
-    userIsEditor = ALLOWED_USERS.indexOf(user.login.toLowerCase()) !== -1;
-    localStorage.setItem("twitch_token", token);
-    localStorage.setItem("twitch_user", JSON.stringify(currentUser));
-    updateLoginUI();
-    renderFromCache();
-    showToast(userIsEditor
-      ? "✔ Willkommen " + currentUser.display_name + " — Bearbeitungsrechte aktiv"
-      : "👁 Eingeloggt als " + currentUser.display_name + " (nur lesen)", 4000);
-  })
-  .catch(function(err) {
-    console.error("[Auth] Fehler:", err);
-    showToast("⚠ Twitch-Anmeldung fehlgeschlagen", 3500);
-  });
-}
-
-function updateLoginUI() {
-  var loginBtn   = document.getElementById("twitch-login-btn");
-  var userWidget = document.getElementById("user-widget");
-  var authNotice = document.getElementById("auth-notice");
-
-  if (currentUser) {
-    loginBtn.style.display  = "none";
-    userWidget.classList.add("visible");
-    document.getElementById("user-name").textContent = currentUser.display_name;
-
-    // Avatar
-    var avatarImg         = document.getElementById("user-avatar");
-    var avatarPlaceholder = document.getElementById("user-avatar-placeholder");
-    if (currentUser.profile_image_url) {
-      avatarImg.src           = currentUser.profile_image_url;
-      avatarImg.style.display = "block";
-      avatarPlaceholder.style.display = "none";
-    } else {
-      avatarPlaceholder.textContent   = currentUser.display_name.charAt(0).toUpperCase();
-      avatarPlaceholder.style.display = "flex";
-    }
-
-    // Role badge
-    var badge = document.getElementById("user-role-badge");
-    if (userIsEditor) {
-      badge.textContent  = "✦ Editor";
-      badge.className    = "user-role-badge editor";
-      authNotice.classList.remove("visible");
-    } else {
-      badge.textContent  = "● Zuschauer";
-      badge.className    = "user-role-badge viewer";
-      authNotice.classList.add("visible");
-    }
-  } else {
-    loginBtn.style.display = "";
-    userWidget.classList.remove("visible");
-    authNotice.classList.remove("visible");
-  }
-}
-
-function isAuthorized() {
-  return userIsEditor && currentUser !== null;
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// SHEET WRITE-BACK  (via Google Apps Script Web App)
-// ═══════════════════════════════════════════════════════════════════════════
-
-function writeToSheet(area, boss, action, value) {
-  if (APPS_SCRIPT_URL === "DEINE_APPS_SCRIPT_URL_HIER" || !APPS_SCRIPT_URL) {
-    console.warn("[Sheet] Apps Script URL nicht konfiguriert – Änderung nur lokal.");
-    return;
-  }
-  var url = APPS_SCRIPT_URL
-    + "?area="   + encodeURIComponent(area)
-    + "&boss="   + encodeURIComponent(boss)
-    + "&action=" + encodeURIComponent(action)
-    + "&value="  + encodeURIComponent(value);
-
-  fetch(url, { method: "GET", mode: "no-cors" })
-    .catch(function(err) {
-      console.error("[Sheet] Schreibfehler:", err);
-    });
-}
-
-// Optimistic update helper: modifies currentAreas in memory so the
-// UI reflects the change immediately, then writes to sheet.
-function applyLocalBossChange(area, boss, field, value) {
-  if (!currentAreas[area]) return;
-  var bossData = currentAreas[area].bosses.find(function(b) { return b.boss === boss; });
-  if (!bossData) return;
-
-  var oldDone = bossData.done;
-  bossData[field] = value;
-
-  // Recount area done
-  currentAreas[area].done = currentAreas[area].bosses.filter(function(b) { return b.done; }).length;
-
-  // Re-render just this row immediately
-  updateBossRow(area, boss, bossData);
-  updateAreaHeader(area);
-
-  // Sync indicator
-  var row = document.querySelector('.boss-row[data-area="' + CSS.escape(area) + '"][data-boss="' + CSS.escape(boss) + '"]');
-  if (row) {
-    row.classList.add("syncing");
-    setTimeout(function() { row.classList.remove("syncing"); }, 3000);
-  }
-
-  // If boss just got marked done and it's a main boss, show toast
-  if (field === "done" && value === true && !oldDone && MAIN_BOSSES.has(boss)) {
-    showToast("✔ " + boss + " besiegt!");
-  }
-}
-
-function updateBossRow(areaName, bossName, bossData) {
-  var row = document.querySelector(
-    '.boss-row[data-area="' + CSS.escape(areaName) + '"][data-boss="' + CSS.escape(bossName) + '"]'
-  );
-  if (!row) return;
-
-  var isDone       = bossData.done;
-  var isMain       = MAIN_BOSSES.has(bossName);
-  var deathClass   = bossData.deaths === 0 ? " boss-deaths-zero" : "";
-  var editClass    = isAuthorized() ? " editable" : "";
-
-  row.className    = "boss-row" + (isDone ? " done" : "") + editClass;
-  var deathsEl     = row.querySelector(".boss-deaths");
-  var nameEl       = row.querySelector(".boss-name");
-  if (deathsEl) deathsEl.textContent = bossData.deaths > 0 ? "†" + bossData.deaths : "†–";
-  if (nameEl)   nameEl.className     = "boss-name" + (isMain ? " main" : "");
-}
-
-function updateAreaHeader(areaName) {
-  var data = currentAreas[areaName];
-  if (!data) return;
-  var card = document.querySelector('.area-card[data-area="' + CSS.escape(areaName) + '"]');
-  if (!card) return;
-  var fraction = card.querySelector(".area-fraction");
-  var fillEl   = card.querySelector(".area-progress-fill");
-  var pct      = data.total > 0 ? (data.done / data.total) * 100 : 0;
-  var complete = data.done === data.total && data.total > 0;
-  if (fraction) fraction.textContent = data.done + "/" + data.total;
-  if (fillEl) {
-    fillEl.style.width = pct + "%";
-    fillEl.classList.toggle("complete", complete);
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// BOSS CONTEXT MENU
-// ═══════════════════════════════════════════════════════════════════════════
-
-var menuOpen = false;
-
-function openBossMenu(e, areaName, bossName) {
-  if (!isAuthorized()) return;
-  e.stopPropagation();
-
-  var area     = currentAreas[areaName];
-  if (!area) return;
-  var bossData = null;
-  for (var i = 0; i < area.bosses.length; i++) {
-    if (area.bosses[i].boss === bossName) { bossData = area.bosses[i]; break; }
-  }
-  if (!bossData) return;
-
-  menuState = {
-    area:   areaName,
-    boss:   bossName,
-    deaths: bossData.deaths,
-    done:   bossData.done,
-    pinned: bossData.pinned
-  };
-
-  // Update menu content
-  document.getElementById("menu-boss-name").textContent = bossName;
-  document.getElementById("menu-area-name").textContent = areaName;
-  updateMenuDisplay();
-
-  // Position the menu near the click
-  positionMenu(e);
-
-  // Mark row
-  document.querySelectorAll(".boss-row.menu-open").forEach(function(r) { r.classList.remove("menu-open"); });
-  var row = e.currentTarget;
-  row.classList.add("menu-open");
-
-  // Show
-  var menu = document.getElementById("boss-menu");
-  menu.classList.add("open");
-  menuOpen = true;
-}
-
-function positionMenu(e) {
-  var menu   = document.getElementById("boss-menu");
-  menu.style.display = "block";
-  var mw     = 240;
-  var mh     = 260; // approximate
-  var vw     = window.innerWidth;
-  var vh     = window.innerHeight;
-  var cx     = e.clientX;
-  var cy     = e.clientY;
-
-  var left   = cx + 10;
-  var top    = cy + 4;
-
-  if (left + mw > vw - 12) left = cx - mw - 10;
-  if (top  + mh > vh - 12) top  = cy - mh - 4;
-  if (left < 8) left = 8;
-  if (top  < 8) top  = 8;
-
-  menu.style.left = left + "px";
-  menu.style.top  = top  + "px";
-}
-
-function closeBossMenu() {
-  var menu = document.getElementById("boss-menu");
-  menu.classList.remove("open");
-  menuOpen = false;
-  document.querySelectorAll(".boss-row.menu-open").forEach(function(r) { r.classList.remove("menu-open"); });
-}
-
-function updateMenuDisplay() {
-  document.getElementById("menu-deaths-val").textContent = menuState.deaths;
-
-  var doneBtn   = document.getElementById("menu-done-btn");
-  var doneIcon  = document.getElementById("menu-done-icon");
-  var doneLabel = document.getElementById("menu-done-label");
-  if (menuState.done) {
-    doneBtn.className   = "boss-menu-action-btn active";
-    doneIcon.textContent = "☑";
-    doneLabel.textContent = "Als nicht besiegt markieren";
-  } else {
-    doneBtn.className   = "boss-menu-action-btn";
-    doneIcon.textContent = "☐";
-    doneLabel.textContent = "Als besiegt markieren";
-  }
-
-  var pinBtn   = document.getElementById("menu-pin-btn");
-  var pinIcon  = document.getElementById("menu-pin-icon");
-  var pinLabel = document.getElementById("menu-pin-label");
-  if (menuState.pinned) {
-    pinBtn.className    = "boss-menu-action-btn active-pin";
-    pinIcon.textContent = "📍";
-    pinLabel.textContent = "Anpinnung entfernen";
-  } else {
-    pinBtn.className    = "boss-menu-action-btn";
-    pinIcon.textContent = "📌";
-    pinLabel.textContent = "Anpinnen";
-  }
-}
-
-function menuAdjustDeaths(delta) {
-  var newDeaths = Math.max(0, menuState.deaths + delta);
-  menuState.deaths = newDeaths;
-  updateMenuDisplay();
-  applyLocalBossChange(menuState.area, menuState.boss, "deaths", newDeaths);
-  writeToSheet(menuState.area, menuState.boss, "setDeaths", newDeaths);
-}
-
-function menuToggleDone() {
-  var newDone = !menuState.done;
-  menuState.done = newDone;
-  updateMenuDisplay();
-  applyLocalBossChange(menuState.area, menuState.boss, "done", newDone);
-  writeToSheet(menuState.area, menuState.boss, "setDone", newDone ? "TRUE" : "FALSE");
-}
-
-function menuTogglePin() {
-  var newPinned = !menuState.pinned;
-  menuState.pinned = newPinned;
-  updateMenuDisplay();
-  applyLocalBossChange(menuState.area, menuState.boss, "pinned", newPinned);
-  writeToSheet(menuState.area, menuState.boss, "setPinned", newPinned ? "TRUE" : "FALSE");
-}
-
-// Close menu when clicking outside
-document.addEventListener("click", function(e) {
-  if (!menuOpen) return;
-  var menu = document.getElementById("boss-menu");
-  if (!menu.contains(e.target)) closeBossMenu();
-});
-
-document.addEventListener("keydown", function(e) {
-  if (e.key === "Escape") {
-    closeClipModal();
-    closeBossMenu();
-  }
-});
-
-// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // TIMER
-// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 
 function updateTimerDisplay() {
   var timerChip = document.getElementById("timer-chip");
@@ -1855,9 +1602,9 @@ function startTimerTick() {
   timerInterval = setInterval(updateTimerDisplay, 1000);
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // TOGGLE CONTROLS
-// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 
 function toggleFlag(flag) {
   if (flag === "base") {
@@ -1875,9 +1622,9 @@ function setAllCollapsed(val) {
   renderAreas(currentAreas);
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // SEARCH
-// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 
 function onSearchInput(val) {
   searchQuery = val.trim().toLowerCase();
@@ -1952,9 +1699,9 @@ function applySearch() {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // RANKING
-// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 
 var rankingCollapsed = false;
 
@@ -1968,10 +1715,11 @@ function renderRanking(allBosses) {
   withDeaths.sort(function(a, b) { return b.deaths - a.deaths; });
   var top = withDeaths.slice(0, RANKING_TOP_N);
 
-  var maxDeaths       = top.length > 0 ? top[0].deaths : 1;
+  var maxDeaths = top.length > 0 ? top[0].deaths : 1;
+
   var totalDeaths     = allBosses.reduce(function(s, b) { return s + b.deaths; }, 0);
   var bossesAttempted = allBosses.filter(function(b) { return b.deaths > 0; }).length;
-  var avgDeaths       = bossesAttempted > 0 ? (totalDeaths / bossesAttempted).toFixed(1) : "–";
+  var avgDeaths = bossesAttempted > 0 ? (totalDeaths / bossesAttempted).toFixed(1) : "–";
 
   document.getElementById("val-avg").textContent = avgDeaths === "–" ? "–" : avgDeaths + " †";
 
@@ -1994,10 +1742,10 @@ function renderRanking(allBosses) {
   var medals = ["🥇", "🥈", "🥉"];
 
   listEl.innerHTML = top.map(function(b, i) {
-    var pct        = maxDeaths > 0 ? (b.deaths / maxDeaths * 100) : 0;
-    var isMain     = MAIN_BOSSES.has(b.boss);
-    var rankLabel  = i < 3 ? medals[i] : "#" + (i + 1);
-    var rankClass  = i === 0 ? "top1" : (i === 1 ? "top2" : (i === 2 ? "top3" : ""));
+    var pct    = maxDeaths > 0 ? (b.deaths / maxDeaths * 100) : 0;
+    var isMain = MAIN_BOSSES.has(b.boss);
+    var rankLabel = i < 3 ? medals[i] : "#" + (i + 1);
+    var rankClass = i === 0 ? "top1" : (i === 1 ? "top2" : (i === 2 ? "top3" : ""));
     var entryClass = i === 0 ? "rank-entry-1" : (i === 1 ? "rank-entry-2" : "");
     var delayStyle = "animation-delay:" + (i * 55) + "ms";
 
@@ -2012,9 +1760,265 @@ function renderRanking(allBosses) {
   }).join("");
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+// BOSS-MENÜ
+// ═══════════════════════════════════════════════════════════
+
+function openBossMenu(event, row) {
+  event.stopPropagation();
+
+  // Clip-Modal offen? Dann nicht öffnen
+  if (document.getElementById("clip-modal").classList.contains("open")) return;
+
+  // Gleiche Zeile → schließen (Toggle)
+  if (activeMenuRow === row) {
+    closeBossMenu();
+    return;
+  }
+
+  // Alten aktiven Row zurücksetzen
+  if (activeMenuRow) activeMenuRow.classList.remove("menu-open");
+
+  activeMenuRow     = row;
+  menuCurrentArea   = row.dataset.area   || "";
+  menuCurrentBoss   = row.dataset.boss   || "";
+  menuCurrentDeaths = parseInt(row.dataset.deaths, 10) || 0;
+  menuCurrentDone   = row.dataset.done   === "1";
+  menuCurrentPinned = row.dataset.pinned === "1";
+
+  row.classList.add("menu-open");
+
+  // Menü befüllen
+  var isMain = MAIN_BOSSES.has(menuCurrentBoss);
+  var nameEl = document.getElementById("bm-boss-name");
+  nameEl.textContent = menuCurrentBoss;
+  nameEl.className   = "boss-menu-boss-name" + (isMain ? " main-name" : "");
+
+  updateMenuDeathDisplay();
+  updateMenuDoneDisplay();
+  updateMenuPinDisplay();
+  setMenuStatus("", "");
+
+  // Menü positionieren
+  var menu     = document.getElementById("boss-menu");
+  var backdrop = document.getElementById("boss-menu-backdrop");
+  menu.classList.remove("open");
+  menu.style.display = "flex";
+
+  var rect     = row.getBoundingClientRect();
+  var menuW    = menu.offsetWidth  || 240;
+  var menuH    = menu.offsetHeight || 200;
+  var vpW      = window.innerWidth;
+  var vpH      = window.innerHeight;
+
+  var left = rect.left;
+  var top  = rect.bottom + 6;
+
+  // Passt nach unten?
+  if (top + menuH > vpH - 16) {
+    top = rect.top - menuH - 6;
+  }
+  // Passt nach rechts?
+  if (left + menuW > vpW - 12) {
+    left = vpW - menuW - 12;
+  }
+  if (left < 8) left = 8;
+  if (top  < 8) top  = 8;
+
+  menu.style.left = left + "px";
+  menu.style.top  = top  + "px";
+  menu.classList.add("open");
+  backdrop.classList.add("open");
+}
+
+function closeBossMenu() {
+  var menu     = document.getElementById("boss-menu");
+  var backdrop = document.getElementById("boss-menu-backdrop");
+  menu.classList.remove("open");
+  backdrop.classList.remove("open");
+  if (activeMenuRow) {
+    activeMenuRow.classList.remove("menu-open");
+    activeMenuRow = null;
+  }
+}
+
+function updateMenuDeathDisplay() {
+  var el = document.getElementById("bm-death-count");
+  el.textContent = menuCurrentDeaths > 0 ? "†" + menuCurrentDeaths : "†–";
+}
+
+function updateMenuDoneDisplay() {
+  var btn   = document.getElementById("bm-done-btn");
+  var icon  = document.getElementById("bm-done-icon");
+  var label = document.getElementById("bm-done-label");
+  if (menuCurrentDone) {
+    btn.classList.add("is-done");
+    icon.textContent  = "☑";
+    label.textContent = "Als offen markieren";
+  } else {
+    btn.classList.remove("is-done");
+    icon.textContent  = "☐";
+    label.textContent = "Als erledigt markieren";
+  }
+}
+
+function updateMenuPinDisplay() {
+  var btn   = document.getElementById("bm-pin-btn");
+  var label = document.getElementById("bm-pin-label");
+  if (menuCurrentPinned) {
+    btn.classList.add("is-pinned");
+    label.textContent = "Anpinnen aufheben";
+  } else {
+    btn.classList.remove("is-pinned");
+    label.textContent = "Anpinnen";
+  }
+}
+
+function setMenuStatus(msg, type) {
+  var el = document.getElementById("bm-status");
+  el.textContent = msg;
+  el.className   = "boss-menu-status" + (msg ? " visible" : "") + (type ? " " + type : "");
+  if (menuWriteTimer) clearTimeout(menuWriteTimer);
+  if (msg) {
+    menuWriteTimer = setTimeout(function() { setMenuStatus("", ""); }, 3000);
+  }
+}
+
+// ── Tode anpassen ──
+function menuDeaths(delta) {
+  var newDeaths = Math.max(0, menuCurrentDeaths + delta);
+  if (newDeaths === menuCurrentDeaths) return;
+  menuCurrentDeaths = newDeaths;
+
+  // Menü-Anzeige
+  var countEl = document.getElementById("bm-death-count");
+  countEl.classList.remove("bump");
+  void countEl.offsetWidth;
+  countEl.classList.add("bump");
+  updateMenuDeathDisplay();
+
+  // Zeile im DOM sofort aktualisieren
+  if (activeMenuRow) {
+    activeMenuRow.dataset.deaths = menuCurrentDeaths;
+    var deathEl = activeMenuRow.querySelector(".boss-deaths");
+    if (deathEl) {
+      deathEl.textContent = menuCurrentDeaths > 0 ? "†" + menuCurrentDeaths : "†–";
+      deathEl.className   = "boss-deaths" + (menuCurrentDeaths === 0 ? " boss-deaths-zero" : "");
+    }
+    // Flash
+    if (delta > 0) {
+      activeMenuRow.classList.remove("death-flash");
+      void activeMenuRow.offsetWidth;
+      activeMenuRow.classList.add("death-flash");
+    }
+  }
+
+  // Cache aktualisieren
+  updateLocalCache(menuCurrentArea, menuCurrentBoss, "deaths", menuCurrentDeaths);
+
+  // Sheet schreiben
+  writeToSheet(menuCurrentArea, menuCurrentBoss, "deaths", menuCurrentDeaths);
+}
+
+// ── Erledigt toggling ──
+function menuToggleDone() {
+  menuCurrentDone = !menuCurrentDone;
+  updateMenuDoneDisplay();
+
+  // Zeile im DOM
+  if (activeMenuRow) {
+    activeMenuRow.dataset.done = menuCurrentDone ? "1" : "0";
+    activeMenuRow.classList.toggle("done", menuCurrentDone);
+    if (menuCurrentDone) {
+      activeMenuRow.classList.remove("boss-complete-flash");
+      void activeMenuRow.offsetWidth;
+      activeMenuRow.classList.add("boss-complete-flash");
+      if (MAIN_BOSSES.has(menuCurrentBoss)) showToast("✔ " + menuCurrentBoss + " besiegt!");
+    }
+  }
+
+  updateLocalCache(menuCurrentArea, menuCurrentBoss, "done", menuCurrentDone);
+  writeToSheet(menuCurrentArea, menuCurrentBoss, "done", menuCurrentDone);
+}
+
+// ── Anpinnen toggling ──
+function menuTogglePin() {
+  menuCurrentPinned = !menuCurrentPinned;
+  updateMenuPinDisplay();
+
+  if (activeMenuRow) {
+    activeMenuRow.dataset.pinned = menuCurrentPinned ? "1" : "0";
+  }
+
+  updateLocalCache(menuCurrentArea, menuCurrentBoss, "pinned", menuCurrentPinned);
+  writeToSheet(menuCurrentArea, menuCurrentBoss, "pinned", menuCurrentPinned);
+
+  // Pinned-Sektion sofort neu rendern
+  renderAreas(currentAreas);
+}
+
+// ═══════════════════════════════════════════════════════════
+// LOCAL CACHE UPDATE  (verhindert Revert beim nächsten Render)
+// ═══════════════════════════════════════════════════════════
+
+function updateLocalCache(area, boss, field, value) {
+  if (!currentAreas[area]) return;
+  var bossData = null;
+  for (var i = 0; i < currentAreas[area].bosses.length; i++) {
+    if (currentAreas[area].bosses[i].boss === boss) {
+      bossData = currentAreas[area].bosses[i];
+      break;
+    }
+  }
+  if (!bossData) return;
+
+  if (field === "deaths") {
+    bossData.deaths = value;
+  } else if (field === "done") {
+    var wasDone = bossData.done;
+    bossData.done = value;
+    if (!wasDone &&  value) currentAreas[area].done++;
+    if ( wasDone && !value) currentAreas[area].done = Math.max(0, currentAreas[area].done - 1);
+  } else if (field === "pinned") {
+    bossData.pinned = value;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// SHEET WRITE-BACK
+// ═══════════════════════════════════════════════════════════
+
+function writeToSheet(area, boss, field, value) {
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === "DEINE_APPS_SCRIPT_URL_HIER") {
+    setMenuStatus("⚠ Apps Script URL nicht konfiguriert", "err");
+    console.warn("[Tracker] Apps Script URL nicht gesetzt. Bitte APPS_SCRIPT_URL in der HTML-Datei eintragen.");
+    return;
+  }
+
+  var payload = JSON.stringify({ area: area, boss: boss, field: field, value: value });
+
+  setMenuStatus("Speichert…", "");
+
+  // mode:'no-cors' → fire-and-forget (kein CORS-Header nötig)
+  fetch(APPS_SCRIPT_URL, {
+    method:  "POST",
+    mode:    "no-cors",
+    headers: { "Content-Type": "text/plain" },
+    body:    payload,
+  })
+  .then(function() {
+    // Bei no-cors erhalten wir immer eine opaque response → als Erfolg werten
+    setMenuStatus("✓ Gespeichert", "ok");
+  })
+  .catch(function(err) {
+    console.error("[Tracker] Sheet-Schreibfehler:", err);
+    setMenuStatus("✗ Fehler beim Speichern", "err");
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
 // CLIP HELPERS
-// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 
 function parseTwitchClip(url) {
   if (!url || typeof url !== "string") return null;
@@ -2046,22 +2050,149 @@ function buildEmbedUrl(parsed) {
   return null;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // CLIP MODAL
-// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 
 function openClipModal() {
+  closeBossMenu();
   document.getElementById("clip-backdrop").classList.add("open");
   document.getElementById("clip-modal").classList.add("open");
   document.body.style.overflow = "hidden";
+
+  // Show/hide add-clip button based on auth
+  var addBtn = document.getElementById("add-clip-btn");
+  if (addBtn) addBtn.style.display = isAuthorized() ? "flex" : "none";
+
   renderClipModal();
+  updateCategorySuggestions();
 }
 
 function closeClipModal() {
   document.getElementById("clip-backdrop").classList.remove("open");
   document.getElementById("clip-modal").classList.remove("open");
   document.body.style.overflow = "";
+  // Close add panel too
+  var panel = document.getElementById("clip-add-panel");
+  if (panel) panel.classList.remove("open");
 }
+
+// ── ADD-CLIP PANEL ──
+
+var addClipPanelOpen = false;
+
+function toggleAddClipPanel() {
+  var panel = document.getElementById("clip-add-panel");
+  addClipPanelOpen = !addClipPanelOpen;
+  panel.classList.toggle("open", addClipPanelOpen);
+  if (addClipPanelOpen) {
+    setTimeout(function() {
+      var urlInput = document.getElementById("clip-add-url");
+      if (urlInput) urlInput.focus();
+    }, 200);
+    setAddClipFeedback("", "");
+  }
+}
+
+function updateCategorySuggestions() {
+  var dl = document.getElementById("clip-category-suggestions");
+  if (!dl) return;
+  var cats = {};
+  clipsData.forEach(function(c) { if (c.category) cats[c.category] = true; });
+  dl.innerHTML = Object.keys(cats).map(function(c) {
+    return '<option value="' + c.replace(/"/g, "&quot;") + '">';
+  }).join("");
+}
+
+function setAddClipFeedback(msg, type) {
+  var el = document.getElementById("clip-add-feedback");
+  if (!el) return;
+  el.textContent = msg;
+  el.className   = "clip-add-feedback" + (type ? " " + type : "");
+}
+
+function submitAddClip() {
+  if (!isAuthorized()) return;
+
+  var url      = (document.getElementById("clip-add-url").value      || "").trim();
+  var category = (document.getElementById("clip-add-category").value || "").trim();
+  var title    = (document.getElementById("clip-add-title").value    || "").trim();
+
+  if (!url) {
+    setAddClipFeedback("Bitte einen Twitch-Link eintragen.", "err");
+    document.getElementById("clip-add-url").focus();
+    return;
+  }
+  if (!category) {
+    setAddClipFeedback("Bitte eine Kategorie angeben.", "err");
+    document.getElementById("clip-add-category").focus();
+    return;
+  }
+
+  // Validate: is it a recognisable Twitch URL?
+  var parsed = parseTwitchClip(url);
+  if (!parsed || parsed.type === "link") {
+    setAddClipFeedback("Link sieht nicht wie ein Twitch-Clip oder VOD aus.", "err");
+    return;
+  }
+
+  var submitBtn = document.getElementById("clip-add-submit");
+  submitBtn.disabled = true;
+  setAddClipFeedback("Wird gespeichert…", "");
+
+  var payload = JSON.stringify({ action: "addClip", url: url, category: category, title: title });
+
+  fetch(APPS_SCRIPT_URL, {
+    method:  "POST",
+    mode:    "no-cors",
+    headers: { "Content-Type": "text/plain" },
+    body:    payload
+  })
+  .then(function() {
+    // Optimistic: add to local clipsData immediately
+    clipsData.push({ url: url, category: category, title: title });
+
+    // Update count
+    var countEl = document.getElementById("btn-clips-count");
+    if (countEl) countEl.textContent = "(" + clipsData.length + ")";
+    var modalCount = document.getElementById("modal-clip-count");
+    if (modalCount) modalCount.textContent = clipsData.length;
+
+    // Re-render clip modal
+    renderClipModal();
+    updateCategorySuggestions();
+
+    // Switch to the new category tab
+    if (category) switchClipTab(category);
+
+    // Reset form
+    document.getElementById("clip-add-url").value      = "";
+    document.getElementById("clip-add-category").value = "";
+    document.getElementById("clip-add-title").value    = "";
+    setAddClipFeedback("✓ Clip gespeichert!", "ok");
+    submitBtn.disabled = false;
+
+    // Auto-close panel after success
+    setTimeout(function() {
+      var panel = document.getElementById("clip-add-panel");
+      if (panel) panel.classList.remove("open");
+      addClipPanelOpen = false;
+      setAddClipFeedback("", "");
+    }, 1800);
+  })
+  .catch(function(err) {
+    console.error("[Clip Add] Fehler:", err);
+    setAddClipFeedback("✗ Fehler beim Speichern.", "err");
+    submitBtn.disabled = false;
+  });
+}
+
+document.addEventListener("keydown", function(e) {
+  if (e.key === "Escape") {
+    closeClipModal();
+    closeBossMenu();
+  }
+});
 
 function renderClipModal() {
   var tabsEl = document.getElementById("clip-tabs");
@@ -2151,9 +2282,9 @@ function renderClipCard(clip, index) {
     + '</div></div></div>';
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // CLIPS LADEN
-// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 
 function loadClips() {
   fetch(CLIPS_URL + "&nocache=" + Date.now())
@@ -2186,12 +2317,14 @@ function loadClips() {
         }
       }
     })
-    .catch(function(err) { console.error("[Clips] Fehler:", err); });
+    .catch(function(err) {
+      console.error("[Clips] Fehler:", err);
+    });
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // HAUPT-DATEN LADEN
-// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 
 function setRefreshState(state) {
   var dot  = document.getElementById("refresh-dot");
@@ -2219,7 +2352,7 @@ function loadData() {
       processData(rows);
       setRefreshState("ok");
       document.getElementById("loading-overlay").style.display = "none";
-      document.getElementById("areas-grid").style.display      = "grid";
+      document.getElementById("areas-grid").style.display = "grid";
     })
     .catch(function(err) {
       console.error("[Main] Fehler beim Laden:", err);
@@ -2243,8 +2376,8 @@ function processData(rows) {
   timerVisible = isTrue(rows[0] && rows[0].c[12] ? rows[0].c[12].v : false);
   updateTimerDisplay();
 
-  var baseDeaths   = Number(rows[1] && rows[1].c[9] ? rows[1].c[9].v : 0) || 0;
-  var dlcDeaths    = Number(rows[168] && rows[168].c[9] ? rows[168].c[9].v : 0) || 0;
+  var baseDeaths = Number(rows[1] && rows[1].c[9] ? rows[1].c[9].v : 0) || 0;
+  var dlcDeaths  = Number(rows[168] && rows[168].c[9] ? rows[168].c[9].v : 0) || 0;
   var globalDeaths = 0;
   if (showBase && showDLC)  globalDeaths = baseDeaths + dlcDeaths;
   else if (showBase)         globalDeaths = baseDeaths;
@@ -2284,11 +2417,11 @@ function processData(rows) {
     if (isBaseGame && !showBase) return;
     if (isDLC      && !showDLC)  return;
 
-    var done           = isTrue(r.c[2] ? r.c[2].v : false);
-    var pinned         = isTrue(r.c[4] ? r.c[4].v : false);
-    var deaths         = Number(r.c[3] ? r.c[3].v : 0) || 0;
+    var done    = isTrue(r.c[2] ? r.c[2].v : false);
+    var pinned  = isTrue(r.c[4] ? r.c[4].v : false);
+    var deaths  = Number(r.c[3] ? r.c[3].v : 0) || 0;
     var sheetCollapsed = isTrue(r.c[5] ? r.c[5].v : false);
-    var key            = area + "|" + boss;
+    var key = area + "|" + boss;
 
     if (!(key in previousBossStates)) {
       previousBossStates[key] = done;
@@ -2309,6 +2442,8 @@ function processData(rows) {
     allBosses.push({ boss: boss, deaths: deaths, done: done, area: area });
   });
 
+  // Bereits offenes Menü: Daten aus Sheet nicht überschreiben wenn Menü offen
+  // (der Cache-Update in menuDeaths/menuToggleDone/menuTogglePin verhindert das)
   currentAreas = areas;
 
   var totalBosses = 0, doneBosses = 0;
@@ -2331,14 +2466,13 @@ function renderFromCache() {
   if (Object.keys(currentAreas).length > 0) renderAreas(currentAreas);
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // RENDER AREAS
-// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 
 function renderAreas(areas) {
   var grid = document.getElementById("areas-grid");
 
-  // Pinned section
   var allPinned = [];
   Object.values(areas).forEach(function(a) {
     a.bosses.forEach(function(b) { if (b.pinned) allPinned.push(b); });
@@ -2350,7 +2484,7 @@ function renderAreas(areas) {
     pinnedList.innerHTML = "";
     allPinned.forEach(function(b) {
       var isMain = MAIN_BOSSES.has(b.boss);
-      var card   = document.createElement("div");
+      var card = document.createElement("div");
       card.className = "pinned-card" + (b.done ? " done" : "");
       card.innerHTML = '<span class="pinned-deaths">📌 ' + (b.deaths > 0 ? b.deaths : "–") + '</span>'
         + '<span class="pinned-name' + (isMain ? " main-boss" : "") + '">' + escHtml(b.boss) + '</span>';
@@ -2360,7 +2494,6 @@ function renderAreas(areas) {
     pinnedSection.style.display = "none";
   }
 
-  // Area cards
   var existingCards = {};
   grid.querySelectorAll(".area-card[data-area]").forEach(function(el) {
     existingCards[el.dataset.area] = el;
@@ -2377,7 +2510,7 @@ function renderAreas(areas) {
 
     if (!card) {
       card = document.createElement("div");
-      card.className  = "area-card";
+      card.className = "area-card";
       card.dataset.area = areaName;
     }
 
@@ -2387,9 +2520,7 @@ function renderAreas(areas) {
 
     var pct      = data.total > 0 ? (data.done / data.total) * 100 : 0;
     var complete = data.done === data.total && data.total > 0;
-    var dlcLabel = data.isDLC
-      ? ' <span style="font-size:11px;color:var(--gold-dim);font-family:\'Crimson Pro\',serif;font-style:italic;">DLC</span>'
-      : "";
+    var dlcLabel = data.isDLC ? ' <span style="font-size:11px;color:var(--gold-dim);font-family:\'Crimson Pro\',serif;font-style:italic;">DLC</span>' : "";
 
     card.innerHTML = '<div class="area-header" onclick="toggleArea(\'' + escAttr(areaName) + '\')">'
       + '<div class="area-header-left">'
@@ -2420,23 +2551,20 @@ function renderAreas(areas) {
 }
 
 function renderBossRow(b, areaName) {
-  var isMain     = MAIN_BOSSES.has(b.boss);
-  var deathClass = b.deaths === 0 ? " boss-deaths-zero" : "";
-  var editClass  = isAuthorized() ? " editable" : "";
-
-  // onclick only if authorized
-  var clickAttr = isAuthorized()
-    ? ' onclick="openBossMenu(event,\'' + escAttr(areaName) + '\',\'' + escAttr(b.boss) + '\')"'
-    : '';
-
-  return '<div class="boss-row' + (b.done ? " done" : "") + editClass + '"'
-    + ' data-boss="' + escAttr(b.boss) + '"'
+  var isMain      = MAIN_BOSSES.has(b.boss);
+  var deathClass  = b.deaths === 0 ? " boss-deaths-zero" : "";
+  return '<div class="boss-row'
+    + (b.done ? " done" : "")
+    + '" data-boss="' + escAttr(b.boss) + '"'
     + ' data-area="' + escAttr(areaName) + '"'
-    + clickAttr + '>'
+    + ' data-deaths="' + b.deaths + '"'
+    + ' data-done="' + (b.done ? "1" : "0") + '"'
+    + ' data-pinned="' + (b.pinned ? "1" : "0") + '"'
+    + ' onclick="openBossMenu(event, this)"'
+    + ' title="Klicken zum Bearbeiten">'
     + '<span class="boss-deaths' + deathClass + '">' + (b.deaths > 0 ? "†" + b.deaths : "†–") + '</span>'
     + '<span class="boss-name' + (isMain ? " main" : "") + '">' + escHtml(b.boss) + '</span>'
     + '<span class="boss-check">✓</span>'
-    + (isAuthorized() ? '<span class="boss-edit-hint" title="Bearbeiten">✏</span>' : '')
     + '</div>';
 }
 
@@ -2446,11 +2574,15 @@ function toggleArea(areaName) {
   if (card) card.classList.toggle("collapsed", localCollapsed[areaName]);
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════════════════════════════
+// Klick auf Menü selbst soll nicht nach außen propagieren
+document.getElementById("boss-menu").addEventListener("click", function(e) {
+  e.stopPropagation();
+});
 
-checkAuthOnLoad();
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+
 loadData();
 loadClips();
 setInterval(loadData,  5000);
