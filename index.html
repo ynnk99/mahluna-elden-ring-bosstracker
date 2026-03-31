@@ -1101,6 +1101,138 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
   .clip-body { padding: 16px; }
   .clip-modal-title h2 { font-size: 16px; }
 }
+
+/* ─── ADD CLIP PANEL ─── */
+.add-clip-btn {
+  display: none;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  background: rgba(145,70,255,0.12);
+  border: 1px solid rgba(145,70,255,0.35);
+  border-radius: var(--radius);
+  color: #c4a8ff;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+.add-clip-btn:hover { background: rgba(145,70,255,0.22); border-color: var(--twitch); color: #d8c4ff; box-shadow: 0 0 14px rgba(145,70,255,0.2); }
+.add-clip-btn.active { background: rgba(145,70,255,0.22); border-color: var(--twitch); color: #d8c4ff; }
+.add-clip-btn.editor-visible { display: flex; }
+
+.add-clip-panel {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  background: rgba(8,6,12,0.7);
+  border-bottom: 1px solid transparent;
+  flex-shrink: 0;
+}
+.add-clip-panel.open {
+  max-height: 260px;
+  border-bottom-color: rgba(145,70,255,0.2);
+}
+
+.add-clip-form {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 12px;
+  padding: 18px 28px;
+  align-items: end;
+}
+
+.add-clip-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.add-clip-field label {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+}
+
+.add-clip-input,
+.add-clip-select {
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(145,70,255,0.25);
+  border-radius: 5px;
+  color: var(--parchment);
+  font-family: 'Crimson Pro', serif;
+  font-size: 15px;
+  padding: 9px 13px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+}
+.add-clip-input::placeholder { color: var(--parchment-dim); opacity: 0.45; font-style: italic; }
+.add-clip-input:focus,
+.add-clip-select:focus { border-color: rgba(145,70,255,0.6); box-shadow: 0 0 12px rgba(145,70,255,0.12); }
+
+.add-clip-select option { background: #0d0b10; color: var(--parchment); }
+
+.add-clip-divider {
+  width: 1px;
+  height: 38px;
+  background: rgba(145,70,255,0.15);
+  align-self: end;
+  margin-bottom: 1px;
+}
+
+.add-clip-row2 {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  padding: 0 28px 18px;
+  align-items: end;
+}
+
+.add-clip-submit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  background: rgba(145,70,255,0.18);
+  border: 1px solid rgba(145,70,255,0.45);
+  border-radius: 5px;
+  color: #c4a8ff;
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.add-clip-submit:hover { background: rgba(145,70,255,0.3); border-color: var(--twitch); color: #d8c4ff; box-shadow: 0 0 16px rgba(145,70,255,0.2); }
+.add-clip-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.add-clip-feedback {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--green-bright);
+  padding: 0 28px 14px;
+  min-height: 20px;
+  transition: opacity 0.3s ease;
+}
+.add-clip-feedback.error { color: var(--red-bright); }
+.add-clip-feedback:empty { display: none; }
+
+@media (max-width: 700px) {
+  .add-clip-form { grid-template-columns: 1fr; }
+  .add-clip-divider { display: none; }
+  .add-clip-row2 { grid-template-columns: 1fr; padding: 0 16px 16px; }
+  .add-clip-form { padding: 16px; }
+}
 </style>
 
   <!-- Google Analytics -->
@@ -1306,8 +1438,48 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
           <span class="clip-count" id="modal-clip-count">0</span> Clips
         </div>
       </div>
-      <button class="clip-close-btn" onclick="closeClipModal()" title="Schließen">✕</button>
+      <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
+        <button class="add-clip-btn" id="add-clip-btn" onclick="toggleAddClipPanel()">
+          ➕ Clip hinzufügen
+        </button>
+        <button class="clip-close-btn" onclick="closeClipModal()" title="Schließen">✕</button>
+      </div>
     </div>
+
+    <!-- ── ADD CLIP PANEL ── -->
+    <div class="add-clip-panel" id="add-clip-panel">
+      <div class="add-clip-form">
+        <div class="add-clip-field">
+          <label for="clip-url-input">Twitch-Link</label>
+          <input class="add-clip-input" id="clip-url-input" type="text"
+            placeholder="https://clips.twitch.tv/…" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="add-clip-divider"></div>
+        <div class="add-clip-field">
+          <label for="clip-cat-select">Kategorie</label>
+          <select class="add-clip-select" id="clip-cat-select">
+            <option value="Allgemein">Allgemein</option>
+            <option value="Boss">Boss</option>
+            <option value="Funny Moment">Funny Moment</option>
+            <option value="Rage">Rage</option>
+            <option value="Sonstige">Sonstige</option>
+          </select>
+        </div>
+      </div>
+      <div class="add-clip-row2">
+        <div class="add-clip-field">
+          <label for="clip-title-input">Titel <span style="opacity:0.45;font-family:'Crimson Pro',serif;font-style:italic;text-transform:none;letter-spacing:0;">(optional)</span></label>
+          <input class="add-clip-input" id="clip-title-input" type="text"
+            placeholder="z.B. Malenia besiegt beim ersten Versuch" autocomplete="off">
+        </div>
+        <button class="add-clip-submit" id="add-clip-submit" onclick="submitNewClip()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+          Clip speichern
+        </button>
+      </div>
+      <div class="add-clip-feedback" id="add-clip-feedback"></div>
+    </div>
+
     <div class="clip-tabs" id="clip-tabs"></div>
     <div class="clip-body" id="clip-body">
       <div class="clip-loading" id="clip-modal-loading">
@@ -1574,6 +1746,7 @@ function updateLoginUI() {
     userWidget.classList.remove("visible");
     authNotice.classList.remove("visible");
   }
+  updateAddClipButton();
 }
 
 function isAuthorized() {
@@ -2131,6 +2304,126 @@ function renderClipCard(clip, index) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// ADD CLIP (Editor only)
+// ═══════════════════════════════════════════════════════════════════════════
+
+var addClipPanelOpen = false;
+
+function toggleAddClipPanel() {
+  addClipPanelOpen = !addClipPanelOpen;
+  var panel = document.getElementById("add-clip-panel");
+  var btn   = document.getElementById("add-clip-btn");
+  panel.classList.toggle("open", addClipPanelOpen);
+  btn.classList.toggle("active", addClipPanelOpen);
+  if (addClipPanelOpen) {
+    setTimeout(function() {
+      var inp = document.getElementById("clip-url-input");
+      if (inp) inp.focus();
+    }, 360);
+  }
+  document.getElementById("add-clip-feedback").textContent = "";
+}
+
+function submitNewClip() {
+  if (!isAuthorized()) return;
+
+  var urlEl   = document.getElementById("clip-url-input");
+  var catEl   = document.getElementById("clip-cat-select");
+  var titleEl = document.getElementById("clip-title-input");
+  var feedEl  = document.getElementById("add-clip-feedback");
+  var submitBtn = document.getElementById("add-clip-submit");
+
+  var url      = urlEl.value.trim();
+  var category = catEl.value;
+  var title    = titleEl.value.trim();
+
+  // Basic validation
+  feedEl.className = "add-clip-feedback";
+  if (!url) {
+    feedEl.textContent = "⚠ Bitte einen Twitch-Link eingeben.";
+    feedEl.classList.add("error");
+    urlEl.focus();
+    return;
+  }
+  var parsed = parseTwitchClip(url);
+  if (!parsed || parsed.type === "link") {
+    feedEl.textContent = "⚠ Kein gültiger Twitch-Clip- oder VOD-Link erkannt.";
+    feedEl.classList.add("error");
+    urlEl.focus();
+    return;
+  }
+
+  // Duplicate check
+  var isDupe = clipsData.some(function(c) { return c.url.trim() === url; });
+  if (isDupe) {
+    feedEl.textContent = "⚠ Dieser Clip ist bereits in der Sammlung.";
+    feedEl.classList.add("error");
+    return;
+  }
+
+  // Optimistic local update
+  var newClip = { url: url, category: category, title: title };
+  clipsData.push(newClip);
+
+  // Update counts
+  var countEl = document.getElementById("btn-clips-count");
+  if (countEl) countEl.textContent = "(" + clipsData.length + ")";
+  var modalCount = document.getElementById("modal-clip-count");
+  if (modalCount) modalCount.textContent = clipsData.length;
+
+  // Re-render modal content, switch to the new clip's tab
+  activeCategory = category;
+  renderClipModal();
+
+  // Feedback & reset form
+  feedEl.textContent = "✔ Clip gespeichert – wird gleich im Sheet hinterlegt.";
+  urlEl.value   = "";
+  titleEl.value = "";
+  catEl.value   = "Allgemein";
+
+  // Auto-close panel after a moment
+  setTimeout(function() {
+    addClipPanelOpen = false;
+    var panel = document.getElementById("add-clip-panel");
+    var btn   = document.getElementById("add-clip-btn");
+    if (panel) panel.classList.remove("open");
+    if (btn)   btn.classList.remove("active");
+    var fb = document.getElementById("add-clip-feedback");
+    if (fb) fb.textContent = "";
+  }, 2200);
+
+  // Write to sheet
+  writeClipToSheet(url, category, title);
+}
+
+function writeClipToSheet(url, category, title) {
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === "DEINE_APPS_SCRIPT_URL_HIER") {
+    console.warn("[Clips] Apps Script URL nicht konfiguriert – Clip nur lokal.");
+    return;
+  }
+  var reqUrl = APPS_SCRIPT_URL
+    + "?action=addClip"
+    + "&value="    + encodeURIComponent(url)
+    + "&category=" + encodeURIComponent(category)
+    + "&title="    + encodeURIComponent(title);
+  fetch(reqUrl, { method: "GET", mode: "no-cors" })
+    .catch(function(err) { console.error("[Clips] Schreibfehler:", err); });
+}
+
+// Show add-clip button only for editors
+function updateAddClipButton() {
+  var btn = document.getElementById("add-clip-btn");
+  if (!btn) return;
+  if (isAuthorized()) {
+    btn.classList.add("editor-visible");
+  } else {
+    btn.classList.remove("editor-visible");
+    // Close panel if open when rights are lost
+    if (addClipPanelOpen) toggleAddClipPanel();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // CLIPS LADEN
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -2436,6 +2729,17 @@ function toggleArea(areaName) {
   var card = document.querySelector('.area-card[data-area="' + CSS.escape(areaName) + '"]');
   if (card) card.classList.toggle("collapsed", localCollapsed[areaName]);
 }
+
+// Allow Enter key in clip form inputs to submit
+document.addEventListener("keydown", function(e) {
+  if (e.key === "Enter" && addClipPanelOpen) {
+    var active = document.activeElement;
+    if (active && (active.id === "clip-url-input" || active.id === "clip-title-input" || active.id === "clip-cat-select")) {
+      e.preventDefault();
+      submitNewClip();
+    }
+  }
+});
 
 // ═══════════════════════════════════════════════════════════════════════════
 // INIT
