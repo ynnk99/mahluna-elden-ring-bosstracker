@@ -1981,14 +1981,14 @@ function renderRanking(allBosses) {
     var doneBossCount = allBosses.filter(function(b) { return b.done; }).length;
     subtitle.textContent = top.length > 0
       ? "— Top " + top.length + " von " + doneBossCount + " erledigten Bossen"
-      : "— noch keine Tode verzeichnet";
+      : "— No-Death Run still possible";
   }
 
   var listEl = document.getElementById("ranking-list");
   if (!listEl) return;
 
   if (top.length === 0) {
-    listEl.innerHTML = '<div class="ranking-empty">Noch keine Tode verzeichnet – viel Glück!</div>';
+    listEl.innerHTML = '<div class="ranking-empty">Noch nicht gestorben - Du Macherin!</div>';
     return;
   }
 
