@@ -1413,6 +1413,9 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
     <button class="toggle-btn" id="btn-dlc" onclick="toggleFlag('dlc')">
       <span class="dot"></span> Shadow of the Erdtree DLC
     </button>
+    <button class="toggle-btn" id="btn-mainbosses" onclick="toggleMainBosses()">
+      <span class="dot"></span> Main-Bosse
+    </button>
     <div class="divider"></div>
     <button class="toggle-btn" id="btn-expand-all" onclick="setAllCollapsed(false)">
       <span class="dot"></span> Alle aufklappen
@@ -1668,6 +1671,7 @@ const MAIN_BOSSES = new Set([
 var localCollapsed      = {};
 var showBase            = true;
 var showDLC             = true;
+var showMainBosses      = false;
 var previousBossStates  = {};
 var prevDeaths          = null;
 var prevDoneBosses      = null;
@@ -2135,6 +2139,15 @@ function toggleFlag(flag) {
     showDLC = !showDLC;
     document.getElementById("btn-dlc").classList.toggle("active", showDLC);
   }
+  renderFromCache();
+}
+
+function toggleMainBosses() {
+  showMainBosses = !showMainBosses;
+
+  var btn = document.getElementById("btn-mainbosses");
+  if (btn) btn.classList.toggle("active", showMainBosses);
+
   renderFromCache();
 }
 
@@ -2855,97 +2868,100 @@ function renderFromCache() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 function renderAreas(areas) {
+
   var grid = document.getElementById("areas-grid");
 
-  // ── PATCH 2+3: Pinned section — carry area name, add menu support ─────
-  var allPinned = [];
-  Object.keys(areas).forEach(function(areaName) {
-    var a = areas[areaName];
-    a.bosses.forEach(function(b) {
-      if (b.pinned) allPinned.push(Object.assign({}, b, { area: areaName }));
-    });
-  });
-
-  var pinnedSection = document.getElementById("pinned-section");
-  var pinnedList    = document.getElementById("pinned-list");
-  if (allPinned.length > 0) {
-    pinnedSection.style.display = "block";
-    pinnedList.innerHTML = "";
-    allPinned.forEach(function(b) {
-      var isMain    = MAIN_BOSSES.has(b.boss);
-      var editClass = isAuthorized() ? " editable" : "";
-      var card      = document.createElement("div");
-      card.className    = "pinned-card" + (b.done ? " done" : "") + editClass;
-      card.dataset.boss = b.boss;
-      card.dataset.area = b.area;
-      if (isAuthorized()) {
-        card.addEventListener("click", function(e) {
-          openBossMenu(e, b.area, b.boss);
-        });
-      }
-      card.innerHTML = '<span class="pinned-deaths">📌 ' + (b.deaths > 0 ? b.deaths : "–") + '</span>'
-        + '<span class="pinned-name' + (isMain ? " main-boss" : "") + '">' + escHtml(b.boss) + '</span>'
-        + (isAuthorized() ? '<span class="boss-edit-hint" title="Bearbeiten">✏</span>' : '');
-      pinnedList.appendChild(card);
-    });
-  } else {
-    pinnedSection.style.display = "none";
-  }
-
-  // Area cards
   var existingCards = {};
   grid.querySelectorAll(".area-card[data-area]").forEach(function(el) {
     existingCards[el.dataset.area] = el;
   });
 
   var newKeys = Object.keys(areas);
+
   Object.keys(existingCards).forEach(function(k) {
     if (!areas[k]) existingCards[k].remove();
   });
 
   newKeys.forEach(function(areaName, idx) {
+
     var data = areas[areaName];
-    var card = existingCards[areaName];
 
-    if (!card) {
-      card = document.createElement("div");
-      card.className  = "area-card";
-      card.dataset.area = areaName;
-    }
+    // Base/DLC Filter
+    if (!showBase && !data.isDLC) return;
+    if (!showDLC && data.isDLC) return;
 
-    if (!(areaName in localCollapsed)) localCollapsed[areaName] = data.collapsed;
-    var collapsed = localCollapsed[areaName];
-    card.classList.toggle("collapsed", collapsed);
+    // Main-Boss Filter
+    var visibleBosses = data.bosses.filter(function(b) {
+      if (showMainBosses && !MAIN_BOSSES.has(b.boss)) return false;
+      return true;
+    });
 
-    var pct      = data.total > 0 ? (data.done / data.total) * 100 : 0;
-    var complete = data.done === data.total && data.total > 0;
+    if (visibleBosses.length === 0) return;
+
+    var doneCount = visibleBosses.filter(function(b) {
+      return b.done;
+    }).length;
+
+    var totalCount = visibleBosses.length;
+
+    var pct = totalCount > 0
+      ? (doneCount / totalCount) * 100
+      : 0;
+
+    var complete = doneCount === totalCount && totalCount > 0;
+
     var dlcLabel = data.isDLC
       ? ' <span style="font-size:11px;color:var(--gold-dim);font-family:\'Crimson Pro\',serif;font-style:italic;">DLC</span>'
       : "";
 
-    card.innerHTML = '<div class="area-header" onclick="toggleArea(\'' + escAttr(areaName) + '\')">'
+    var card = existingCards[areaName];
+
+    if (!card) {
+      card = document.createElement("div");
+      card.className = "area-card";
+      card.dataset.area = areaName;
+    }
+
+    if (!(areaName in localCollapsed)) {
+      localCollapsed[areaName] = data.collapsed;
+    }
+
+    var collapsed = localCollapsed[areaName];
+
+    card.classList.toggle("collapsed", collapsed);
+
+    card.innerHTML =
+      '<div class="area-header" onclick="toggleArea(\'' + escAttr(areaName) + '\')">'
       + '<div class="area-header-left">'
       + '<span class="area-toggle-icon">▼</span>'
       + '<span class="area-name">' + escHtml(areaName) + dlcLabel + '</span>'
       + '</div>'
       + '<div class="area-progress-wrap">'
-      + '<span class="area-fraction">' + data.done + '/' + data.total + '</span>'
+      + '<span class="area-fraction">' + doneCount + '/' + totalCount + '</span>'
       + '<div class="area-progress-bar">'
-      + '<div class="area-progress-fill' + (complete ? " complete" : "") + '" style="width:' + pct + '%"></div>'
+      + '<div class="area-progress-fill'
+      + (complete ? " complete" : "")
+      + '" style="width:' + pct + '%"></div>'
       + '</div></div></div>'
       + '<div class="boss-list">'
-      + data.bosses.map(function(b) { return renderBossRow(b, areaName); }).join("")
+      + visibleBosses.map(function(b) {
+          return renderBossRow(b, areaName);
+        }).join("")
       + '</div>';
 
-    var children     = Array.from(grid.children);
+    var children = Array.from(grid.children);
     var currentIndex = children.indexOf(card);
+
     if (currentIndex !== idx) {
+
       if (idx >= grid.children.length) {
         grid.appendChild(card);
       } else {
         grid.insertBefore(card, grid.children[idx]);
       }
+
     }
+
   });
 
   if (searchQuery) applySearch();
