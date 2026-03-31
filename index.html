@@ -2324,8 +2324,18 @@ function processData(rows) {
   document.getElementById("val-percent").textContent = pct + "%";
   prevDoneBosses = doneBosses;
 
+  var rankingSnapshot = JSON.stringify(
+  allBosses
+    .filter(function(b) { return b.deaths > 0; })
+    .sort(function(a, b) { return b.deaths - a.deaths; })
+    .slice(0, RANKING_TOP_N)
+    .map(function(b) { return b.boss + ":" + b.deaths; })
+);
+if (rankingSnapshot !== prevRankingSnapshot) {
+  prevRankingSnapshot = rankingSnapshot;
   renderRanking(allBosses);
-  renderAreas(areas);
+}
+renderAreas(areas);
 }
 
 function renderFromCache() {
