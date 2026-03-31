@@ -570,15 +570,17 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
   display: flex; align-items: center; gap: 0; padding: 7px 16px;
   border-bottom: 1px solid rgba(201,164,74,0.06);
   transition: background 0.15s ease;
-  cursor: pointer;
+  cursor: default;
   position: relative;
 }
+
+.boss-row.editable { cursor: pointer; }
 
 .boss-row:last-child { border-bottom: none; }
 .boss-row:hover { background: rgba(201,164,74,0.06); }
 
 /* Subtiler Edit-Indikator rechts beim Hover */
-.boss-row::after {
+.boss-row.editable::after {
   content: "✎";
   position: absolute;
   right: 8px;
@@ -588,7 +590,7 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
   transition: opacity 0.2s ease;
   pointer-events: none;
 }
-.boss-row:hover::after { opacity: 0.5; }
+.boss-row.editable:hover::after { opacity: 0.5; }
 .boss-row.done:hover::after { right: 28px; }
 
 /* Aktive / gerade offene Zeile */
@@ -1765,7 +1767,7 @@ function fetchTwitchUser(token) {
     renderFromCache();
     showToast(userIsEditor
       ? "\u2714 Willkommen " + currentUser.display_name + " \u2014 Bearbeitungsrechte aktiv"
-      : "\U0001f441 Eingeloggt als " + currentUser.display_name + " (nur lesen)", 4000);
+      : "👁 Eingeloggt als " + currentUser.display_name + " (nur lesen)", 4000);
   })
   .catch(function(err) {
     console.error("[Auth] Fehler:", err);
@@ -1995,6 +1997,7 @@ function renderRanking(allBosses) {
 // ═══════════════════════════════════════════════════════════
 
 function openBossMenu(event, row) {
+  if (!isAuthorized()) return;
   event.stopPropagation();
 
   // Clip-Modal offen? Dann nicht öffnen
@@ -2798,13 +2801,14 @@ function renderBossRow(b, areaName) {
   var deathClass  = b.deaths === 0 ? " boss-deaths-zero" : "";
   return '<div class="boss-row'
     + (b.done ? " done" : "")
+    + (isAuthorized() ? " editable" : "")
     + '" data-boss="' + escAttr(b.boss) + '"'
     + ' data-area="' + escAttr(areaName) + '"'
     + ' data-deaths="' + b.deaths + '"'
     + ' data-done="' + (b.done ? "1" : "0") + '"'
     + ' data-pinned="' + (b.pinned ? "1" : "0") + '"'
-    + ' onclick="openBossMenu(event, this)"'
-    + ' title="Klicken zum Bearbeiten">'
+    + (isAuthorized() ? ' onclick="openBossMenu(event, this)" title="Klicken zum Bearbeiten"' : '')
+    + '>'
     + '<span class="boss-deaths' + deathClass + '">' + (b.deaths > 0 ? "†" + b.deaths : "†–") + '</span>'
     + '<span class="boss-name' + (isMain ? " main" : "") + '">' + escHtml(b.boss) + '</span>'
     + '<span class="boss-check">✓</span>'
