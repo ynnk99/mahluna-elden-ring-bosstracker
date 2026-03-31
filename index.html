@@ -2126,27 +2126,36 @@ function startTimerTick() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 function toggleFlag(flag) {
+
   if (flag === "base") {
     showBase = !showBase;
     document.getElementById("btn-basegame").classList.toggle("active", showBase);
-  } else {
+  }
+
+  if (flag === "dlc") {
     showDLC = !showDLC;
     document.getElementById("btn-dlc").classList.toggle("active", showDLC);
   }
+
   renderFromCache();
 }
 
 function toggleMainBosses() {
+
   showMainBosses = !showMainBosses;
 
-  var btn = document.getElementById("btn-mainbosses");
-  if (btn) btn.classList.toggle("active", showMainBosses);
+  document
+    .getElementById("btn-mainbosses")
+    .classList.toggle("active", showMainBosses);
 
   renderFromCache();
 }
 
 function setAllCollapsed(val) {
-  Object.keys(currentAreas).forEach(function(k) { localCollapsed[k] = val; });
+  Object.keys(currentAreas).forEach(function(k) {
+    localCollapsed[k] = val;
+  });
+
   renderAreas(currentAreas);
 }
 
@@ -2880,37 +2889,17 @@ function renderAreas(areas) {
 
     var data = areas[areaName];
 
-    // =====================
-    // Base / DLC Filter
-    // =====================
-
+    // Base/DLC Filter
     if (!showBase && !data.isDLC) return;
     if (!showDLC && data.isDLC) return;
 
-    // =====================
-    // MAIN BOSS FILTER
-    // =====================
-
+    // Main-Boss Filter
     var visibleBosses = data.bosses.filter(function(b) {
-
-      if (showMainBosses) {
-
-        var normalized = normalizeBossName(b.boss);
-
-        if (!MAIN_BOSSES_NORMALIZED.has(normalized)) {
-          return false;
-        }
-
-      }
-
+      if (showMainBosses && !MAIN_BOSSES.has(b.boss)) return false;
       return true;
     });
 
     if (visibleBosses.length === 0) return;
-
-    // =====================
-    // Progress
-    // =====================
 
     var doneCount = visibleBosses.filter(function(b) {
       return b.done;
