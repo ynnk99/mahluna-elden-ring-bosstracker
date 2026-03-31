@@ -1188,7 +1188,7 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 
 .add-clip-row2 {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr 1fr auto;
   gap: 12px;
   padding: 0 28px 18px;
   align-items: end;
@@ -1232,6 +1232,99 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
   .add-clip-divider { display: none; }
   .add-clip-row2 { grid-template-columns: 1fr; padding: 0 16px 16px; }
   .add-clip-form { padding: 16px; }
+}
+
+/* ─── BOSS CLIP BADGE ─── */
+.boss-clip-badge {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 2px 7px; background: rgba(145,70,255,0.1);
+  border: 1px solid rgba(145,70,255,0.28); border-radius: 10px;
+  font-family: 'Cinzel', serif; font-size: 10px; color: #b89cff;
+  margin-left: 5px; flex-shrink: 0; cursor: pointer;
+  transition: all 0.15s ease; letter-spacing: 0.03em; line-height: 1.4;
+}
+.boss-clip-badge:hover { background: rgba(145,70,255,0.22); border-color: rgba(145,70,255,0.55); color: #c4a8ff; box-shadow: 0 0 8px rgba(145,70,255,0.15); }
+
+/* ─── BOSS CLIPS MODAL ─── */
+.boss-clips-backdrop {
+  position: fixed; inset: 0; background: rgba(3,2,1,0.75);
+  backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+  z-index: 510; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+}
+.boss-clips-backdrop.open { opacity: 1; pointer-events: all; }
+
+.boss-clips-modal {
+  position: fixed; inset: 0; z-index: 511; display: flex;
+  pointer-events: none; transform: translateY(22px); opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.boss-clips-modal.open { pointer-events: all; opacity: 1; transform: translateY(0); }
+
+.boss-clips-inner {
+  display: flex; flex-direction: column;
+  max-width: 920px; width: calc(100% - 40px); max-height: calc(100vh - 56px);
+  margin: auto;
+  background: linear-gradient(170deg, rgba(16,12,8,0.99) 0%, rgba(10,9,7,0.99) 100%);
+  border: 1px solid rgba(145,70,255,0.32); border-radius: 10px;
+  box-shadow: 0 0 60px rgba(145,70,255,0.12), 0 20px 60px rgba(0,0,0,0.75);
+  overflow: hidden;
+}
+
+.boss-clips-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 24px; border-bottom: 1px solid rgba(145,70,255,0.18);
+  background: rgba(10,8,6,0.5); flex-shrink: 0; gap: 12px;
+}
+
+.boss-clips-title { display: flex; align-items: center; gap: 12px; min-width: 0; }
+
+.boss-clips-title h3 {
+  font-family: 'Cinzel', serif; font-size: 16px; font-weight: 600;
+  letter-spacing: 0.07em; color: var(--gold-light);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.boss-clips-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 12px; background: rgba(145,70,255,0.15);
+  border: 1px solid rgba(145,70,255,0.3); border-radius: 20px;
+  font-family: 'Crimson Pro', serif; font-size: 13px; color: #b89cff;
+  white-space: nowrap; flex-shrink: 0;
+}
+
+.boss-clips-body {
+  flex: 1; overflow-y: auto; padding: 20px 24px;
+  scrollbar-width: thin; scrollbar-color: rgba(145,70,255,0.3) transparent;
+}
+.boss-clips-body::-webkit-scrollbar { width: 5px; }
+.boss-clips-body::-webkit-scrollbar-thumb { background: rgba(145,70,255,0.3); border-radius: 3px; }
+
+/* ─── CLIP CARD BOSS EDIT ─── */
+.clip-boss-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 14px 10px;
+  border-top: 1px solid rgba(145,70,255,0.1);
+  background: rgba(0,0,0,0.18);
+}
+.clip-boss-row label {
+  font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--gold-dim); white-space: nowrap; flex-shrink: 0;
+}
+.clip-boss-select {
+  flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(201,164,74,0.2);
+  border-radius: 4px; color: var(--parchment-dim); font-family: 'Crimson Pro', serif;
+  font-size: 13px; padding: 4px 8px; outline: none; transition: border-color 0.2s ease;
+}
+.clip-boss-select:focus { border-color: rgba(201,164,74,0.45); color: var(--parchment); }
+.clip-boss-select option { background: #0d0b10; color: var(--parchment); }
+.clip-boss-label {
+  padding: 5px 14px 8px; font-family: 'Crimson Pro', serif;
+  font-size: 12px; color: var(--gold-dim); font-style: italic;
+}
+
+@media (max-width: 600px) {
+  .boss-clips-inner { height: 100vh; max-height: none; border-radius: 0; width: 100%; margin: 0; }
+  .boss-clips-body { padding: 14px; }
 }
 </style>
 
@@ -1472,6 +1565,12 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
           <input class="add-clip-input" id="clip-title-input" type="text"
             placeholder="z.B. Malenia besiegt beim ersten Versuch" autocomplete="off">
         </div>
+        <div class="add-clip-field">
+          <label for="clip-boss-select">Boss <span style="opacity:0.45;font-family:'Crimson Pro',serif;font-style:italic;text-transform:none;letter-spacing:0;">(optional)</span></label>
+          <select class="add-clip-select" id="clip-boss-select">
+            <option value="">– Kein Boss –</option>
+          </select>
+        </div>
         <button class="add-clip-submit" id="add-clip-submit" onclick="submitNewClip()">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
           Clip speichern
@@ -1487,6 +1586,21 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
         <span>Clips werden geladen…</span>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ── BOSS CLIPS OVERLAY ── -->
+<div class="boss-clips-backdrop" id="boss-clips-backdrop" onclick="closeBossClipsPanel()"></div>
+<div class="boss-clips-modal" id="boss-clips-modal" role="dialog" aria-modal="true">
+  <div class="boss-clips-inner">
+    <div class="boss-clips-header">
+      <div class="boss-clips-title">
+        <h3 id="boss-clips-heading">Boss Clips</h3>
+        <span class="boss-clips-badge" id="boss-clips-badge">0 Clips</span>
+      </div>
+      <button class="clip-close-btn" onclick="closeBossClipsPanel()" title="Schließen">✕</button>
+    </div>
+    <div class="boss-clips-body" id="boss-clips-body"></div>
   </div>
 </div>
 
@@ -1515,7 +1629,7 @@ const SHEET_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
   + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json";
 
 const CLIPS_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
-  + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&range=V10:X100";
+  + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&range=V10:Y100";
 
 const RANKING_TOP_N = 10;
 
@@ -1568,6 +1682,7 @@ var activeCategory = null;
 var currentAreas   = {};
 var searchQuery    = "";
 var prevRankingSnapshot = "";
+var clipsByBoss         = {};   // bossName → [clip, …]
 
 // Auth state
 var currentUser = null;
@@ -1982,6 +2097,7 @@ document.addEventListener("click", function(e) {
 
 document.addEventListener("keydown", function(e) {
   if (e.key === "Escape") {
+    closeBossClipsPanel();
     closeClipModal();
     closeBossMenu();
   }
@@ -2291,6 +2407,18 @@ function renderClipCard(clip, index) {
     ? '<p class="clip-title">' + escHtml(clip.title) + '</p>'
     : '';
 
+  var bossEditHtml = '';
+  if (isAuthorized()) {
+    bossEditHtml = '<div class="clip-boss-row">'
+      + '<label>Boss:</label>'
+      + '<select class="clip-boss-select" onchange="updateClipBoss(\'' + escAttr(clip.url) + '\',this.value)">'
+      + getBossOptions(clip.boss || "")
+      + '</select>'
+      + '</div>';
+  } else if (clip.boss) {
+    bossEditHtml = '<div class="clip-boss-label">🎮 ' + escHtml(clip.boss) + '</div>';
+  }
+
   return '<div class="clip-card">'
     + embedHtml
     + '<div class="clip-card-footer">'
@@ -2300,7 +2428,10 @@ function renderClipCard(clip, index) {
     + '<a href="' + escAttr(linkUrl) + '" target="_blank" rel="noopener" class="clip-open-link">'
     + '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42L17.59 5H14V3zM5 5h6v2H7v10h10v-4h2v6H5V5z"/></svg>'
     + 'Auf Twitch</a>'
-    + '</div></div></div>';
+    + '</div>'
+    + '</div>'
+    + bossEditHtml
+    + '</div>';
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -2316,6 +2447,15 @@ function toggleAddClipPanel() {
   panel.classList.toggle("open", addClipPanelOpen);
   btn.classList.toggle("active", addClipPanelOpen);
   if (addClipPanelOpen) {
+    // Populate boss select lazily on first open
+    var bossSelect = document.getElementById("clip-boss-select");
+    if (bossSelect && bossSelect.options.length <= 1) {
+      Array.from(MAIN_BOSSES).sort().forEach(function(b) {
+        var opt = document.createElement("option");
+        opt.value = b; opt.textContent = b;
+        bossSelect.appendChild(opt);
+      });
+    }
     setTimeout(function() {
       var inp = document.getElementById("clip-url-input");
       if (inp) inp.focus();
@@ -2327,15 +2467,17 @@ function toggleAddClipPanel() {
 function submitNewClip() {
   if (!isAuthorized()) return;
 
-  var urlEl   = document.getElementById("clip-url-input");
-  var catEl   = document.getElementById("clip-cat-select");
-  var titleEl = document.getElementById("clip-title-input");
-  var feedEl  = document.getElementById("add-clip-feedback");
+  var urlEl     = document.getElementById("clip-url-input");
+  var catEl     = document.getElementById("clip-cat-select");
+  var titleEl   = document.getElementById("clip-title-input");
+  var bossEl    = document.getElementById("clip-boss-select");
+  var feedEl    = document.getElementById("add-clip-feedback");
   var submitBtn = document.getElementById("add-clip-submit");
 
   var url      = urlEl.value.trim();
   var category = catEl.value;
   var title    = titleEl.value.trim();
+  var boss     = bossEl ? bossEl.value : "";
 
   // Basic validation
   feedEl.className = "add-clip-feedback";
@@ -2362,8 +2504,9 @@ function submitNewClip() {
   }
 
   // Optimistic local update
-  var newClip = { url: url, category: category, title: title };
+  var newClip = { url: url, category: category, title: title, boss: boss };
   clipsData.push(newClip);
+  rebuildClipsByBoss();
 
   // Update counts
   var countEl = document.getElementById("btn-clips-count");
@@ -2380,6 +2523,7 @@ function submitNewClip() {
   urlEl.value   = "";
   titleEl.value = "";
   catEl.value   = "Allgemein";
+  if (bossEl) bossEl.value = "";
 
   // Auto-close panel after a moment
   setTimeout(function() {
@@ -2393,10 +2537,10 @@ function submitNewClip() {
   }, 2200);
 
   // Write to sheet
-  writeClipToSheet(url, category, title);
+  writeClipToSheet(url, category, title, boss);
 }
 
-function writeClipToSheet(url, category, title) {
+function writeClipToSheet(url, category, title, boss) {
   if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === "DEINE_APPS_SCRIPT_URL_HIER") {
     console.warn("[Clips] Apps Script URL nicht konfiguriert – Clip nur lokal.");
     return;
@@ -2405,9 +2549,109 @@ function writeClipToSheet(url, category, title) {
     + "?action=addClip"
     + "&value="    + encodeURIComponent(url)
     + "&category=" + encodeURIComponent(category)
-    + "&title="    + encodeURIComponent(title);
+    + "&title="    + encodeURIComponent(title)
+    + "&boss="     + encodeURIComponent(boss || "");
   fetch(reqUrl, { method: "GET", mode: "no-cors" })
     .catch(function(err) { console.error("[Clips] Schreibfehler:", err); });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// BOSS CLIPS — helpers, panel, edit
+// ═══════════════════════════════════════════════════════════════════════════
+
+function rebuildClipsByBoss() {
+  clipsByBoss = {};
+  clipsData.forEach(function(c) {
+    if (c.boss && MAIN_BOSSES.has(c.boss)) {
+      if (!clipsByBoss[c.boss]) clipsByBoss[c.boss] = [];
+      clipsByBoss[c.boss].push(c);
+    }
+  });
+}
+
+function getBossOptions(selectedBoss) {
+  var opts = '<option value="">– Kein Boss –</option>';
+  Array.from(MAIN_BOSSES).sort().forEach(function(b) {
+    opts += '<option value="' + escAttr(b) + '"' + (b === selectedBoss ? ' selected' : '') + '>' + escHtml(b) + '</option>';
+  });
+  return opts;
+}
+
+function openBossClipsPanel(bossName, e) {
+  if (e) e.stopPropagation();
+  var clips = clipsByBoss[bossName] || [];
+  if (clips.length === 0) return;
+
+  document.getElementById("boss-clips-heading").textContent = bossName;
+  document.getElementById("boss-clips-badge").textContent =
+    clips.length + (clips.length === 1 ? " Clip" : " Clips");
+
+  var body = document.getElementById("boss-clips-body");
+  body.innerHTML = '<div class="clip-grid">'
+    + clips.map(function(c, i) { return renderClipCard(c, i); }).join("")
+    + '</div>';
+
+  document.getElementById("boss-clips-backdrop").classList.add("open");
+  document.getElementById("boss-clips-modal").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+function closeBossClipsPanel() {
+  document.getElementById("boss-clips-backdrop").classList.remove("open");
+  document.getElementById("boss-clips-modal").classList.remove("open");
+  if (!document.getElementById("clip-modal").classList.contains("open")) {
+    document.body.style.overflow = "";
+  }
+}
+
+function updateClipBoss(clipUrl, newBoss) {
+  var clip = clipsData.find(function(c) { return c.url === clipUrl; });
+  if (!clip) return;
+
+  var oldBoss = clip.boss || "";
+  clip.boss   = newBoss;
+  rebuildClipsByBoss();
+
+  // Refresh boss clips panel if open and affected
+  var panel = document.getElementById("boss-clips-modal");
+  if (panel && panel.classList.contains("open")) {
+    var heading  = document.getElementById("boss-clips-heading");
+    var panelBoss = heading ? heading.textContent : "";
+    if (panelBoss === oldBoss || panelBoss === newBoss) {
+      var clips = clipsByBoss[panelBoss] || [];
+      var body  = document.getElementById("boss-clips-body");
+      var badge = document.getElementById("boss-clips-badge");
+      if (clips.length === 0) {
+        closeBossClipsPanel();
+      } else {
+        badge.textContent = clips.length + (clips.length === 1 ? " Clip" : " Clips");
+        body.innerHTML = '<div class="clip-grid">'
+          + clips.map(function(c, i) { return renderClipCard(c, i); }).join("")
+          + '</div>';
+      }
+    }
+  }
+
+  // Refresh main clip modal if open
+  if (document.getElementById("clip-modal").classList.contains("open")) {
+    renderClipModal();
+  }
+
+  // Update boss badges on all boss rows
+  renderFromCache();
+
+  writeBossTagToSheet(clipUrl, newBoss);
+  showToast(newBoss ? "🎮 Boss gesetzt: " + newBoss : "Boss-Zuordnung entfernt", 2500);
+}
+
+function writeBossTagToSheet(clipUrl, boss) {
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === "DEINE_APPS_SCRIPT_URL_HIER") return;
+  var reqUrl = APPS_SCRIPT_URL
+    + "?action=setBossTag"
+    + "&value=" + encodeURIComponent(clipUrl)
+    + "&boss="  + encodeURIComponent(boss || "");
+  fetch(reqUrl, { method: "GET", mode: "no-cors" })
+    .catch(function(err) { console.error("[Clips] BossTag Schreibfehler:", err); });
 }
 
 // Show add-clip button only for editors
@@ -2440,12 +2684,15 @@ function loadClips() {
         var url      = row.c[0] && row.c[0].v ? String(row.c[0].v).trim() : "";
         var category = row.c[1] && row.c[1].v ? String(row.c[1].v).trim() : "Sonstige";
         var title    = row.c[2] && row.c[2].v ? String(row.c[2].v).trim() : "";
-        if (url) newClips.push({ url: url, category: category, title: title });
+        var boss     = row.c[3] && row.c[3].v ? String(row.c[3].v).trim() : "";
+        if (url) newClips.push({ url: url, category: category, title: title, boss: boss });
       });
 
       var clipsChanged = JSON.stringify(newClips) !== JSON.stringify(clipsData);
       if (clipsChanged) {
         clipsData = newClips;
+        rebuildClipsByBoss();
+        renderFromCache(); // boss-clip badges aktualisieren
 
         var countEl = document.getElementById("btn-clips-count");
         if (countEl) countEl.textContent = clipsData.length > 0 ? "(" + clipsData.length + ")" : "";
@@ -2713,12 +2960,18 @@ function renderBossRow(b, areaName) {
     ? ' onclick="openBossMenu(event,\'' + escAttr(areaName) + '\',\'' + escAttr(b.boss) + '\')"'
     : '';
 
+  var bossClipCount = (clipsByBoss[b.boss] || []).length;
+  var clipBadge = bossClipCount > 0
+    ? '<span class="boss-clip-badge" onclick="openBossClipsPanel(\'' + escAttr(b.boss) + '\',event)" title="' + bossClipCount + ' Clip' + (bossClipCount > 1 ? 's' : '') + ' ansehen">🎬 ' + bossClipCount + '</span>'
+    : '';
+
   return '<div class="boss-row' + (b.done ? " done" : "") + editClass + '"'
     + ' data-boss="' + escAttr(b.boss) + '"'
     + ' data-area="' + escAttr(areaName) + '"'
     + clickAttr + '>'
     + '<span class="boss-deaths' + deathClass + '">' + (b.deaths > 0 ? "†" + b.deaths : "†–") + '</span>'
     + '<span class="boss-name' + (isMain ? " main" : "") + '">' + escHtml(b.boss) + '</span>'
+    + clipBadge
     + '<span class="boss-check">✓</span>'
     + (isAuthorized() ? '<span class="boss-edit-hint" title="Bearbeiten">✏</span>' : '')
     + '</div>';
