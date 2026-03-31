@@ -576,7 +576,13 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
   50% { box-shadow: 0 0 20px rgba(201,164,74,0.35); }
 }
 
+/* ── PATCH 1: editable pinned cards ── */
 .pinned-card.done { opacity: 0.45; animation: none; }
+.pinned-card.editable { cursor: pointer; }
+.pinned-card.editable .boss-edit-hint { display: flex; }
+.pinned-card.editable:hover .boss-edit-hint { opacity: 0.5; }
+.pinned-card.editable:hover { background: rgba(201,164,74,0.12); }
+
 .pinned-name { font-family: 'Crimson Pro', serif; font-size: 15px; color: var(--parchment); }
 .pinned-name.main-boss { color: var(--gold-light); font-weight: 600; }
 .pinned-deaths { font-family: 'Cinzel', serif; font-size: 13px; color: var(--gold); }
@@ -635,11 +641,9 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 .boss-row:last-child { border-bottom: none; }
 .boss-row:hover { background: rgba(201,164,74,0.04); }
 
-/* Editable rows get a subtle cursor and hover state */
 .boss-row.editable { cursor: pointer; }
 .boss-row.editable:hover { background: rgba(201,164,74,0.07); }
 
-/* Edit hint icon — only visible on hover when user has edit rights */
 .boss-edit-hint {
   display: none;
   align-items: center;
@@ -657,9 +661,12 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 .boss-row.editable .boss-edit-hint { display: flex; }
 .boss-row.editable:hover .boss-edit-hint { opacity: 0.5; }
 
-/* Highlight row when menu is open for it */
 .boss-row.menu-open { background: rgba(201,164,74,0.10); }
 .boss-row.menu-open .boss-edit-hint { opacity: 1; }
+
+/* also highlight pinned card when its menu is open */
+.pinned-card.menu-open { background: rgba(201,164,74,0.12); box-shadow: 0 0 20px rgba(201,164,74,0.3); animation: none; }
+.pinned-card.menu-open .boss-edit-hint { opacity: 1; }
 
 .boss-deaths { font-family: 'Cinzel', serif; font-size: 14px; color: var(--gold); min-width: 40px; flex-shrink: 0; opacity: 0.9; }
 .boss-deaths-zero { opacity: 0.9; }
@@ -677,7 +684,6 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 .boss-check { font-size: 14px; flex-shrink: 0; margin-left: 8px; opacity: 0; transition: opacity 0.3s ease; color: #6ab86a; }
 .boss-row.done .boss-check { opacity: 0.7; }
 
-/* Pending sync indicator */
 .boss-row.syncing::after {
   content: "↑";
   position: absolute;
@@ -756,7 +762,6 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
   margin-top: 2px;
 }
 
-/* Deaths counter row */
 .boss-menu-deaths-row {
   display: flex;
   align-items: center;
@@ -812,7 +817,6 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
   opacity: 0.6;
 }
 
-/* Toggle action buttons */
 .boss-menu-actions {
   display: flex;
   flex-direction: column;
@@ -1316,37 +1320,15 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 
 <script>
 // ═══════════════════════════════════════════════════════════════════════════
-//  ██████╗ ██████╗ ███╗   ██╗███████╗██╗ ██████╗
-// ██╔════╝██╔═══██╗████╗  ██║██╔════╝██║██╔════╝
-// ██║     ██║   ██║██╔██╗ ██║█████╗  ██║██║  ███╗
-// ██║     ██║   ██║██║╚██╗██║██╔══╝  ██║██║   ██║
-// ╚██████╗╚██████╔╝██║ ╚████║██║     ██║╚██████╔╝
-//  ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝     ╚═╝ ╚═════╝
+//  CONFIG
 // ═══════════════════════════════════════════════════════════════════════════
-//
-// ┌─────────────────────────────────────────────────────────────────────────┐
-// │  SETUP — Fülle diese drei Werte aus, bevor du die Seite hostest:         │
-// │                                                                           │
-// │  1. TWITCH_CLIENT_ID  → Twitch Developer Console                         │
-// │     https://dev.twitch.tv/console/apps/create                            │
-// │     App-Typ: "Web Application"                                            │
-// │     Redirect URI: genau die URL dieser Seite (z.B. https://meine-seite.de)│
-// │                                                                           │
-// │  2. TWITCH_REDIRECT_URI → URL dieser Seite (ohne Slash am Ende)          │
-// │                                                                           │
-// │  3. APPS_SCRIPT_URL → URL deines Google Apps Script Web App              │
-// │     (Anleitung am Ende dieser Datei als Kommentar)                        │
-// │                                                                           │
-// │  4. ALLOWED_USERS → Twitch-Usernamen (lowercase) mit Bearbeitungsrechten │
-// └─────────────────────────────────────────────────────────────────────────┘
 
 const TWITCH_CLIENT_ID   = "n3oqt780bnsi3lb2gzinxdbrrazork";
 const TWITCH_REDIRECT_URI = window.location.origin + window.location.pathname;
 const APPS_SCRIPT_URL    = "https://script.google.com/macros/s/AKfycbwmB0Wyy7ziIbK2WpJOhPHRakyRULJVxeRNXC2g-M3WGfn1gVKKQz5Wym4WV6Q16jI/exec";
 
-// Twitch-Usernamen (alles lowercase!) mit Bearbeitungsrechten
 const ALLOWED_USERS = [
-  "ynnk99",    
+  "ynnk99",
   "mahluna",
   "der_gude_nico",
 ];
@@ -1416,7 +1398,7 @@ var searchQuery    = "";
 var prevRankingSnapshot = "";
 
 // Auth state
-var currentUser = null;  // { login, display_name, profile_image_url }
+var currentUser = null;
 var userIsEditor = false;
 
 // Boss menu state
@@ -1472,13 +1454,7 @@ function escAttr(str) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// ████████╗██╗    ██╗██╗████████╗ ██████╗██╗  ██╗
-//    ██╔══╝██║    ██║██║╚══██╔══╝██╔════╝██║  ██║
-//    ██║   ██║ █╗ ██║██║   ██║   ██║     ███████║
-//    ██║   ██║███╗██║██║   ██║   ██║     ██╔══██║
-//    ██║   ╚███╔███╔╝██║   ██║   ╚██████╗██║  ██║
-//    ╚═╝    ╚══╝╚══╝ ╚═╝   ╚═╝    ╚═════╝╚═╝  ╚═╝
-//  AUTH / TWITCH OAUTH (Implicit Grant Flow)
+// AUTH / TWITCH OAUTH
 // ═══════════════════════════════════════════════════════════════════════════
 
 function loginWithTwitch() {
@@ -1505,21 +1481,18 @@ function logout() {
   renderFromCache();
 }
 
-// Called on page load — handles OAuth callback hash AND restores saved session
 function checkAuthOnLoad() {
   var hash = window.location.hash;
   if (hash && hash.includes("access_token=")) {
     var params = new URLSearchParams(hash.substring(1));
     var token  = params.get("access_token");
     if (token) {
-      // Clean URL
       history.replaceState(null, "", window.location.pathname + window.location.search);
       fetchTwitchUser(token);
       return;
     }
   }
 
-  // Restore from localStorage
   var savedToken = localStorage.getItem("twitch_token");
   var savedUser  = localStorage.getItem("twitch_user");
   if (savedToken && savedUser) {
@@ -1575,7 +1548,6 @@ function updateLoginUI() {
     userWidget.classList.add("visible");
     document.getElementById("user-name").textContent = currentUser.display_name;
 
-    // Avatar
     var avatarImg         = document.getElementById("user-avatar");
     var avatarPlaceholder = document.getElementById("user-avatar-placeholder");
     if (currentUser.profile_image_url) {
@@ -1587,7 +1559,6 @@ function updateLoginUI() {
       avatarPlaceholder.style.display = "flex";
     }
 
-    // Role badge
     var badge = document.getElementById("user-role-badge");
     if (userIsEditor) {
       badge.textContent  = "✦ Editor";
@@ -1610,7 +1581,7 @@ function isAuthorized() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// SHEET WRITE-BACK  (via Google Apps Script Web App)
+// SHEET WRITE-BACK
 // ═══════════════════════════════════════════════════════════════════════════
 
 function writeToSheet(area, boss, action, value) {
@@ -1630,8 +1601,6 @@ function writeToSheet(area, boss, action, value) {
     });
 }
 
-// Optimistic update helper: modifies currentAreas in memory so the
-// UI reflects the change immediately, then writes to sheet.
 function applyLocalBossChange(area, boss, field, value) {
   if (!currentAreas[area]) return;
   var bossData = currentAreas[area].bosses.find(function(b) { return b.boss === boss; });
@@ -1640,21 +1609,20 @@ function applyLocalBossChange(area, boss, field, value) {
   var oldDone = bossData.done;
   bossData[field] = value;
 
-  // Recount area done
   currentAreas[area].done = currentAreas[area].bosses.filter(function(b) { return b.done; }).length;
 
-  // Re-render just this row immediately
   updateBossRow(area, boss, bossData);
   updateAreaHeader(area);
 
-  // Sync indicator
+  // Also update the pinned card if this boss is pinned
+  updatePinnedCard(area, boss, bossData);
+
   var row = document.querySelector('.boss-row[data-area="' + CSS.escape(area) + '"][data-boss="' + CSS.escape(boss) + '"]');
   if (row) {
     row.classList.add("syncing");
     setTimeout(function() { row.classList.remove("syncing"); }, 3000);
   }
 
-  // If boss just got marked done and it's a main boss, show toast
   if (field === "done" && value === true && !oldDone && MAIN_BOSSES.has(boss)) {
     showToast("✔ " + boss + " besiegt!");
   }
@@ -1668,7 +1636,6 @@ function updateBossRow(areaName, bossName, bossData) {
 
   var isDone       = bossData.done;
   var isMain       = MAIN_BOSSES.has(bossName);
-  var deathClass   = bossData.deaths === 0 ? " boss-deaths-zero" : "";
   var editClass    = isAuthorized() ? " editable" : "";
 
   row.className    = "boss-row" + (isDone ? " done" : "") + editClass;
@@ -1676,6 +1643,17 @@ function updateBossRow(areaName, bossName, bossData) {
   var nameEl       = row.querySelector(".boss-name");
   if (deathsEl) deathsEl.textContent = bossData.deaths > 0 ? "†" + bossData.deaths : "†–";
   if (nameEl)   nameEl.className     = "boss-name" + (isMain ? " main" : "");
+}
+
+// ── PATCH: update a pinned card's deaths/done state in place ──────────────
+function updatePinnedCard(areaName, bossName, bossData) {
+  var card = document.querySelector(
+    '.pinned-card[data-area="' + CSS.escape(areaName) + '"][data-boss="' + CSS.escape(bossName) + '"]'
+  );
+  if (!card) return;
+  card.classList.toggle("done", bossData.done);
+  var deathsEl = card.querySelector(".pinned-deaths");
+  if (deathsEl) deathsEl.textContent = "📌 " + (bossData.deaths > 0 ? bossData.deaths : "–");
 }
 
 function updateAreaHeader(areaName) {
@@ -1720,20 +1698,18 @@ function openBossMenu(e, areaName, bossName) {
     pinned: bossData.pinned
   };
 
-  // Update menu content
   document.getElementById("menu-boss-name").textContent = bossName;
   document.getElementById("menu-area-name").textContent = areaName;
   updateMenuDisplay();
 
-  // Position the menu near the click
   positionMenu(e);
 
-  // Mark row
-  document.querySelectorAll(".boss-row.menu-open").forEach(function(r) { r.classList.remove("menu-open"); });
-  var row = e.currentTarget;
-  row.classList.add("menu-open");
+  // Mark the triggering element (row OR pinned card)
+  document.querySelectorAll(".boss-row.menu-open, .pinned-card.menu-open").forEach(function(r) {
+    r.classList.remove("menu-open");
+  });
+  e.currentTarget.classList.add("menu-open");
 
-  // Show
   var menu = document.getElementById("boss-menu");
   menu.classList.add("open");
   menuOpen = true;
@@ -1743,7 +1719,7 @@ function positionMenu(e) {
   var menu   = document.getElementById("boss-menu");
   menu.style.display = "block";
   var mw     = 240;
-  var mh     = 260; // approximate
+  var mh     = 260;
   var vw     = window.innerWidth;
   var vh     = window.innerHeight;
   var cx     = e.clientX;
@@ -1765,7 +1741,9 @@ function closeBossMenu() {
   var menu = document.getElementById("boss-menu");
   menu.classList.remove("open");
   menuOpen = false;
-  document.querySelectorAll(".boss-row.menu-open").forEach(function(r) { r.classList.remove("menu-open"); });
+  document.querySelectorAll(".boss-row.menu-open, .pinned-card.menu-open").forEach(function(r) {
+    r.classList.remove("menu-open");
+  });
 }
 
 function updateMenuDisplay() {
@@ -2339,22 +2317,35 @@ function renderFromCache() {
 function renderAreas(areas) {
   var grid = document.getElementById("areas-grid");
 
-  // Pinned section
+  // ── PATCH 2+3: Pinned section — carry area name, add menu support ─────
   var allPinned = [];
-  Object.values(areas).forEach(function(a) {
-    a.bosses.forEach(function(b) { if (b.pinned) allPinned.push(b); });
+  Object.keys(areas).forEach(function(areaName) {
+    var a = areas[areaName];
+    a.bosses.forEach(function(b) {
+      if (b.pinned) allPinned.push(Object.assign({}, b, { area: areaName }));
+    });
   });
+
   var pinnedSection = document.getElementById("pinned-section");
   var pinnedList    = document.getElementById("pinned-list");
   if (allPinned.length > 0) {
     pinnedSection.style.display = "block";
     pinnedList.innerHTML = "";
     allPinned.forEach(function(b) {
-      var isMain = MAIN_BOSSES.has(b.boss);
-      var card   = document.createElement("div");
-      card.className = "pinned-card" + (b.done ? " done" : "");
+      var isMain    = MAIN_BOSSES.has(b.boss);
+      var editClass = isAuthorized() ? " editable" : "";
+      var card      = document.createElement("div");
+      card.className    = "pinned-card" + (b.done ? " done" : "") + editClass;
+      card.dataset.boss = b.boss;
+      card.dataset.area = b.area;
+      if (isAuthorized()) {
+        card.addEventListener("click", function(e) {
+          openBossMenu(e, b.area, b.boss);
+        });
+      }
       card.innerHTML = '<span class="pinned-deaths">📌 ' + (b.deaths > 0 ? b.deaths : "–") + '</span>'
-        + '<span class="pinned-name' + (isMain ? " main-boss" : "") + '">' + escHtml(b.boss) + '</span>';
+        + '<span class="pinned-name' + (isMain ? " main-boss" : "") + '">' + escHtml(b.boss) + '</span>'
+        + (isAuthorized() ? '<span class="boss-edit-hint" title="Bearbeiten">✏</span>' : '');
       pinnedList.appendChild(card);
     });
   } else {
@@ -2425,7 +2416,6 @@ function renderBossRow(b, areaName) {
   var deathClass = b.deaths === 0 ? " boss-deaths-zero" : "";
   var editClass  = isAuthorized() ? " editable" : "";
 
-  // onclick only if authorized
   var clickAttr = isAuthorized()
     ? ' onclick="openBossMenu(event,\'' + escAttr(areaName) + '\',\'' + escAttr(b.boss) + '\')"'
     : '';
