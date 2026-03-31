@@ -1636,33 +1636,27 @@ const CLIPS_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
 
 const RANKING_TOP_N = 10;
 
-const MAIN_BOSSES = new Set([
-  "Margit, das Grausame Mal",
-  "Godrick der Verpflanzte",
-  "Rennala, Königin des Vollmonds",
-  "Roter Wolf von Radagon",
-  "Sternengeißel Radahn",
-  "Götterverschlingende Schlange / Rykard, Fürst der Blasphemie",
-  "Drachenbaumwächter",
-  "Godfrey, Erster Eldenfürst",
-  "Morgott, König des Mals",
-  "Mohg, Fürst des Blutes",
-  "Feuerriese",
-  "Bestienkleriker / Maliketh, die Schwarze Klinge",
-  "Duo der Götterskalpe",
-  "Malenia, Klinge von Miquella",
-  "Godfrey, Erster Eldenfürst (Hoarah Loux)",
-  "Sir Gideon Ofnir, der Allwissende",
-  "Radagon von der Goldenen Ordnung / Eldenbestie",
-  "Rellana, Zwillings-Mondritterin",
-  "Göttliche Bestie - Tanzender Löwe",
-  "Messmer der Pfähler + Böse Schlange Messmer",
-  "Bayle der Schreckliche",
-  "Midra, Herr der Rasenden Flamme",
-  "Kommandant Gaius",
-  "Romina, Heilige der Knospe",
-  "Radahn, versprochener Gemahl + Radahn, Miquellas Gemahl",
-]);
+// ===============================
+// NORMALIZE FUNCTION
+// ===============================
+
+function normalizeBossName(name) {
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, " ")
+    .replace(/\s*\/\s*/g, " / ")
+    .replace(/\s*\+\s*/g, " + ");
+}
+
+
+// ===============================
+// NORMALIZED SET
+// ===============================
+
+const MAIN_BOSSES_NORMALIZED = new Set(
+  Array.from(MAIN_BOSSES).map(normalizeBossName)
+);
 
 // ═══════════════════════════════════════════════════════════════════════════
 // STATE
@@ -2886,17 +2880,37 @@ function renderAreas(areas) {
 
     var data = areas[areaName];
 
-    // Base/DLC Filter
+    // =====================
+    // Base / DLC Filter
+    // =====================
+
     if (!showBase && !data.isDLC) return;
     if (!showDLC && data.isDLC) return;
 
-    // Main-Boss Filter
+    // =====================
+    // MAIN BOSS FILTER
+    // =====================
+
     var visibleBosses = data.bosses.filter(function(b) {
-      if (showMainBosses && !MAIN_BOSSES.has(b.boss)) return false;
+
+      if (showMainBosses) {
+
+        var normalized = normalizeBossName(b.boss);
+
+        if (!MAIN_BOSSES_NORMALIZED.has(normalized)) {
+          return false;
+        }
+
+      }
+
       return true;
     });
 
     if (visibleBosses.length === 0) return;
+
+    // =====================
+    // Progress
+    // =====================
 
     var doneCount = visibleBosses.filter(function(b) {
       return b.done;
