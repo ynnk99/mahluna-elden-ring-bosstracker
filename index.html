@@ -891,6 +891,67 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 ::-webkit-scrollbar-track { background: var(--bg-deep); }
 ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
 
+
+/* ─── TWITCH LOGIN WIDGET ─── */
+.login-widget {
+  position: absolute; top: 40px; right: 0;
+  display: flex; align-items: center; gap: 10px;
+}
+.twitch-login-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 18px;
+  background: rgba(145,70,255,0.12);
+  border: 1px solid rgba(145,70,255,0.35);
+  border-radius: var(--radius);
+  color: #c4a8ff; font-family: 'Cinzel', serif;
+  font-size: 12px; letter-spacing: 0.08em;
+  cursor: pointer; transition: all 0.25s ease; text-transform: uppercase;
+}
+.twitch-login-btn:hover {
+  background: rgba(145,70,255,0.22); border-color: var(--twitch);
+  color: #d8c4ff; box-shadow: 0 0 18px rgba(145,70,255,0.25);
+}
+.twitch-login-btn svg { flex-shrink: 0; }
+.user-widget { display: none; align-items: center; gap: 10px; }
+.user-widget.visible { display: flex; }
+.user-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 1px solid rgba(145,70,255,0.4); object-fit: cover;
+  background: rgba(145,70,255,0.15);
+}
+.user-avatar-placeholder {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 1px solid rgba(145,70,255,0.4);
+  background: rgba(145,70,255,0.15);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; color: #b89cff;
+  font-family: 'Cinzel', serif; font-weight: 600; flex-shrink: 0;
+}
+.user-name-wrap { display: flex; flex-direction: column; gap: 2px; }
+.user-name { font-family: 'Cinzel', serif; font-size: 13px; color: #c4a8ff; letter-spacing: 0.05em; }
+.user-role-badge { display: inline-flex; align-items: center; gap: 4px; font-family: 'Crimson Pro', serif; font-size: 11px; letter-spacing: 0.04em; }
+.user-role-badge.editor { color: var(--gold); }
+.user-role-badge.viewer { color: var(--parchment-dim); opacity: 0.6; }
+.user-logout-btn {
+  padding: 5px 10px; background: transparent;
+  border: 1px solid rgba(201,164,74,0.2); border-radius: 4px;
+  color: var(--parchment-dim); font-family: 'Crimson Pro', serif;
+  font-size: 12px; cursor: pointer; transition: all 0.2s ease;
+}
+.user-logout-btn:hover { border-color: var(--gold-dim); color: var(--parchment); background: rgba(201,164,74,0.06); }
+/* ─── AUTH NOTICE BANNER ─── */
+.auth-notice {
+  display: none; align-items: center; gap: 10px;
+  padding: 10px 18px;
+  background: rgba(145,70,255,0.08);
+  border: 1px solid rgba(145,70,255,0.2);
+  border-radius: var(--radius); margin-bottom: 14px;
+  font-family: 'Crimson Pro', serif; font-size: 14px;
+  color: rgba(180,150,255,0.8); font-style: italic;
+}
+.auth-notice.visible { display: flex; }
+.auth-notice .notice-icon { font-size: 16px; }
+
 @media (max-width: 600px) {
   .areas-grid { grid-template-columns: 1fr; }
   .controls-bar { flex-direction: column; align-items: flex-start; }
@@ -1246,13 +1307,31 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 <div class="page-wrapper">
 
   <header class="site-header">
+    <div class="login-widget" id="login-widget">
+      <button class="twitch-login-btn" id="twitch-login-btn" onclick="loginWithTwitch()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="#9146ff"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>
+        Mit Twitch anmelden
+      </button>
+      <div class="user-widget" id="user-widget">
+        <div class="user-avatar-placeholder" id="user-avatar-placeholder">?</div>
+        <img class="user-avatar" id="user-avatar" src="" alt="" style="display:none;">
+        <div class="user-name-wrap">
+          <span class="user-name" id="user-name">–</span>
+          <span class="user-role-badge" id="user-role-badge"></span>
+        </div>
+        <button class="user-logout-btn" onclick="logout()">Abmelden</button>
+      </div>
+    </div>
     <h1>Elden Ring</h1>
     <p class="subtitle">Boss Tracker &amp; Fortschrittsübersicht</p>
     <div class="header-ornament">
       <span class="ornament-rune">⚔</span>
     </div>
   </header>
-
+  <div class="auth-notice" id="auth-notice">
+    <span class="notice-icon">👁</span>
+    <span>Du bist als Zuschauer angemeldet – Bearbeitungsrechte müssen von einem Admin vergeben werden.</span>
+  </div>
   <div class="stats-bar">
     <div class="stat-chip deaths-chip" id="stat-deaths">
       <span class="icon">💀</span>
@@ -1467,16 +1546,31 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 // KONFIGURATION
 // ═══════════════════════════════════════════════════════════
 
+// ┌─────────────────────────────────────────────────────────────────────────────┐
+// │  SETUP — Anpassen vor dem Hosten:                                     │
+// │  1. TWITCH_CLIENT_ID  → https://dev.twitch.tv/console/apps/create      │
+// │     Redirect URI = URL dieser Seite                                      │
+// │  2. APPS_SCRIPT_URL  → Google Apps Script Web App URL                  │
+// │  3. ALLOWED_USERS    → Twitch-Usernamen mit Bearbeitungsrechten         │
+// └─────────────────────────────────────────────────────────────────────────────┘
+
+const TWITCH_CLIENT_ID    = "n3oqt780bnsi3lb2gzinxdbrrazork";
+const TWITCH_REDIRECT_URI = window.location.origin + window.location.pathname;
+const APPS_SCRIPT_URL     = "https://script.google.com/macros/s/AKfycby9jq8b48n69StAXcE56S9LSSJMV4okZjPyF9Ax_FlCgtfaX48FWkoiMaSF8M5vT9S-/exec";
+
+// Twitch-Usernamen (alles lowercase!) mit Bearbeitungsrechten
+const ALLOWED_USERS = [
+  "ynnk99",
+  "mahluna",
+  "der_gude_nico",
+];
+
 const SPREADSHEET_ID = "1r9BzZJYFrk4rQLlMn4ZPBBUuc8u_peqwThTi1UTCQcE";
 
-const SHEET_URL  = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json";
-const CLIPS_URL  = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
+const SHEET_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
+  + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json";
+const CLIPS_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
   + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&range=V10:X100";
-
-// ▼▼▼ HIER deine Apps Script Web App URL eintragen ▼▼▼
-// Anleitung: siehe apps-script.gs
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby9jq8b48n69StAXcE56S9LSSJMV4okZjPyF9Ax_FlCgtfaX48FWkoiMaSF8M5vT9S-/exec";
-// ▲▲▲
 
 const RANKING_TOP_N = 10;
 
@@ -1530,6 +1624,10 @@ var currentAreas   = {};
 
 var searchQuery = "";
 
+// ── Auth state ──
+var currentUser  = null;  // { login, display_name, profile_image_url }
+var userIsEditor = false;
+
 // ── BOSS-MENÜ STATE ──
 var activeMenuRow    = null;  // das aktuell geöffnete <div.boss-row>
 var menuCurrentArea  = "";
@@ -1580,6 +1678,126 @@ function escHtml(str) {
 
 function escAttr(str) {
   return str.replace(/'/g, "\\'").replace(/"/g, '\\"');
+}
+
+
+// ═══════════════════════════════════════════════════════════
+// AUTH / TWITCH OAUTH (Implicit Grant Flow)
+// ═══════════════════════════════════════════════════════════
+
+function loginWithTwitch() {
+  var scope = "user:read:email";
+  var url   = "https://id.twitch.tv/oauth2/authorize"
+    + "?client_id="    + encodeURIComponent(TWITCH_CLIENT_ID)
+    + "&redirect_uri=" + encodeURIComponent(TWITCH_REDIRECT_URI)
+    + "&response_type=token"
+    + "&scope="        + encodeURIComponent(scope)
+    + "&force_verify=false";
+  window.location.href = url;
+}
+
+function logout() {
+  localStorage.removeItem("twitch_token");
+  localStorage.removeItem("twitch_user");
+  currentUser  = null;
+  userIsEditor = false;
+  updateLoginUI();
+  renderFromCache();
+}
+
+function checkAuthOnLoad() {
+  var hash = window.location.hash;
+  if (hash && hash.includes("access_token=")) {
+    var params = new URLSearchParams(hash.substring(1));
+    var token  = params.get("access_token");
+    if (token) {
+      history.replaceState(null, "", window.location.pathname + window.location.search);
+      fetchTwitchUser(token);
+      return;
+    }
+  }
+  var savedToken = localStorage.getItem("twitch_token");
+  var savedUser  = localStorage.getItem("twitch_user");
+  if (savedToken && savedUser) {
+    try {
+      currentUser  = JSON.parse(savedUser);
+      userIsEditor = ALLOWED_USERS.indexOf(currentUser.login.toLowerCase()) !== -1;
+      updateLoginUI();
+    } catch (e) {
+      localStorage.removeItem("twitch_token");
+      localStorage.removeItem("twitch_user");
+    }
+  }
+}
+
+function fetchTwitchUser(token) {
+  fetch("https://api.twitch.tv/helix/users", {
+    headers: {
+      "Authorization": "Bearer " + token,
+      "Client-Id":     TWITCH_CLIENT_ID
+    }
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (!data.data || data.data.length === 0) { throw new Error("No user data"); }
+    var user = data.data[0];
+    currentUser = {
+      login:             user.login,
+      display_name:      user.display_name,
+      profile_image_url: user.profile_image_url
+    };
+    userIsEditor = ALLOWED_USERS.indexOf(user.login.toLowerCase()) !== -1;
+    localStorage.setItem("twitch_token", token);
+    localStorage.setItem("twitch_user", JSON.stringify(currentUser));
+    updateLoginUI();
+    renderFromCache();
+    showToast(userIsEditor
+      ? "\u2714 Willkommen " + currentUser.display_name + " \u2014 Bearbeitungsrechte aktiv"
+      : "\U0001f441 Eingeloggt als " + currentUser.display_name + " (nur lesen)", 4000);
+  })
+  .catch(function(err) {
+    console.error("[Auth] Fehler:", err);
+    showToast("\u26a0 Twitch-Anmeldung fehlgeschlagen", 3500);
+  });
+}
+
+function updateLoginUI() {
+  var loginBtn   = document.getElementById("twitch-login-btn");
+  var userWidget = document.getElementById("user-widget");
+  var authNotice = document.getElementById("auth-notice");
+  if (currentUser) {
+    loginBtn.style.display = "none";
+    userWidget.classList.add("visible");
+    document.getElementById("user-name").textContent = currentUser.display_name;
+    var avatarImg         = document.getElementById("user-avatar");
+    var avatarPlaceholder = document.getElementById("user-avatar-placeholder");
+    if (currentUser.profile_image_url) {
+      avatarImg.src           = currentUser.profile_image_url;
+      avatarImg.style.display = "block";
+      avatarPlaceholder.style.display = "none";
+    } else {
+      avatarPlaceholder.textContent   = currentUser.display_name.charAt(0).toUpperCase();
+      avatarPlaceholder.style.display = "flex";
+    }
+    var badge = document.getElementById("user-role-badge");
+    if (userIsEditor) {
+      badge.textContent = "\u2746 Editor";
+      badge.className   = "user-role-badge editor";
+      authNotice.classList.remove("visible");
+    } else {
+      badge.textContent = "\u25cf Zuschauer";
+      badge.className   = "user-role-badge viewer";
+      authNotice.classList.add("visible");
+    }
+  } else {
+    loginBtn.style.display = "";
+    userWidget.classList.remove("visible");
+    authNotice.classList.remove("visible");
+  }
+}
+
+function isAuthorized() {
+  return userIsEditor && currentUser !== null;
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -2583,6 +2801,7 @@ document.getElementById("boss-menu").addEventListener("click", function(e) {
 // INIT
 // ═══════════════════════════════════════════════════════════
 
+checkAuthOnLoad();
 loadData();
 loadClips();
 setInterval(loadData,  5000);
