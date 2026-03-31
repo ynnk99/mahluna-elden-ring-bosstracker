@@ -1413,9 +1413,6 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
     <button class="toggle-btn" id="btn-dlc" onclick="toggleFlag('dlc')">
       <span class="dot"></span> Shadow of the Erdtree DLC
     </button>
-    <button class="toggle-btn" id="btn-mainbosses" onclick="toggleMainBosses()">
-      <span class="dot"></span> Main-Bosse
-    </button>
     <div class="divider"></div>
     <button class="toggle-btn" id="btn-expand-all" onclick="setAllCollapsed(false)">
       <span class="dot"></span> Alle aufklappen
@@ -1486,7 +1483,7 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 <div class="toast" id="toast"></div>
 
 <footer class="site-footer">
-  &copy; ynnk99 &bull; Daten werden alle 5 Sekunden aus Google Sheets geladen &bull; Elden Ring Boss Tracker
+  Daten werden alle 5 Sekunden aus Google Sheets geladen &bull; Elden Ring Boss Tracker
 </footer>
 
 <!-- ── BOSS CONTEXT MENU ── -->
@@ -1636,27 +1633,33 @@ const CLIPS_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
 
 const RANKING_TOP_N = 10;
 
-// ===============================
-// NORMALIZE FUNCTION
-// ===============================
-
-function normalizeBossName(name) {
-  return name
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, " ")
-    .replace(/\s*\/\s*/g, " / ")
-    .replace(/\s*\+\s*/g, " + ");
-}
-
-
-// ===============================
-// NORMALIZED SET
-// ===============================
-
-const MAIN_BOSSES_NORMALIZED = new Set(
-  Array.from(MAIN_BOSSES).map(normalizeBossName)
-);
+const MAIN_BOSSES = new Set([
+  "Margit, das Grausame Mal",
+  "Godrick der Verpflanzte",
+  "Rennala, Königin des Vollmonds",
+  "Roter Wolf von Radagon",
+  "Sternengeißel Radahn",
+  "Götterverschlingende Schlange / Rykard, Fürst der Blasphemie",
+  "Drachenbaumwächter",
+  "Godfrey, Erster Eldenfürst",
+  "Morgott, König des Mals",
+  "Mohg, Fürst des Blutes",
+  "Feuerriese",
+  "Bestienkleriker / Maliketh, die Schwarze Klinge",
+  "Duo der Götterskalpe",
+  "Malenia, Klinge von Miquella",
+  "Godfrey, Erster Eldenfürst (Hoarah Loux)",
+  "Sir Gideon Ofnir, der Allwissende",
+  "Radagon von der Goldenen Ordnung / Eldenbestie",
+  "Rellana, Zwillings-Mondritterin",
+  "Göttliche Bestie - Tanzender Löwe",
+  "Messmer der Pfähler + Böse Schlange Messmer",
+  "Bayle der Schreckliche",
+  "Midra, Herr der Rasenden Flamme",
+  "Kommandant Gaius",
+  "Romina, Heilige der Knospe",
+  "Radahn, versprochener Gemahl + Radahn, Miquellas Gemahl",
+]);
 
 // ═══════════════════════════════════════════════════════════════════════════
 // STATE
@@ -1665,7 +1668,6 @@ const MAIN_BOSSES_NORMALIZED = new Set(
 var localCollapsed      = {};
 var showBase            = true;
 var showDLC             = true;
-var showMainBosses      = false;
 var previousBossStates  = {};
 var prevDeaths          = null;
 var prevDoneBosses      = null;
@@ -2126,36 +2128,18 @@ function startTimerTick() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 function toggleFlag(flag) {
-
   if (flag === "base") {
     showBase = !showBase;
     document.getElementById("btn-basegame").classList.toggle("active", showBase);
-  }
-
-  if (flag === "dlc") {
+  } else {
     showDLC = !showDLC;
     document.getElementById("btn-dlc").classList.toggle("active", showDLC);
   }
-
-  renderFromCache();
-}
-
-function toggleMainBosses() {
-
-  showMainBosses = !showMainBosses;
-
-  document
-    .getElementById("btn-mainbosses")
-    .classList.toggle("active", showMainBosses);
-
   renderFromCache();
 }
 
 function setAllCollapsed(val) {
-  Object.keys(currentAreas).forEach(function(k) {
-    localCollapsed[k] = val;
-  });
-
+  Object.keys(currentAreas).forEach(function(k) { localCollapsed[k] = val; });
   renderAreas(currentAreas);
 }
 
@@ -2871,100 +2855,97 @@ function renderFromCache() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 function renderAreas(areas) {
-
   var grid = document.getElementById("areas-grid");
 
+  // ── PATCH 2+3: Pinned section — carry area name, add menu support ─────
+  var allPinned = [];
+  Object.keys(areas).forEach(function(areaName) {
+    var a = areas[areaName];
+    a.bosses.forEach(function(b) {
+      if (b.pinned) allPinned.push(Object.assign({}, b, { area: areaName }));
+    });
+  });
+
+  var pinnedSection = document.getElementById("pinned-section");
+  var pinnedList    = document.getElementById("pinned-list");
+  if (allPinned.length > 0) {
+    pinnedSection.style.display = "block";
+    pinnedList.innerHTML = "";
+    allPinned.forEach(function(b) {
+      var isMain    = MAIN_BOSSES.has(b.boss);
+      var editClass = isAuthorized() ? " editable" : "";
+      var card      = document.createElement("div");
+      card.className    = "pinned-card" + (b.done ? " done" : "") + editClass;
+      card.dataset.boss = b.boss;
+      card.dataset.area = b.area;
+      if (isAuthorized()) {
+        card.addEventListener("click", function(e) {
+          openBossMenu(e, b.area, b.boss);
+        });
+      }
+      card.innerHTML = '<span class="pinned-deaths">📌 ' + (b.deaths > 0 ? b.deaths : "–") + '</span>'
+        + '<span class="pinned-name' + (isMain ? " main-boss" : "") + '">' + escHtml(b.boss) + '</span>'
+        + (isAuthorized() ? '<span class="boss-edit-hint" title="Bearbeiten">✏</span>' : '');
+      pinnedList.appendChild(card);
+    });
+  } else {
+    pinnedSection.style.display = "none";
+  }
+
+  // Area cards
   var existingCards = {};
   grid.querySelectorAll(".area-card[data-area]").forEach(function(el) {
     existingCards[el.dataset.area] = el;
   });
 
   var newKeys = Object.keys(areas);
-
   Object.keys(existingCards).forEach(function(k) {
     if (!areas[k]) existingCards[k].remove();
   });
 
   newKeys.forEach(function(areaName, idx) {
-
     var data = areas[areaName];
-
-    // Base/DLC Filter
-    if (!showBase && !data.isDLC) return;
-    if (!showDLC && data.isDLC) return;
-
-    // Main-Boss Filter
-    var visibleBosses = data.bosses.filter(function(b) {
-      if (showMainBosses && !MAIN_BOSSES.has(b.boss)) return false;
-      return true;
-    });
-
-    if (visibleBosses.length === 0) return;
-
-    var doneCount = visibleBosses.filter(function(b) {
-      return b.done;
-    }).length;
-
-    var totalCount = visibleBosses.length;
-
-    var pct = totalCount > 0
-      ? (doneCount / totalCount) * 100
-      : 0;
-
-    var complete = doneCount === totalCount && totalCount > 0;
-
-    var dlcLabel = data.isDLC
-      ? ' <span style="font-size:11px;color:var(--gold-dim);font-family:\'Crimson Pro\',serif;font-style:italic;">DLC</span>'
-      : "";
-
     var card = existingCards[areaName];
 
     if (!card) {
       card = document.createElement("div");
-      card.className = "area-card";
+      card.className  = "area-card";
       card.dataset.area = areaName;
     }
 
-    if (!(areaName in localCollapsed)) {
-      localCollapsed[areaName] = data.collapsed;
-    }
-
+    if (!(areaName in localCollapsed)) localCollapsed[areaName] = data.collapsed;
     var collapsed = localCollapsed[areaName];
-
     card.classList.toggle("collapsed", collapsed);
 
-    card.innerHTML =
-      '<div class="area-header" onclick="toggleArea(\'' + escAttr(areaName) + '\')">'
+    var pct      = data.total > 0 ? (data.done / data.total) * 100 : 0;
+    var complete = data.done === data.total && data.total > 0;
+    var dlcLabel = data.isDLC
+      ? ' <span style="font-size:11px;color:var(--gold-dim);font-family:\'Crimson Pro\',serif;font-style:italic;">DLC</span>'
+      : "";
+
+    card.innerHTML = '<div class="area-header" onclick="toggleArea(\'' + escAttr(areaName) + '\')">'
       + '<div class="area-header-left">'
       + '<span class="area-toggle-icon">▼</span>'
       + '<span class="area-name">' + escHtml(areaName) + dlcLabel + '</span>'
       + '</div>'
       + '<div class="area-progress-wrap">'
-      + '<span class="area-fraction">' + doneCount + '/' + totalCount + '</span>'
+      + '<span class="area-fraction">' + data.done + '/' + data.total + '</span>'
       + '<div class="area-progress-bar">'
-      + '<div class="area-progress-fill'
-      + (complete ? " complete" : "")
-      + '" style="width:' + pct + '%"></div>'
+      + '<div class="area-progress-fill' + (complete ? " complete" : "") + '" style="width:' + pct + '%"></div>'
       + '</div></div></div>'
       + '<div class="boss-list">'
-      + visibleBosses.map(function(b) {
-          return renderBossRow(b, areaName);
-        }).join("")
+      + data.bosses.map(function(b) { return renderBossRow(b, areaName); }).join("")
       + '</div>';
 
-    var children = Array.from(grid.children);
+    var children     = Array.from(grid.children);
     var currentIndex = children.indexOf(card);
-
     if (currentIndex !== idx) {
-
       if (idx >= grid.children.length) {
         grid.appendChild(card);
       } else {
         grid.insertBefore(card, grid.children[idx]);
       }
-
     }
-
   });
 
   if (searchQuery) applySearch();
