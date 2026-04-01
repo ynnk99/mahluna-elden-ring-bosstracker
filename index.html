@@ -1414,6 +1414,9 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
     <button class="toggle-btn" id="btn-dlc" onclick="toggleFlag('dlc')">
       <span class="dot"></span> Shadow of the Erdtree DLC
     </button>
+    <button class="toggle-btn" id="btn-mainbosses" onclick="toggleFlag('main')">
+      <span class="dot"></span> Main Bosse
+    </button>
     <div class="divider"></div>
     <button class="toggle-btn" id="btn-expand-all" onclick="setAllCollapsed(false)">
       <span class="dot"></span> Alle aufklappen
@@ -1686,6 +1689,7 @@ const MAIN_BOSSES = new Set([
 var localCollapsed      = {};
 var showBase            = true;
 var showDLC             = true;
+var showOnlyMain        = false;
 var previousBossStates  = {};
 var prevDeaths          = null;
 var prevDoneBosses      = null;
@@ -2167,9 +2171,12 @@ function toggleFlag(flag) {
   if (flag === "base") {
     showBase = !showBase;
     document.getElementById("btn-basegame").classList.toggle("active", showBase);
-  } else {
+  } else if (flag === "dlc") {
     showDLC = !showDLC;
     document.getElementById("btn-dlc").classList.toggle("active", showDLC);
+  } else if (flag === "main") {
+    showOnlyMain = !showOnlyMain;
+    document.getElementById("btn-mainbosses").classList.toggle("active", showOnlyMain);
   }
   renderFromCache();
 }
@@ -2939,6 +2946,7 @@ function processData(rows) {
     var isDLC      = separatorIndex !== -1  && index > separatorIndex;
     if (isBaseGame && !showBase) return;
     if (isDLC      && !showDLC)  return;
+    if (showOnlyMain && !MAIN_BOSSES.has(boss)) return;
 
     var done           = isTrue(r.c[2] ? r.c[2].v : false);
     var date           = r.c[3] && r.c[3].f ? r.c[3].f.trim() : "";
