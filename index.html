@@ -1700,6 +1700,7 @@ var activeCategory = null;
 var currentAreas   = {};
 var searchQuery    = "";
 var prevRankingSnapshot = "";
+var prevChartSnapshot = "";
 var clipsByBoss         = {};   // bossName → [clip, …]
 var deathsWriteTimer = null;
 var pendingLocalChanges = {}; // key: "area|boss" → timestamp
@@ -2995,7 +2996,14 @@ function processData(rows) {
   prevDoneBosses = doneBosses;
 
   renderRanking(allBosses);
-  renderChart(allBosses);
+  var chartSnapshot = JSON.stringify(
+    allBosses.filter(function(b) { return b.done && b.date; })
+      .map(function(b) { return b.boss + "|" + b.date; })
+  );
+  if (chartSnapshot !== prevChartSnapshot) {
+    prevChartSnapshot = chartSnapshot;
+    renderChart(allBosses);
+  }
   renderAreas(areas);
 }
 
