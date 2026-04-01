@@ -3013,6 +3013,18 @@ function processData(rows) {
     renderRanking(allBosses);
   }
 
+  var chartSnapshot = JSON.stringify(
+    allBosses.filter(function(b) { return b.done && b.date; })
+      .map(function(b) { return b.boss + "|" + b.date; })
+  );
+  if (chartSnapshot !== prevChartSnapshot) {
+    prevChartSnapshot = chartSnapshot;
+    renderChart(allBosses);
+  }
+
+  renderAreas(areas);
+}
+
 function renderFromCache() {
   if (cachedRows) {
     processData(cachedRows);
