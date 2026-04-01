@@ -2821,8 +2821,8 @@ function processData(rows) {
     if (isDLC      && !showDLC)  return;
 
     var done           = isTrue(r.c[2] ? r.c[2].v : false);
-    var pinned         = isTrue(r.c[4] ? r.c[5].v : false);
-    var deaths         = Number(r.c[3] ? r.c[4].v : 0) || 0;
+    var deaths         = Number(r.c[4] ? r.c[4].v : 0) || 0;
+    var pinned         = isTrue(r.c[5] ? r.c[5].v : false);
     // Lokale Änderungen 10 Sekunden lang gegen Sheet-Überschreibung schützen
     var pendingKey = area + "|" + boss;
     if (pendingLocalChanges[pendingKey]) {
@@ -2838,7 +2838,7 @@ function processData(rows) {
         delete pendingLocalChanges[pendingKey];
       }
     }
-    var sheetCollapsed = isTrue(r.c[5] ? r.c[6].v : false);
+    var sheetCollapsed = isTrue(r.c[6] ? r.c[6].v : false);
     var key            = area + "|" + boss;
 
     if (!(key in previousBossStates)) {
