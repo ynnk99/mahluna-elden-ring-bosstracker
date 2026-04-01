@@ -1683,6 +1683,7 @@ var currentAreas   = {};
 var searchQuery    = "";
 var prevRankingSnapshot = "";
 var clipsByBoss         = {};   // bossName → [clip, …]
+var deathsWriteTimer = null;
 
 // Auth state
 var currentUser = null;
@@ -2026,6 +2027,12 @@ function positionMenu(e) {
 }
 
 function closeBossMenu() {
+  if (deathsWriteTimer) {
+    clearTimeout(deathsWriteTimer);
+    writeToSheet(menuState.area, menuState.boss, "setDeaths", menuState.deaths);
+    deathsWriteTimer = null;
+  }
+
   var menu = document.getElementById("boss-menu");
   menu.classList.remove("open");
   menuOpen = false;
@@ -2069,7 +2076,15 @@ function menuAdjustDeaths(delta) {
   menuState.deaths = newDeaths;
   updateMenuDisplay();
   applyLocalBossChange(menuState.area, menuState.boss, "deaths", newDeaths);
-  writeToSheet(menuState.area, menuState.boss, "setDeaths", newDeaths);
+
+  if (deathsWriteTimer) clearTimeout(deathsWriteTimer);
+  var capturedArea   = menuState.area;
+  var capturedBoss   = menuState.boss;
+  var capturedDeaths = newDeaths;
+  deathsWriteTimer = setTimeout(function() {
+    writeToSheet(capturedArea, capturedBoss, "setDeaths", capturedDeaths);
+    deathsWriteTimer = null;
+  }, 600);
 }
 
 function menuToggleDone() {
