@@ -1629,7 +1629,7 @@ const SHEET_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
   + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json";
 
 const CLIPS_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
-  + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&range=V10:Y100";
+  + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&range=W10:Z100";
 
 const RANKING_TOP_N = 10;
 
@@ -2764,8 +2764,8 @@ function loadData() {
 }
 
 function processData(rows) {
-  var baseGameFlag = isTrue(rows[0] && rows[0].c[15] ? rows[0].c[15].v : false);
-  var dlcFlag      = isTrue(rows[1] && rows[1].c[15] ? rows[1].c[15].v : false);
+  var baseGameFlag = isTrue(rows[0] && rows[0].c[16] ? rows[0].c[16].v : false);
+  var dlcFlag      = isTrue(rows[1] && rows[1].c[16] ? rows[1].c[16].v : false);
 
   if (prevDeaths === null) {
     showBase = baseGameFlag;
@@ -2774,13 +2774,13 @@ function processData(rows) {
     document.getElementById("btn-dlc").classList.toggle("active", showDLC);
   }
 
-  timerStartTs = Number(rows[0] && rows[0].c[21] ? rows[0].c[21].v : 0) || 0;
-  timerElapsed = Number(rows[2] && rows[2].c[21] ? rows[2].c[21].v : 0) || 0;
-  timerVisible = isTrue(rows[0] && rows[0].c[12] ? rows[0].c[12].v : false);
+  timerStartTs = Number(rows[0] && rows[0].c[22] ? rows[0].c[22].v : 0) || 0;
+  timerElapsed = Number(rows[2] && rows[2].c[22] ? rows[2].c[22].v : 0) || 0;
+  timerVisible = isTrue(rows[0] && rows[0].c[13] ? rows[0].c[13].v : false);
   updateTimerDisplay();
 
-  var baseDeaths   = Number(rows[1] && rows[1].c[9] ? rows[1].c[9].v : 0) || 0;
-  var dlcDeaths    = Number(rows[168] && rows[168].c[9] ? rows[168].c[9].v : 0) || 0;
+  var baseDeaths   = Number(rows[1] && rows[1].c[10] ? rows[1].c[10].v : 0) || 0;
+  var dlcDeaths    = Number(rows[168] && rows[168].c[10] ? rows[168].c[10].v : 0) || 0;
   var globalDeaths = 0;
   if (showBase && showDLC)  globalDeaths = baseDeaths + dlcDeaths;
   else if (showBase)         globalDeaths = baseDeaths;
@@ -2821,8 +2821,8 @@ function processData(rows) {
     if (isDLC      && !showDLC)  return;
 
     var done           = isTrue(r.c[2] ? r.c[2].v : false);
-    var pinned         = isTrue(r.c[4] ? r.c[4].v : false);
-    var deaths         = Number(r.c[3] ? r.c[3].v : 0) || 0;
+    var pinned         = isTrue(r.c[4] ? r.c[5].v : false);
+    var deaths         = Number(r.c[3] ? r.c[4].v : 0) || 0;
     // Lokale Änderungen 10 Sekunden lang gegen Sheet-Überschreibung schützen
     var pendingKey = area + "|" + boss;
     if (pendingLocalChanges[pendingKey]) {
@@ -2838,7 +2838,7 @@ function processData(rows) {
         delete pendingLocalChanges[pendingKey];
       }
     }
-    var sheetCollapsed = isTrue(r.c[5] ? r.c[5].v : false);
+    var sheetCollapsed = isTrue(r.c[5] ? r.c[6].v : false);
     var key            = area + "|" + boss;
 
     if (!(key in previousBossStates)) {
