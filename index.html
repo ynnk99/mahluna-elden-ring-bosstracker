@@ -3005,17 +3005,13 @@ function processData(rows) {
   document.getElementById("val-percent").textContent = pct + "%";
   prevDoneBosses = doneBosses;
 
-  renderRanking(allBosses);
-  var chartSnapshot = JSON.stringify(
-    allBosses.filter(function(b) { return b.done && b.date; })
-      .map(function(b) { return b.boss + "|" + b.date; })
+  var rankingSnapshot = JSON.stringify(
+    allBosses.map(function(b) { return b.boss + "|" + b.deaths + "|" + b.done; })
   );
-  if (chartSnapshot !== prevChartSnapshot) {
-    prevChartSnapshot = chartSnapshot;
-    renderChart(allBosses);
+  if (rankingSnapshot !== prevRankingSnapshot) {
+    prevRankingSnapshot = rankingSnapshot;
+    renderRanking(allBosses);
   }
-  renderAreas(areas);
-}
 
 function renderFromCache() {
   if (cachedRows) {
