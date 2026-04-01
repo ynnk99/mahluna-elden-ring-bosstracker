@@ -1336,6 +1336,7 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
     gtag('js', new Date());
     gtag('config', 'G-DDZ4BFG7JS');
   </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -1477,6 +1478,23 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
     </div>
     <div class="areas-grid" id="areas-grid" style="display:none;"></div>
   </main>
+
+  <section id="chart-section" style="display:none; margin-top: 30px;">
+  <div class="ranking-panel" id="chart-panel">
+    <div class="ranking-header" onclick="toggleChart()">
+      <div class="ranking-header-left">
+        <span class="ranking-toggle-icon" id="chart-toggle-icon">▼</span>
+        <span class="ranking-title">📅 Bosse pro Tag</span>
+        <span class="ranking-subtitle" id="chart-subtitle">— Fortschritt im Zeitverlauf</span>
+      </div>
+    </div>
+    <div class="ranking-body" id="chart-body">
+      <div style="padding: 20px 24px;">
+        <canvas id="boss-chart" height="120"></canvas>
+      </div>
+    </div>
+  </div>
+</section>
 
 </div><!-- /page-wrapper -->
 
@@ -2297,6 +2315,107 @@ function renderRanking(allBosses) {
   }).join("");
 }
 
+  var chartCollapsed = false;
+var chartInstance  = null;
+
+function toggleChart() {
+  chartCollapsed = !chartCollapsed;
+  document.getElementById("chart-panel").classList.toggle("collapsed", chartCollapsed);
+  document.getElementById("chart-toggle-icon").style.transform = chartCollapsed ? "rotate(-90deg)" : "";
+}
+
+function renderChart(allBosses) {
+  // Nur erledigte Bosse mit Datum
+  var byDate = {};
+  allBosses.forEach(function(b) {
+    if (!b.done || !b.date) return;
+    if (!byDate[b.date]) byDate[b.date] = [];
+    byDate[b.date].push(b.boss);
+  });
+
+  var dates = Object.keys(byDate).sort(function(a, b) {
+    // DD.MM.YYYY → sortierbar machen
+    var pa = a.split("."); var pb = b.split(".");
+    var da = new Date(pa[2], pa[1]-1, pa[0]);
+    var db = new Date(pb[2], pb[1]-1, pb[0]);
+    return da - db;
+  });
+
+  if (dates.length === 0) {
+    document.getElementById("chart-section").style.display = "none";
+    return;
+  }
+
+  document.getElementById("chart-section").style.display = "block";
+  document.getElementById("chart-subtitle").textContent =
+    "— " + dates.length + " Tage, " + allBosses.filter(function(b){ return b.done && b.date; }).length + " Bosse erledigt";
+
+  var counts  = dates.map(function(d) { return byDate[d].length; });
+  var bossList = dates.map(function(d) { return byDate[d]; });
+
+  var ctx = document.getElementById("boss-chart").getContext("2d");
+
+  if (chartInstance) { chartInstance.destroy(); }
+
+  chartInstance = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: dates,
+      datasets: [{
+        label: "Bosse besiegt",
+        data: counts,
+        backgroundColor: "rgba(201, 164, 74, 0.35)",
+        borderColor: "rgba(201, 164, 74, 0.85)",
+        borderWidth: 1,
+        borderRadius: 4,
+        hoverBackgroundColor: "rgba(227, 184, 115, 0.5)",
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: "rgba(14, 11, 7, 0.97)",
+          borderColor: "rgba(201, 164, 74, 0.4)",
+          borderWidth: 1,
+          titleColor: "#e3b873",
+          bodyColor: "#e6dcc8",
+          titleFont: { family: "Cinzel, serif", size: 12 },
+          bodyFont: { family: "Crimson Pro, Georgia, serif", size: 13 },
+          padding: 12,
+          callbacks: {
+            title: function(items) { return items[0].label; },
+            label: function(item) {
+              var list = bossList[item.dataIndex];
+              return ["† " + list.length + " Boss" + (list.length > 1 ? "se" : "") + ":"]
+                .concat(list.map(function(n){ return "  · " + n; }));
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: "#a89880",
+            font: { family: "Crimson Pro, serif", size: 12 }
+          },
+          grid: { color: "rgba(201,164,74,0.07)" }
+        },
+        y: {
+          beginAtZero: true,
+          ticks: {
+            color: "#a89880",
+            stepSize: 1,
+            font: { family: "Cinzel, serif", size: 11 }
+          },
+          grid: { color: "rgba(201,164,74,0.07)" }
+        }
+      }
+    }
+  });
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // CLIP HELPERS
 // ═══════════════════════════════════════════════════════════════════════════
@@ -2821,6 +2940,7 @@ function processData(rows) {
     if (isDLC      && !showDLC)  return;
 
     var done           = isTrue(r.c[2] ? r.c[2].v : false);
+    var date           = r.c[3] && r.c[3].f ? r.c[3].f.trim() : "";
     var deaths         = Number(r.c[4] ? r.c[4].v : 0) || 0;
     var pinned         = isTrue(r.c[5] ? r.c[5].v : false);
     // Lokale Änderungen 10 Sekunden lang gegen Sheet-Überschreibung schützen
@@ -2857,7 +2977,7 @@ function processData(rows) {
     if (done) areas[area].done++;
     areas[area].bosses.push({ boss: boss, done: done, deaths: deaths, pinned: pinned });
 
-    allBosses.push({ boss: boss, deaths: deaths, done: done, area: area });
+    allBosses.push({ boss: boss, deaths: deaths, done: done, area: area, date: date });
   });
 
   currentAreas = areas;
@@ -2875,6 +2995,7 @@ function processData(rows) {
   prevDoneBosses = doneBosses;
 
   renderRanking(allBosses);
+  renderChart(allBosses);
   renderAreas(areas);
 }
 
