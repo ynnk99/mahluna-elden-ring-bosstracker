@@ -1693,6 +1693,7 @@ var showOnlyMain        = false;
 var previousBossStates  = {};
 var prevDeaths          = null;
 var prevDoneBosses      = null;
+var cachedRows = null;
 
 var timerStartTs  = 0;
 var timerElapsed  = 0;
@@ -2891,6 +2892,7 @@ function loadData() {
 }
 
 function processData(rows) {
+  cachedRows = rows;
   var baseGameFlag = isTrue(rows[0] && rows[0].c[16] ? rows[0].c[16].v : false);
   var dlcFlag      = isTrue(rows[1] && rows[1].c[16] ? rows[1].c[16].v : false);
 
@@ -3016,7 +3018,11 @@ function processData(rows) {
 }
 
 function renderFromCache() {
-  if (Object.keys(currentAreas).length > 0) renderAreas(currentAreas);
+  if (cachedRows) {
+    processData(cachedRows);
+  } else if (Object.keys(currentAreas).length > 0) {
+    renderAreas(currentAreas);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
