@@ -1684,6 +1684,7 @@ var searchQuery    = "";
 var prevRankingSnapshot = "";
 var clipsByBoss         = {};   // bossName → [clip, …]
 var deathsWriteTimer = null;
+var pendingLocalChanges = {}; // key: "area|boss" → timestamp
 
 // Auth state
 var currentUser = null;
@@ -1891,6 +1892,7 @@ function writeToSheet(area, boss, action, value) {
 }
 
 function applyLocalBossChange(area, boss, field, value) {
+  pendingLocalChanges[area + "|" + boss] = Date.now();
   if (!currentAreas[area]) return;
   var bossData = currentAreas[area].bosses.find(function(b) { return b.boss === boss; });
   if (!bossData) return;
@@ -2821,6 +2823,21 @@ function processData(rows) {
     var done           = isTrue(r.c[2] ? r.c[2].v : false);
     var pinned         = isTrue(r.c[4] ? r.c[4].v : false);
     var deaths         = Number(r.c[3] ? r.c[3].v : 0) || 0;
+    // Lokale Änderungen 10 Sekunden lang gegen Sheet-Überschreibung schützen
+    var pendingKey = area + "|" + boss;
+    if (pendingLocalChanges[pendingKey]) {
+      var age = Date.now() - pendingLocalChanges[pendingKey];
+      if (age < 10000) {
+        var localBoss = currentAreas[area] && currentAreas[area].bosses.find(function(b) { return b.boss === boss; });
+        if (localBoss) {
+          deaths = localBoss.deaths;
+          done   = localBoss.done;
+          pinned = localBoss.pinned;
+        }
+      } else {
+        delete pendingLocalChanges[pendingKey];
+      }
+    }
     var sheetCollapsed = isTrue(r.c[5] ? r.c[5].v : false);
     var key            = area + "|" + boss;
 
