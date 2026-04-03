@@ -341,6 +341,20 @@ body::before {
 
 .toggle-btn.active .dot { background: var(--gold); box-shadow: 0 0 8px var(--gold); }
 
+/* ── Filter: Erledigt ── */
+.toggle-btn.done-btn { border-color: rgba(106,184,106,0.3); color: rgba(160,210,160,0.8); }
+.toggle-btn.done-btn .dot { background: rgba(106,184,106,0.4); }
+.toggle-btn.done-btn:hover { border-color: var(--green-bright); color: var(--green-bright); background: rgba(106,184,106,0.07); }
+.toggle-btn.done-btn.active { border-color: var(--green-bright); color: var(--green-bright); background: rgba(106,184,106,0.12); box-shadow: 0 0 12px rgba(106,184,106,0.18); }
+.toggle-btn.done-btn.active .dot { background: var(--green-bright); box-shadow: 0 0 8px var(--green-bright); }
+
+/* ── Filter: Offen ── */
+.toggle-btn.open-btn { border-color: rgba(196,74,58,0.3); color: rgba(220,140,130,0.8); }
+.toggle-btn.open-btn .dot { background: rgba(196,74,58,0.4); }
+.toggle-btn.open-btn:hover { border-color: var(--red-bright); color: var(--red-bright); background: rgba(196,74,58,0.07); }
+.toggle-btn.open-btn.active { border-color: var(--red-bright); color: var(--red-bright); background: rgba(196,74,58,0.12); box-shadow: 0 0 12px rgba(196,74,58,0.18); }
+.toggle-btn.open-btn.active .dot { background: var(--red-bright); box-shadow: 0 0 8px var(--red-bright); }
+
 .toggle-btn.twitch-btn { border-color: rgba(145, 70, 255, 0.35); color: rgba(180, 140, 255, 0.85); }
 .toggle-btn.twitch-btn .dot { background: rgba(145, 70, 255, 0.5); }
 .toggle-btn.twitch-btn:hover { border-color: var(--twitch); color: #b89cff; background: var(--twitch-dim); }
@@ -576,7 +590,6 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
   50% { box-shadow: 0 0 20px rgba(201,164,74,0.35); }
 }
 
-/* ── PATCH 1: editable pinned cards ── */
 .pinned-card.done { opacity: 0.45; animation: none; }
 .pinned-card.editable { cursor: pointer; }
 .pinned-card.editable .boss-edit-hint { display: flex; }
@@ -664,7 +677,6 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 .boss-row.menu-open { background: rgba(201,164,74,0.10); }
 .boss-row.menu-open .boss-edit-hint { opacity: 1; }
 
-/* also highlight pinned card when its menu is open */
 .pinned-card.menu-open { background: rgba(201,164,74,0.12); box-shadow: 0 0 20px rgba(201,164,74,0.3); animation: none; }
 .pinned-card.menu-open .boss-edit-hint { opacity: 1; }
 
@@ -1299,7 +1311,6 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 .boss-clips-body::-webkit-scrollbar { width: 5px; }
 .boss-clips-body::-webkit-scrollbar-thumb { background: rgba(145,70,255,0.3); border-radius: 3px; }
 
-/* ─── CLIP CARD BOSS EDIT ─── */
 .clip-boss-row {
   display: flex; align-items: center; gap: 8px;
   padding: 7px 14px 10px;
@@ -1346,14 +1357,12 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 
     <!-- ── TWITCH LOGIN WIDGET ── -->
     <div class="login-widget" id="login-widget">
-      <!-- Shown when not logged in -->
       <button class="twitch-login-btn" id="twitch-login-btn" onclick="loginWithTwitch()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="#9146ff">
           <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/>
         </svg>
         Mit Twitch anmelden
       </button>
-      <!-- Shown when logged in -->
       <div class="user-widget" id="user-widget">
         <div class="user-avatar-placeholder" id="user-avatar-placeholder">?</div>
         <img class="user-avatar" id="user-avatar" src="" alt="" style="display:none;">
@@ -1372,7 +1381,6 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
     </div>
   </header>
 
-  <!-- Auth notice (shown to logged-in viewers without edit rights) -->
   <div class="auth-notice" id="auth-notice">
     <span class="notice-icon">👁</span>
     <span id="auth-notice-text">Du bist als Zuschauer angemeldet. Bearbeitungsrechte müssen von einem Admin vergeben werden.</span>
@@ -1423,6 +1431,14 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
     </button>
     <button class="toggle-btn" id="btn-collapse-all" onclick="setAllCollapsed(true)">
       <span class="dot"></span> Alle zuklappen
+    </button>
+    <div class="divider"></div>
+    <!-- ── NEU: Erledigte / Offene Filter ── -->
+    <button class="toggle-btn done-btn" id="btn-done" onclick="toggleFlag('done')">
+      <span class="dot"></span> ✓ Erledigt
+    </button>
+    <button class="toggle-btn open-btn" id="btn-open" onclick="toggleFlag('open')">
+      <span class="dot"></span> ○ Offen
     </button>
     <div class="divider"></div>
     <button class="toggle-btn twitch-btn" id="btn-clips" onclick="openClipModal()">
@@ -1640,10 +1656,6 @@ const ALLOWED_USERS = [
   "der_gude_nico",
 ];
 
-// ═══════════════════════════════════════════════════════════════════════════
-// KONFIGURATION (unveränderlich)
-// ═══════════════════════════════════════════════════════════════════════════
-
 const SPREADSHEET_ID = "1r9BzZJYFrk4rQLlMn4ZPBBUuc8u_peqwThTi1UTCQcE";
 
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
@@ -1690,6 +1702,10 @@ var localCollapsed      = {};
 var showBase            = true;
 var showDLC             = true;
 var showOnlyMain        = false;
+// ── NEU: Filter für erledigte / offene Bosse ──────────────────────────────
+var showOnlyDone        = false;
+var showOnlyOpen        = false;
+// ─────────────────────────────────────────────────────────────────────────
 var previousBossStates  = {};
 var prevDeaths          = null;
 var prevDoneBosses      = null;
@@ -1706,9 +1722,9 @@ var currentAreas   = {};
 var searchQuery    = "";
 var prevRankingSnapshot = "";
 var prevChartSnapshot = "";
-var clipsByBoss         = {};   // bossName → [clip, …]
+var clipsByBoss         = {};
 var deathsWriteTimer = null;
-var pendingLocalChanges = {}; // key: "area|boss" → timestamp
+var pendingLocalChanges = {};
 
 // Auth state
 var currentUser = null;
@@ -1928,8 +1944,6 @@ function applyLocalBossChange(area, boss, field, value) {
 
   updateBossRow(area, boss, bossData);
   updateAreaHeader(area);
-
-  // Also update the pinned card if this boss is pinned
   updatePinnedCard(area, boss, bossData);
 
   var row = document.querySelector('.boss-row[data-area="' + CSS.escape(area) + '"][data-boss="' + CSS.escape(boss) + '"]');
@@ -1960,7 +1974,6 @@ function updateBossRow(areaName, bossName, bossData) {
   if (nameEl)   nameEl.className     = "boss-name" + (isMain ? " main" : "");
 }
 
-// ── PATCH: update a pinned card's deaths/done state in place ──────────────
 function updatePinnedCard(areaName, bossName, bossData) {
   var card = document.querySelector(
     '.pinned-card[data-area="' + CSS.escape(areaName) + '"][data-boss="' + CSS.escape(bossName) + '"]'
@@ -2019,7 +2032,6 @@ function openBossMenu(e, areaName, bossName) {
 
   positionMenu(e);
 
-  // Mark the triggering element (row OR pinned card)
   document.querySelectorAll(".boss-row.menu-open, .pinned-card.menu-open").forEach(function(r) {
     r.classList.remove("menu-open");
   });
@@ -2129,7 +2141,6 @@ function menuTogglePin() {
   writeToSheet(menuState.area, menuState.boss, "setPinned", newPinned ? "TRUE" : "FALSE");
 }
 
-// Close menu when clicking outside
 document.addEventListener("click", function(e) {
   if (!menuOpen) return;
   var menu = document.getElementById("boss-menu");
@@ -2178,6 +2189,24 @@ function toggleFlag(flag) {
   } else if (flag === "main") {
     showOnlyMain = !showOnlyMain;
     document.getElementById("btn-mainbosses").classList.toggle("active", showOnlyMain);
+  } else if (flag === "done") {
+    // ── NEU ──────────────────────────────────────────────────────────────
+    showOnlyDone = !showOnlyDone;
+    if (showOnlyDone) {
+      showOnlyOpen = false;
+      document.getElementById("btn-open").classList.remove("active");
+    }
+    document.getElementById("btn-done").classList.toggle("active", showOnlyDone);
+    // ─────────────────────────────────────────────────────────────────────
+  } else if (flag === "open") {
+    // ── NEU ──────────────────────────────────────────────────────────────
+    showOnlyOpen = !showOnlyOpen;
+    if (showOnlyOpen) {
+      showOnlyDone = false;
+      document.getElementById("btn-done").classList.remove("active");
+    }
+    document.getElementById("btn-open").classList.toggle("active", showOnlyOpen);
+    // ─────────────────────────────────────────────────────────────────────
   }
   renderFromCache();
 }
@@ -2324,7 +2353,7 @@ function renderRanking(allBosses) {
   }).join("");
 }
 
-  var chartCollapsed = false;
+var chartCollapsed = false;
 var chartInstance  = null;
 
 function toggleChart() {
@@ -2334,7 +2363,6 @@ function toggleChart() {
 }
 
 function renderChart(allBosses) {
-  // Nur erledigte Bosse mit Datum
   var byDate = {};
   allBosses.forEach(function(b) {
     if (!b.done || !b.date) return;
@@ -2343,7 +2371,6 @@ function renderChart(allBosses) {
   });
 
   var dates = Object.keys(byDate).sort(function(a, b) {
-    // DD.MM.YYYY → sortierbar machen
     var pa = a.split("."); var pb = b.split(".");
     var da = new Date(pa[2], pa[1]-1, pa[0]);
     var db = new Date(pb[2], pb[1]-1, pb[0]);
@@ -2592,7 +2619,6 @@ function toggleAddClipPanel() {
   panel.classList.toggle("open", addClipPanelOpen);
   btn.classList.toggle("active", addClipPanelOpen);
   if (addClipPanelOpen) {
-    // Populate boss select lazily on first open
     var bossSelect = document.getElementById("clip-boss-select");
     if (bossSelect && bossSelect.options.length <= 1) {
       Array.from(MAIN_BOSSES).sort().forEach(function(b) {
@@ -2624,7 +2650,6 @@ function submitNewClip() {
   var title    = titleEl.value.trim();
   var boss     = bossEl ? bossEl.value : "";
 
-  // Basic validation
   feedEl.className = "add-clip-feedback";
   if (!url) {
     feedEl.textContent = "⚠ Bitte einen Twitch-Link eingeben.";
@@ -2640,7 +2665,6 @@ function submitNewClip() {
     return;
   }
 
-  // Duplicate check
   var isDupe = clipsData.some(function(c) { return c.url.trim() === url; });
   if (isDupe) {
     feedEl.textContent = "⚠ Dieser Clip ist bereits in der Sammlung.";
@@ -2648,29 +2672,24 @@ function submitNewClip() {
     return;
   }
 
-  // Optimistic local update
   var newClip = { url: url, category: category, title: title, boss: boss };
   clipsData.push(newClip);
   rebuildClipsByBoss();
 
-  // Update counts
   var countEl = document.getElementById("btn-clips-count");
   if (countEl) countEl.textContent = "(" + clipsData.length + ")";
   var modalCount = document.getElementById("modal-clip-count");
   if (modalCount) modalCount.textContent = clipsData.length;
 
-  // Re-render modal content, switch to the new clip's tab
   activeCategory = category;
   renderClipModal();
 
-  // Feedback & reset form
   feedEl.textContent = "✔ Clip gespeichert – wird gleich im Sheet hinterlegt.";
   urlEl.value   = "";
   titleEl.value = "";
   catEl.value   = "Allgemein";
   if (bossEl) bossEl.value = "";
 
-  // Auto-close panel after a moment
   setTimeout(function() {
     addClipPanelOpen = false;
     var panel = document.getElementById("add-clip-panel");
@@ -2681,7 +2700,6 @@ function submitNewClip() {
     if (fb) fb.textContent = "";
   }, 2200);
 
-  // Write to sheet
   writeClipToSheet(url, category, title, boss);
 }
 
@@ -2701,7 +2719,7 @@ function writeClipToSheet(url, category, title, boss) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// BOSS CLIPS — helpers, panel, edit
+// BOSS CLIPS
 // ═══════════════════════════════════════════════════════════════════════════
 
 function rebuildClipsByBoss() {
@@ -2757,7 +2775,6 @@ function updateClipBoss(clipUrl, newBoss) {
   clip.boss   = newBoss;
   rebuildClipsByBoss();
 
-  // Refresh boss clips panel if open and affected
   var panel = document.getElementById("boss-clips-modal");
   if (panel && panel.classList.contains("open")) {
     var heading  = document.getElementById("boss-clips-heading");
@@ -2777,12 +2794,10 @@ function updateClipBoss(clipUrl, newBoss) {
     }
   }
 
-  // Refresh main clip modal if open
   if (document.getElementById("clip-modal").classList.contains("open")) {
     renderClipModal();
   }
 
-  // Update boss badges on all boss rows
   renderFromCache();
 
   writeBossTagToSheet(clipUrl, newBoss);
@@ -2799,7 +2814,6 @@ function writeBossTagToSheet(clipUrl, boss) {
     .catch(function(err) { console.error("[Clips] BossTag Schreibfehler:", err); });
 }
 
-// Show add-clip button only for editors
 function updateAddClipButton() {
   var btn = document.getElementById("add-clip-btn");
   if (!btn) return;
@@ -2807,7 +2821,6 @@ function updateAddClipButton() {
     btn.classList.add("editor-visible");
   } else {
     btn.classList.remove("editor-visible");
-    // Close panel if open when rights are lost
     if (addClipPanelOpen) toggleAddClipPanel();
   }
 }
@@ -2837,7 +2850,7 @@ function loadClips() {
       if (clipsChanged) {
         clipsData = newClips;
         rebuildClipsByBoss();
-        renderFromCache(); // boss-clip badges aktualisieren
+        renderFromCache();
 
         var countEl = document.getElementById("btn-clips-count");
         if (countEl) countEl.textContent = clipsData.length > 0 ? "(" + clipsData.length + ")" : "";
@@ -2954,7 +2967,12 @@ function processData(rows) {
     var date           = r.c[3] && r.c[3].f ? r.c[3].f.trim() : "";
     var deaths         = Number(r.c[4] ? r.c[4].v : 0) || 0;
     var pinned         = isTrue(r.c[5] ? r.c[5].v : false);
-    // Lokale Änderungen 10 Sekunden lang gegen Sheet-Überschreibung schützen
+
+    // ── NEU: Erledigt / Offen Filter ──────────────────────────────────────
+    if (showOnlyDone && !done) return;
+    if (showOnlyOpen && done) return;
+    // ──────────────────────────────────────────────────────────────────────
+
     var pendingKey = area + "|" + boss;
     if (pendingLocalChanges[pendingKey]) {
       var age = Date.now() - pendingLocalChanges[pendingKey];
@@ -3040,7 +3058,6 @@ function renderFromCache() {
 function renderAreas(areas) {
   var grid = document.getElementById("areas-grid");
 
-  // ── PATCH 2+3: Pinned section — carry area name, add menu support ─────
   var allPinned = [];
   Object.keys(areas).forEach(function(areaName) {
     var a = areas[areaName];
@@ -3075,7 +3092,6 @@ function renderAreas(areas) {
     pinnedSection.style.display = "none";
   }
 
-  // Area cards
   var existingCards = {};
   grid.querySelectorAll(".area-card[data-area]").forEach(function(el) {
     existingCards[el.dataset.area] = el;
@@ -3166,7 +3182,6 @@ function toggleArea(areaName) {
   if (card) card.classList.toggle("collapsed", localCollapsed[areaName]);
 }
 
-// Allow Enter key in clip form inputs to submit
 document.addEventListener("keydown", function(e) {
   if (e.key === "Enter" && addClipPanelOpen) {
     var active = document.activeElement;
