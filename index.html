@@ -116,6 +116,143 @@ body::before {
   color: var(--gold-dim);
 }
 
+/* ─── TWITCH LOGIN WIDGET ─── */
+.login-widget {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.twitch-login-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  background: rgba(145,70,255,0.12);
+  border: 1px solid rgba(145,70,255,0.35);
+  border-radius: var(--radius);
+  color: #c4a8ff;
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-transform: uppercase;
+}
+
+.twitch-login-btn:hover {
+  background: rgba(145,70,255,0.22);
+  border-color: var(--twitch);
+  color: #d8c4ff;
+  box-shadow: 0 0 18px rgba(145,70,255,0.25);
+}
+
+.twitch-login-btn svg { flex-shrink: 0; }
+
+.user-widget {
+  display: none;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-widget.visible { display: flex; }
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(145,70,255,0.4);
+  object-fit: cover;
+  background: rgba(145,70,255,0.15);
+}
+
+.user-avatar-placeholder {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(145,70,255,0.4);
+  background: rgba(145,70,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: #b89cff;
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.user-name-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.user-name {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  color: #c4a8ff;
+  letter-spacing: 0.05em;
+}
+
+.user-role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Crimson Pro', serif;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+
+.user-role-badge.editor {
+  color: var(--gold);
+}
+
+.user-role-badge.viewer {
+  color: var(--parchment-dim);
+  opacity: 0.6;
+}
+
+.user-logout-btn {
+  padding: 5px 10px;
+  background: transparent;
+  border: 1px solid rgba(201,164,74,0.2);
+  border-radius: 4px;
+  color: var(--parchment-dim);
+  font-family: 'Crimson Pro', serif;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.user-logout-btn:hover {
+  border-color: var(--gold-dim);
+  color: var(--parchment);
+  background: rgba(201,164,74,0.06);
+}
+
+/* ─── AUTH NOTICE BANNER ─── */
+.auth-notice {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  background: rgba(145,70,255,0.08);
+  border: 1px solid rgba(145,70,255,0.2);
+  border-radius: var(--radius);
+  margin-bottom: 14px;
+  font-family: 'Crimson Pro', serif;
+  font-size: 14px;
+  color: rgba(180,150,255,0.8);
+  font-style: italic;
+}
+
+.auth-notice.visible { display: flex; }
+.auth-notice .notice-icon { font-size: 16px; }
+
 /* ─── STATS BAR ─── */
 .stats-bar {
   display: flex;
@@ -411,7 +548,7 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 }
 
 .rank-number { font-family: 'Cinzel', serif; font-size: 16px; letter-spacing: 0.06em; color: var(--gold-dim); min-width: 24px; flex-shrink: 0; text-align: right; }
-.rank-number.top1 { color: #e3b873; }
+.rank-number.top1 { color: #e3b873; font-size: 16px; }
 .rank-number.top2 { color: #c0c0c0; }
 .rank-number.top3 { color: #cd7f32; }
 
@@ -454,6 +591,11 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 }
 
 .pinned-card.done { opacity: 0.45; animation: none; }
+.pinned-card.editable { cursor: pointer; }
+.pinned-card.editable .boss-edit-hint { display: flex; }
+.pinned-card.editable:hover .boss-edit-hint { opacity: 0.5; }
+.pinned-card.editable:hover { background: rgba(201,164,74,0.12); }
+
 .pinned-name { font-family: 'Crimson Pro', serif; font-size: 15px; color: var(--parchment); }
 .pinned-name.main-boss { color: var(--gold-light); font-weight: 600; }
 .pinned-deaths { font-family: 'Cinzel', serif; font-size: 13px; color: var(--gold); }
@@ -512,6 +654,32 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 .boss-row:last-child { border-bottom: none; }
 .boss-row:hover { background: rgba(201,164,74,0.04); }
 
+.boss-row.editable { cursor: pointer; }
+.boss-row.editable:hover { background: rgba(201,164,74,0.07); }
+
+.boss-edit-hint {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-left: 6px;
+  opacity: 0;
+  font-size: 11px;
+  color: var(--gold-dim);
+  transition: opacity 0.2s ease;
+  flex-shrink: 0;
+}
+
+.boss-row.editable .boss-edit-hint { display: flex; }
+.boss-row.editable:hover .boss-edit-hint { opacity: 0.5; }
+
+.boss-row.menu-open { background: rgba(201,164,74,0.10); }
+.boss-row.menu-open .boss-edit-hint { opacity: 1; }
+
+.pinned-card.menu-open { background: rgba(201,164,74,0.12); box-shadow: 0 0 20px rgba(201,164,74,0.3); animation: none; }
+.pinned-card.menu-open .boss-edit-hint { opacity: 1; }
+
 .boss-deaths { font-family: 'Cinzel', serif; font-size: 16px; color: var(--gold); min-width: 44px; flex-shrink: 0; opacity: 0.9; }
 .boss-deaths-zero { opacity: 0.9; }
 
@@ -528,16 +696,190 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 .boss-check { font-size: 14px; flex-shrink: 0; margin-left: 8px; opacity: 0; transition: opacity 0.3s ease; color: #6ab86a; }
 .boss-row.done .boss-check { opacity: 0.7; }
 
-/* ─── BOSS CLIP BADGE ─── */
-.boss-clip-badge {
-  display: inline-flex; align-items: center; gap: 3px;
-  padding: 3px 9px; background: rgba(145,70,255,0.1);
-  border: 1px solid rgba(145,70,255,0.28); border-radius: 10px;
-  font-family: 'Cinzel', serif; font-size: 15px; color: #b89cff;
-  margin-left: 6px; flex-shrink: 0; cursor: pointer;
-  transition: all 0.15s ease; letter-spacing: 0.03em; line-height: 1.4;
+.boss-row.syncing::after {
+  content: "↑";
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  color: var(--gold-dim);
+  animation: syncPulse 1s ease-in-out infinite;
 }
-.boss-clip-badge:hover { background: rgba(145,70,255,0.22); border-color: rgba(145,70,255,0.55); color: #c4a8ff; box-shadow: 0 0 8px rgba(145,70,255,0.15); }
+
+@keyframes syncPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+/* ─── BOSS CONTEXT MENU ─── */
+.boss-menu {
+  position: fixed;
+  z-index: 200;
+  min-width: 240px;
+  background: linear-gradient(160deg, rgba(18,15,9,0.98) 0%, rgba(10,9,7,0.99) 100%);
+  border: 1px solid rgba(201,164,74,0.4);
+  border-radius: 8px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.7), 0 0 30px rgba(201,164,74,0.08);
+  overflow: hidden;
+  transform-origin: top left;
+  opacity: 0;
+  transform: scale(0.92) translateY(-4px);
+  transition: opacity 0.18s ease, transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.boss-menu.open {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  pointer-events: all;
+}
+
+.boss-menu-header {
+  padding: 12px 16px 10px;
+  border-bottom: 1px solid rgba(201,164,74,0.15);
+  background: rgba(201,164,74,0.04);
+}
+
+.boss-menu-bossname {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--gold-light);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.boss-menu-areaname {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--parchment-dim);
+  margin-top: 2px;
+  opacity: 0.6;
+}
+
+.boss-menu-body {
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.boss-menu-section-label {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+  padding: 0 4px;
+  margin-top: 2px;
+}
+
+.boss-menu-deaths-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: rgba(0,0,0,0.25);
+  border-radius: 5px;
+  border: 1px solid rgba(201,164,74,0.1);
+}
+
+.boss-menu-deaths-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px; height: 30px;
+  background: transparent;
+  border: 1px solid rgba(201,164,74,0.25);
+  border-radius: 4px;
+  color: var(--gold);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  font-family: monospace;
+}
+
+.boss-menu-deaths-btn:hover {
+  background: rgba(201,164,74,0.12);
+  border-color: rgba(201,164,74,0.5);
+  color: var(--gold-light);
+}
+
+.boss-menu-deaths-btn:active { transform: scale(0.92); }
+.boss-menu-deaths-btn.danger { color: var(--red); border-color: rgba(196,74,58,0.3); }
+.boss-menu-deaths-btn.danger:hover { background: rgba(196,74,58,0.1); border-color: var(--red); color: var(--red-bright); }
+
+.boss-menu-deaths-val {
+  flex: 1;
+  text-align: center;
+  font-family: 'Cinzel', serif;
+  font-size: 20px;
+  color: var(--gold-light);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.boss-menu-deaths-label {
+  font-family: 'Crimson Pro', serif;
+  font-size: 11px;
+  color: var(--parchment-dim);
+  text-align: center;
+  opacity: 0.6;
+}
+
+.boss-menu-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.boss-menu-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(201,164,74,0.1);
+  border-radius: 5px;
+  color: var(--parchment);
+  font-family: 'Crimson Pro', serif;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+}
+
+.boss-menu-action-btn:hover {
+  background: rgba(201,164,74,0.08);
+  border-color: rgba(201,164,74,0.3);
+  color: var(--parchment);
+}
+
+.boss-menu-action-btn.active {
+  background: rgba(106,184,106,0.1);
+  border-color: rgba(106,184,106,0.3);
+  color: var(--green-bright);
+}
+
+.boss-menu-action-btn.active:hover {
+  background: rgba(106,184,106,0.15);
+}
+
+.boss-menu-action-btn.active-pin {
+  background: rgba(201,164,74,0.1);
+  border-color: rgba(201,164,74,0.35);
+  color: var(--gold);
+}
+
+.boss-menu-action-btn .action-icon { font-size: 16px; flex-shrink: 0; }
+
+.boss-menu-divider {
+  height: 1px;
+  background: rgba(201,164,74,0.1);
+  margin: 2px 0;
+}
 
 /* ─── ANIMATIONS ─── */
 @keyframes deathFlash {
@@ -596,6 +938,7 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 
 /* ─── RESPONSIVE ─── */
 @media (max-width: 700px) {
+  .login-widget { position: static; justify-content: flex-end; margin-bottom: 12px; }
   .site-header { padding-top: 20px; }
   .areas-grid { grid-template-columns: 1fr; }
   .controls-bar { flex-direction: column; align-items: flex-start; }
@@ -710,7 +1053,7 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
   border-radius: var(--radius); overflow: hidden;
   transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
 }
-.clip-card:hover { border-color: rgba(145,70,255,0.45); box-shadow: 0 4px 30px rgba(145,70,255,0.1); transform: translateY(-2px); }
+.clip-card:hover { border-color: rgba(145,70,255,0.45); box-shadow: 0 4px 30px rgba(145,70,255,0.1), 0 0 0 1px rgba(145,70,255,0.08); transform: translateY(-2px); }
 
 .clip-embed-wrapper { position: relative; width: 100%; padding-top: 56.25%; background: #070507; }
 .clip-embed-wrapper iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; display: block; }
@@ -762,6 +1105,157 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
   width: 32px; height: 32px; border: 2px solid rgba(145,70,255,0.12);
   border-top-color: var(--twitch); border-radius: 50%; animation: spin 1s linear infinite;
 }
+
+@media (max-width: 600px) {
+  .clip-modal-inner { height: 100vh; max-height: none; border-radius: 0; margin: 0; }
+  .clip-grid { grid-template-columns: 1fr; }
+  .clip-modal-header { padding: 14px 16px; }
+  .clip-body { padding: 16px; }
+  .clip-modal-title h2 { font-size: 16px; }
+}
+
+/* ─── ADD CLIP PANEL ─── */
+.add-clip-btn {
+  display: none;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  background: rgba(145,70,255,0.12);
+  border: 1px solid rgba(145,70,255,0.35);
+  border-radius: var(--radius);
+  color: #c4a8ff;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+.add-clip-btn:hover { background: rgba(145,70,255,0.22); border-color: var(--twitch); color: #d8c4ff; box-shadow: 0 0 14px rgba(145,70,255,0.2); }
+.add-clip-btn.active { background: rgba(145,70,255,0.22); border-color: var(--twitch); color: #d8c4ff; }
+.add-clip-btn.editor-visible { display: flex; }
+
+.add-clip-panel {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  background: rgba(8,6,12,0.7);
+  border-bottom: 1px solid transparent;
+  flex-shrink: 0;
+}
+.add-clip-panel.open {
+  max-height: 260px;
+  border-bottom-color: rgba(145,70,255,0.2);
+}
+
+.add-clip-form {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 12px;
+  padding: 18px 28px;
+  align-items: end;
+}
+
+.add-clip-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.add-clip-field label {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+}
+
+.add-clip-input,
+.add-clip-select {
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(145,70,255,0.25);
+  border-radius: 5px;
+  color: var(--parchment);
+  font-family: 'Crimson Pro', serif;
+  font-size: 15px;
+  padding: 9px 13px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+}
+.add-clip-input::placeholder { color: var(--parchment-dim); opacity: 0.45; font-style: italic; }
+.add-clip-input:focus,
+.add-clip-select:focus { border-color: rgba(145,70,255,0.6); box-shadow: 0 0 12px rgba(145,70,255,0.12); }
+
+.add-clip-select option { background: #0d0b10; color: var(--parchment); }
+
+.add-clip-divider {
+  width: 1px;
+  height: 38px;
+  background: rgba(145,70,255,0.15);
+  align-self: end;
+  margin-bottom: 1px;
+}
+
+.add-clip-row2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 12px;
+  padding: 0 28px 18px;
+  align-items: end;
+}
+
+.add-clip-submit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  background: rgba(145,70,255,0.18);
+  border: 1px solid rgba(145,70,255,0.45);
+  border-radius: 5px;
+  color: #c4a8ff;
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.add-clip-submit:hover { background: rgba(145,70,255,0.3); border-color: var(--twitch); color: #d8c4ff; box-shadow: 0 0 16px rgba(145,70,255,0.2); }
+.add-clip-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.add-clip-feedback {
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--green-bright);
+  padding: 0 28px 14px;
+  min-height: 20px;
+  transition: opacity 0.3s ease;
+}
+.add-clip-feedback.error { color: var(--red-bright); }
+.add-clip-feedback:empty { display: none; }
+
+@media (max-width: 700px) {
+  .add-clip-form { grid-template-columns: 1fr; }
+  .add-clip-divider { display: none; }
+  .add-clip-row2 { grid-template-columns: 1fr; padding: 0 16px 16px; }
+  .add-clip-form { padding: 16px; }
+}
+
+/* ─── BOSS CLIP BADGE ─── */
+.boss-clip-badge {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 3px 9px; background: rgba(145,70,255,0.1);
+  border: 1px solid rgba(145,70,255,0.28); border-radius: 10px;
+  font-family: 'Cinzel', serif; font-size: 15px; color: #b89cff;
+  margin-left: 6px; flex-shrink: 0; cursor: pointer;
+  transition: all 0.15s ease; letter-spacing: 0.03em; line-height: 1.4;
+}
+.boss-clip-badge:hover { background: rgba(145,70,255,0.22); border-color: rgba(145,70,255,0.55); color: #c4a8ff; box-shadow: 0 0 8px rgba(145,70,255,0.15); }
 
 /* ─── BOSS CLIPS MODAL ─── */
 .boss-clips-backdrop {
@@ -817,17 +1311,29 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 .boss-clips-body::-webkit-scrollbar { width: 5px; }
 .boss-clips-body::-webkit-scrollbar-thumb { background: rgba(145,70,255,0.3); border-radius: 3px; }
 
+.clip-boss-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 14px 10px;
+  border-top: 1px solid rgba(145,70,255,0.1);
+  background: rgba(0,0,0,0.18);
+}
+.clip-boss-row label {
+  font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--gold-dim); white-space: nowrap; flex-shrink: 0;
+}
+.clip-boss-select {
+  flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(201,164,74,0.2);
+  border-radius: 4px; color: var(--parchment-dim); font-family: 'Crimson Pro', serif;
+  font-size: 13px; padding: 4px 8px; outline: none; transition: border-color 0.2s ease;
+}
+.clip-boss-select:focus { border-color: rgba(201,164,74,0.45); color: var(--parchment); }
+.clip-boss-select option { background: #0d0b10; color: var(--parchment); }
 .clip-boss-label {
   padding: 5px 14px 8px; font-family: 'Crimson Pro', serif;
   font-size: 12px; color: var(--gold-dim); font-style: italic;
 }
 
 @media (max-width: 600px) {
-  .clip-modal-inner { height: 100vh; max-height: none; border-radius: 0; margin: 0; }
-  .clip-grid { grid-template-columns: 1fr; }
-  .clip-modal-header { padding: 14px 16px; }
-  .clip-body { padding: 16px; }
-  .clip-modal-title h2 { font-size: 16px; }
   .boss-clips-inner { height: 100vh; max-height: none; border-radius: 0; width: 100%; margin: 0; }
   .boss-clips-body { padding: 14px; }
 }
@@ -848,12 +1354,37 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 <div class="page-wrapper">
 
   <header class="site-header">
+
+    <!-- ── TWITCH LOGIN WIDGET ── -->
+    <div class="login-widget" id="login-widget">
+      <button class="twitch-login-btn" id="twitch-login-btn" onclick="loginWithTwitch()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="#9146ff">
+          <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/>
+        </svg>
+        Mit Twitch anmelden
+      </button>
+      <div class="user-widget" id="user-widget">
+        <div class="user-avatar-placeholder" id="user-avatar-placeholder">?</div>
+        <img class="user-avatar" id="user-avatar" src="" alt="" style="display:none;">
+        <div class="user-name-wrap">
+          <span class="user-name" id="user-name">–</span>
+          <span class="user-role-badge" id="user-role-badge"></span>
+        </div>
+        <button class="user-logout-btn" onclick="logout()">Abmelden</button>
+      </div>
+    </div>
+
     <h1>Elden Ring</h1>
     <p class="subtitle">Boss Tracker &amp; Fortschrittsübersicht</p>
     <div class="header-ornament">
       <span class="ornament-rune">⚔</span>
     </div>
   </header>
+
+  <div class="auth-notice" id="auth-notice">
+    <span class="notice-icon">👁</span>
+    <span id="auth-notice-text">Du bist als Zuschauer angemeldet. Bearbeitungsrechte müssen von einem Admin vergeben werden.</span>
+  </div>
 
   <div class="stats-bar">
     <div class="stat-chip deaths-chip" id="stat-deaths">
@@ -966,23 +1497,22 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
     <div class="areas-grid" id="areas-grid" style="display:none;"></div>
   </main>
 
-  <!-- CHART SECTION -->
   <section id="chart-section" style="display:none; margin-top: 30px;">
-    <div class="ranking-panel" id="chart-panel">
-      <div class="ranking-header" onclick="toggleChart()">
-        <div class="ranking-header-left">
-          <span class="ranking-toggle-icon" id="chart-toggle-icon">▼</span>
-          <span class="ranking-title">📅 Bosse pro Tag</span>
-          <span class="ranking-subtitle" id="chart-subtitle">— Fortschritt im Zeitverlauf</span>
-        </div>
-      </div>
-      <div class="ranking-body" id="chart-body">
-        <div style="padding: 20px 24px;">
-          <canvas id="boss-chart" height="120"></canvas>
-        </div>
+  <div class="ranking-panel" id="chart-panel">
+    <div class="ranking-header" onclick="toggleChart()">
+      <div class="ranking-header-left">
+        <span class="ranking-toggle-icon" id="chart-toggle-icon">▼</span>
+        <span class="ranking-title">📅 Bosse pro Tag</span>
+        <span class="ranking-subtitle" id="chart-subtitle">— Fortschritt im Zeitverlauf</span>
       </div>
     </div>
-  </section>
+    <div class="ranking-body" id="chart-body">
+      <div style="padding: 20px 24px;">
+        <canvas id="boss-chart" height="120"></canvas>
+      </div>
+    </div>
+  </div>
+</section>
 
 </div><!-- /page-wrapper -->
 
@@ -991,6 +1521,37 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 <footer class="site-footer">
   &copy; ynnk99 &bull; Daten werden alle 5 Sekunden aus Google Sheets geladen &bull; Elden Ring Boss Tracker
 </footer>
+
+<!-- ── BOSS CONTEXT MENU ── -->
+<div class="boss-menu" id="boss-menu" role="menu">
+  <div class="boss-menu-header">
+    <div class="boss-menu-bossname" id="menu-boss-name">–</div>
+    <div class="boss-menu-areaname" id="menu-area-name">–</div>
+  </div>
+  <div class="boss-menu-body">
+    <span class="boss-menu-section-label">Tode</span>
+    <div class="boss-menu-deaths-row">
+      <button class="boss-menu-deaths-btn danger" onclick="menuAdjustDeaths(-1)" title="−1 Tod">−</button>
+      <div>
+        <div class="boss-menu-deaths-val" id="menu-deaths-val">0</div>
+        <div class="boss-menu-deaths-label">Tode</div>
+      </div>
+      <button class="boss-menu-deaths-btn" onclick="menuAdjustDeaths(1)" title="+1 Tod">+</button>
+    </div>
+    <div class="boss-menu-divider"></div>
+    <span class="boss-menu-section-label">Aktionen</span>
+    <div class="boss-menu-actions">
+      <button class="boss-menu-action-btn" id="menu-done-btn" onclick="menuToggleDone()">
+        <span class="action-icon" id="menu-done-icon">☐</span>
+        <span id="menu-done-label">Als besiegt markieren</span>
+      </button>
+      <button class="boss-menu-action-btn" id="menu-pin-btn" onclick="menuTogglePin()">
+        <span class="action-icon" id="menu-pin-icon">📌</span>
+        <span id="menu-pin-label">Anpinnen</span>
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- ── CLIP MODAL ── -->
 <div class="clip-modal-backdrop" id="clip-backdrop" onclick="closeClipModal()"></div>
@@ -1006,8 +1567,54 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
           <span class="clip-count" id="modal-clip-count">0</span> Clips
         </div>
       </div>
-      <button class="clip-close-btn" onclick="closeClipModal()" title="Schließen">✕</button>
+      <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
+        <button class="add-clip-btn" id="add-clip-btn" onclick="toggleAddClipPanel()">
+          ➕ Clip hinzufügen
+        </button>
+        <button class="clip-close-btn" onclick="closeClipModal()" title="Schließen">✕</button>
+      </div>
     </div>
+
+    <!-- ── ADD CLIP PANEL ── -->
+    <div class="add-clip-panel" id="add-clip-panel">
+      <div class="add-clip-form">
+        <div class="add-clip-field">
+          <label for="clip-url-input">Twitch-Link</label>
+          <input class="add-clip-input" id="clip-url-input" type="text"
+            placeholder="https://clips.twitch.tv/…" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="add-clip-divider"></div>
+        <div class="add-clip-field">
+          <label for="clip-cat-select">Kategorie</label>
+          <select class="add-clip-select" id="clip-cat-select">
+            <option value="Allgemein">Allgemein</option>
+            <option value="Boss">Boss</option>
+            <option value="Funny Moment">Funny Moment</option>
+            <option value="Rage">Rage</option>
+            <option value="Sonstige">Sonstige</option>
+          </select>
+        </div>
+      </div>
+      <div class="add-clip-row2">
+        <div class="add-clip-field">
+          <label for="clip-title-input">Titel <span style="opacity:0.45;font-family:'Crimson Pro',serif;font-style:italic;text-transform:none;letter-spacing:0;">(optional)</span></label>
+          <input class="add-clip-input" id="clip-title-input" type="text"
+            placeholder="z.B. Malenia besiegt beim ersten Versuch" autocomplete="off">
+        </div>
+        <div class="add-clip-field">
+          <label for="clip-boss-select">Boss <span style="opacity:0.45;font-family:'Crimson Pro',serif;font-style:italic;text-transform:none;letter-spacing:0;">(optional)</span></label>
+          <select class="add-clip-select" id="clip-boss-select">
+            <option value="">– Kein Boss –</option>
+          </select>
+        </div>
+        <button class="add-clip-submit" id="add-clip-submit" onclick="submitNewClip()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+          Clip speichern
+        </button>
+      </div>
+      <div class="add-clip-feedback" id="add-clip-feedback"></div>
+    </div>
+
     <div class="clip-tabs" id="clip-tabs"></div>
     <div class="clip-body" id="clip-body">
       <div class="clip-loading" id="clip-modal-loading">
@@ -1035,8 +1642,18 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 
 <script>
 // ═══════════════════════════════════════════════════════════════════════════
-// CONFIG
+//  CONFIG
 // ═══════════════════════════════════════════════════════════════════════════
+
+const TWITCH_CLIENT_ID   = "n3oqt780bnsi3lb2gzinxdbrrazork";
+const TWITCH_REDIRECT_URI = window.location.origin + window.location.pathname;
+const APPS_SCRIPT_URL    = "https://script.google.com/macros/s/AKfycbwmB0Wyy7ziIbK2WpJOhPHRakyRULJVxeRNXC2g-M3WGfn1gVKKQz5Wym4WV6Q16jI/exec";
+
+const ALLOWED_USERS = [
+  "ynnk99",
+  "mahluna",
+  "der_gude_nico",
+];
 
 const SPREADSHEET_ID = "1r9BzZJYFrk4rQLlMn4ZPBBUuc8u_peqwThTi1UTCQcE";
 
@@ -1084,28 +1701,42 @@ var localCollapsed      = {};
 var showBase            = true;
 var showDLC             = true;
 var showOnlyMain        = false;
+// ── NEU: Filter für erledigte / offene Bosse ──────────────────────────────
 var showOnlyDone        = false;
 var showOnlyOpen        = false;
+// ─────────────────────────────────────────────────────────────────────────
 var previousBossStates  = {};
 var prevDeaths          = null;
 var prevDoneBosses      = null;
-var cachedRows          = null;
+var cachedRows = null;
 
 var timerStartTs  = 0;
 var timerElapsed  = 0;
 var timerVisible  = false;
 var timerInterval = null;
 
-var clipsData           = [];
-var activeCategory      = null;
-var currentAreas        = {};
-var searchQuery         = "";
+var clipsData      = [];
+var activeCategory = null;
+var currentAreas   = {};
+var searchQuery    = "";
 var prevRankingSnapshot = "";
-var prevChartSnapshot   = "";
+var prevChartSnapshot = "";
 var clipsByBoss         = {};
+var deathsWriteTimer = null;
+var pendingLocalChanges = {};
 
-var chartCollapsed = false;
-var chartInstance  = null;
+// Auth state
+var currentUser = null;
+var userIsEditor = false;
+
+// Boss menu state
+var menuState = {
+  area: null,
+  boss: null,
+  deaths: 0,
+  done: false,
+  pinned: false
+};
 
 // ═══════════════════════════════════════════════════════════════════════════
 // UTILS
@@ -1151,6 +1782,379 @@ function escAttr(str) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// AUTH / TWITCH OAUTH
+// ═══════════════════════════════════════════════════════════════════════════
+
+function loginWithTwitch() {
+  if (TWITCH_CLIENT_ID === "DEINE_TWITCH_CLIENT_ID_HIER") {
+    showToast("⚠ Twitch Client ID nicht konfiguriert!", 4000);
+    return;
+  }
+  var scope = "user:read:email";
+  var url   = "https://id.twitch.tv/oauth2/authorize"
+    + "?client_id="    + encodeURIComponent(TWITCH_CLIENT_ID)
+    + "&redirect_uri=" + encodeURIComponent(TWITCH_REDIRECT_URI)
+    + "&response_type=token"
+    + "&scope="        + encodeURIComponent(scope)
+    + "&force_verify=false";
+  window.location.href = url;
+}
+
+function logout() {
+  localStorage.removeItem("twitch_token");
+  localStorage.removeItem("twitch_user");
+  currentUser  = null;
+  userIsEditor = false;
+  updateLoginUI();
+  renderFromCache();
+}
+
+function checkAuthOnLoad() {
+  var hash = window.location.hash;
+  if (hash && hash.includes("access_token=")) {
+    var params = new URLSearchParams(hash.substring(1));
+    var token  = params.get("access_token");
+    if (token) {
+      history.replaceState(null, "", window.location.pathname + window.location.search);
+      fetchTwitchUser(token);
+      return;
+    }
+  }
+
+  var savedToken = localStorage.getItem("twitch_token");
+  var savedUser  = localStorage.getItem("twitch_user");
+  if (savedToken && savedUser) {
+    try {
+      currentUser  = JSON.parse(savedUser);
+      userIsEditor = ALLOWED_USERS.indexOf(currentUser.login.toLowerCase()) !== -1;
+      updateLoginUI();
+    } catch (e) {
+      localStorage.removeItem("twitch_token");
+      localStorage.removeItem("twitch_user");
+    }
+  }
+}
+
+function fetchTwitchUser(token) {
+  fetch("https://api.twitch.tv/helix/users", {
+    headers: {
+      "Authorization": "Bearer " + token,
+      "Client-Id":     TWITCH_CLIENT_ID
+    }
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (!data.data || data.data.length === 0) { throw new Error("No user data"); }
+    var user = data.data[0];
+    currentUser = {
+      login:             user.login,
+      display_name:      user.display_name,
+      profile_image_url: user.profile_image_url
+    };
+    userIsEditor = ALLOWED_USERS.indexOf(user.login.toLowerCase()) !== -1;
+    localStorage.setItem("twitch_token", token);
+    localStorage.setItem("twitch_user", JSON.stringify(currentUser));
+    updateLoginUI();
+    renderFromCache();
+    showToast(userIsEditor
+      ? "✔ Willkommen " + currentUser.display_name + " — Bearbeitungsrechte aktiv"
+      : "👁 Eingeloggt als " + currentUser.display_name + " (nur lesen)", 4000);
+  })
+  .catch(function(err) {
+    console.error("[Auth] Fehler:", err);
+    showToast("⚠ Twitch-Anmeldung fehlgeschlagen", 3500);
+  });
+}
+
+function updateLoginUI() {
+  var loginBtn   = document.getElementById("twitch-login-btn");
+  var userWidget = document.getElementById("user-widget");
+  var authNotice = document.getElementById("auth-notice");
+
+  if (currentUser) {
+    loginBtn.style.display  = "none";
+    userWidget.classList.add("visible");
+    document.getElementById("user-name").textContent = currentUser.display_name;
+
+    var avatarImg         = document.getElementById("user-avatar");
+    var avatarPlaceholder = document.getElementById("user-avatar-placeholder");
+    if (currentUser.profile_image_url) {
+      avatarImg.src           = currentUser.profile_image_url;
+      avatarImg.style.display = "block";
+      avatarPlaceholder.style.display = "none";
+    } else {
+      avatarPlaceholder.textContent   = currentUser.display_name.charAt(0).toUpperCase();
+      avatarPlaceholder.style.display = "flex";
+    }
+
+    var badge = document.getElementById("user-role-badge");
+    if (userIsEditor) {
+      badge.textContent  = "✦ Editor";
+      badge.className    = "user-role-badge editor";
+      authNotice.classList.remove("visible");
+    } else {
+      badge.textContent  = "● Zuschauer";
+      badge.className    = "user-role-badge viewer";
+      authNotice.classList.add("visible");
+    }
+  } else {
+    loginBtn.style.display = "";
+    userWidget.classList.remove("visible");
+    authNotice.classList.remove("visible");
+  }
+  updateAddClipButton();
+}
+
+function isAuthorized() {
+  return userIsEditor && currentUser !== null;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SHEET WRITE-BACK
+// ═══════════════════════════════════════════════════════════════════════════
+
+function writeToSheet(area, boss, action, value) {
+  if (APPS_SCRIPT_URL === "DEINE_APPS_SCRIPT_URL_HIER" || !APPS_SCRIPT_URL) {
+    console.warn("[Sheet] Apps Script URL nicht konfiguriert – Änderung nur lokal.");
+    return;
+  }
+  var url = APPS_SCRIPT_URL
+    + "?area="   + encodeURIComponent(area)
+    + "&boss="   + encodeURIComponent(boss)
+    + "&action=" + encodeURIComponent(action)
+    + "&value="  + encodeURIComponent(value);
+
+  fetch(url, { method: "GET", mode: "no-cors" })
+    .catch(function(err) {
+      console.error("[Sheet] Schreibfehler:", err);
+    });
+}
+
+function applyLocalBossChange(area, boss, field, value) {
+  pendingLocalChanges[area + "|" + boss] = Date.now();
+  if (!currentAreas[area]) return;
+  var bossData = currentAreas[area].bosses.find(function(b) { return b.boss === boss; });
+  if (!bossData) return;
+
+  var oldDone = bossData.done;
+  bossData[field] = value;
+
+  currentAreas[area].done = currentAreas[area].bosses.filter(function(b) { return b.done; }).length;
+
+  updateBossRow(area, boss, bossData);
+  updateAreaHeader(area);
+  updatePinnedCard(area, boss, bossData);
+
+  var row = document.querySelector('.boss-row[data-area="' + CSS.escape(area) + '"][data-boss="' + CSS.escape(boss) + '"]');
+  if (row) {
+    row.classList.add("syncing");
+    setTimeout(function() { row.classList.remove("syncing"); }, 3000);
+  }
+
+  if (field === "done" && value === true && !oldDone && MAIN_BOSSES.has(boss)) {
+    showToast("✔ " + boss + " besiegt!");
+  }
+}
+
+function updateBossRow(areaName, bossName, bossData) {
+  var row = document.querySelector(
+    '.boss-row[data-area="' + CSS.escape(areaName) + '"][data-boss="' + CSS.escape(bossName) + '"]'
+  );
+  if (!row) return;
+
+  var isDone       = bossData.done;
+  var isMain       = MAIN_BOSSES.has(bossName);
+  var editClass    = isAuthorized() ? " editable" : "";
+
+  row.className    = "boss-row" + (isDone ? " done" : "") + editClass;
+  var deathsEl     = row.querySelector(".boss-deaths");
+  var nameEl       = row.querySelector(".boss-name");
+  if (deathsEl) deathsEl.textContent = bossData.deaths > 0 ? "†" + bossData.deaths : "†–";
+  if (nameEl)   nameEl.className     = "boss-name" + (isMain ? " main" : "");
+}
+
+function updatePinnedCard(areaName, bossName, bossData) {
+  var card = document.querySelector(
+    '.pinned-card[data-area="' + CSS.escape(areaName) + '"][data-boss="' + CSS.escape(bossName) + '"]'
+  );
+  if (!card) return;
+  card.classList.toggle("done", bossData.done);
+  var deathsEl = card.querySelector(".pinned-deaths");
+  if (deathsEl) deathsEl.textContent = "📌 " + (bossData.deaths > 0 ? bossData.deaths : "–");
+}
+
+function updateAreaHeader(areaName) {
+  var data = currentAreas[areaName];
+  if (!data) return;
+  var card = document.querySelector('.area-card[data-area="' + CSS.escape(areaName) + '"]');
+  if (!card) return;
+  var fraction = card.querySelector(".area-fraction");
+  var fillEl   = card.querySelector(".area-progress-fill");
+  var pct      = data.total > 0 ? (data.done / data.total) * 100 : 0;
+  var complete = data.done === data.total && data.total > 0;
+  if (fraction) fraction.textContent = data.done + "/" + data.total;
+  if (fillEl) {
+    fillEl.style.width = pct + "%";
+    fillEl.classList.toggle("complete", complete);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// BOSS CONTEXT MENU
+// ═══════════════════════════════════════════════════════════════════════════
+
+var menuOpen = false;
+
+function openBossMenu(e, areaName, bossName) {
+  if (!isAuthorized()) return;
+  e.stopPropagation();
+
+  var area     = currentAreas[areaName];
+  if (!area) return;
+  var bossData = null;
+  for (var i = 0; i < area.bosses.length; i++) {
+    if (area.bosses[i].boss === bossName) { bossData = area.bosses[i]; break; }
+  }
+  if (!bossData) return;
+
+  menuState = {
+    area:   areaName,
+    boss:   bossName,
+    deaths: bossData.deaths,
+    done:   bossData.done,
+    pinned: bossData.pinned
+  };
+
+  document.getElementById("menu-boss-name").textContent = bossName;
+  document.getElementById("menu-area-name").textContent = areaName;
+  updateMenuDisplay();
+
+  positionMenu(e);
+
+  document.querySelectorAll(".boss-row.menu-open, .pinned-card.menu-open").forEach(function(r) {
+    r.classList.remove("menu-open");
+  });
+  e.currentTarget.classList.add("menu-open");
+
+  var menu = document.getElementById("boss-menu");
+  menu.classList.add("open");
+  menuOpen = true;
+}
+
+function positionMenu(e) {
+  var menu   = document.getElementById("boss-menu");
+  menu.style.display = "block";
+  var mw     = 240;
+  var mh     = 260;
+  var vw     = window.innerWidth;
+  var vh     = window.innerHeight;
+  var cx     = e.clientX;
+  var cy     = e.clientY;
+
+  var left   = cx + 10;
+  var top    = cy + 4;
+
+  if (left + mw > vw - 12) left = cx - mw - 10;
+  if (top  + mh > vh - 12) top  = cy - mh - 4;
+  if (left < 8) left = 8;
+  if (top  < 8) top  = 8;
+
+  menu.style.left = left + "px";
+  menu.style.top  = top  + "px";
+}
+
+function closeBossMenu() {
+  if (deathsWriteTimer) {
+    clearTimeout(deathsWriteTimer);
+    writeToSheet(menuState.area, menuState.boss, "setDeaths", menuState.deaths);
+    deathsWriteTimer = null;
+  }
+
+  var menu = document.getElementById("boss-menu");
+  menu.classList.remove("open");
+  menuOpen = false;
+  document.querySelectorAll(".boss-row.menu-open, .pinned-card.menu-open").forEach(function(r) {
+    r.classList.remove("menu-open");
+  });
+}
+
+function updateMenuDisplay() {
+  document.getElementById("menu-deaths-val").textContent = menuState.deaths;
+
+  var doneBtn   = document.getElementById("menu-done-btn");
+  var doneIcon  = document.getElementById("menu-done-icon");
+  var doneLabel = document.getElementById("menu-done-label");
+  if (menuState.done) {
+    doneBtn.className   = "boss-menu-action-btn active";
+    doneIcon.textContent = "☑";
+    doneLabel.textContent = "Als nicht besiegt markieren";
+  } else {
+    doneBtn.className   = "boss-menu-action-btn";
+    doneIcon.textContent = "☐";
+    doneLabel.textContent = "Als besiegt markieren";
+  }
+
+  var pinBtn   = document.getElementById("menu-pin-btn");
+  var pinIcon  = document.getElementById("menu-pin-icon");
+  var pinLabel = document.getElementById("menu-pin-label");
+  if (menuState.pinned) {
+    pinBtn.className    = "boss-menu-action-btn active-pin";
+    pinIcon.textContent = "📍";
+    pinLabel.textContent = "Anpinnung entfernen";
+  } else {
+    pinBtn.className    = "boss-menu-action-btn";
+    pinIcon.textContent = "📌";
+    pinLabel.textContent = "Anpinnen";
+  }
+}
+
+function menuAdjustDeaths(delta) {
+  var newDeaths = Math.max(0, menuState.deaths + delta);
+  menuState.deaths = newDeaths;
+  updateMenuDisplay();
+  applyLocalBossChange(menuState.area, menuState.boss, "deaths", newDeaths);
+
+  if (deathsWriteTimer) clearTimeout(deathsWriteTimer);
+  var capturedArea   = menuState.area;
+  var capturedBoss   = menuState.boss;
+  var capturedDeaths = newDeaths;
+  deathsWriteTimer = setTimeout(function() {
+    writeToSheet(capturedArea, capturedBoss, "setDeaths", capturedDeaths);
+    deathsWriteTimer = null;
+  }, 600);
+}
+
+function menuToggleDone() {
+  var newDone = !menuState.done;
+  menuState.done = newDone;
+  updateMenuDisplay();
+  applyLocalBossChange(menuState.area, menuState.boss, "done", newDone);
+  writeToSheet(menuState.area, menuState.boss, "setDone", newDone ? "TRUE" : "FALSE");
+}
+
+function menuTogglePin() {
+  var newPinned = !menuState.pinned;
+  menuState.pinned = newPinned;
+  updateMenuDisplay();
+  applyLocalBossChange(menuState.area, menuState.boss, "pinned", newPinned);
+  writeToSheet(menuState.area, menuState.boss, "setPinned", newPinned ? "TRUE" : "FALSE");
+}
+
+document.addEventListener("click", function(e) {
+  if (!menuOpen) return;
+  var menu = document.getElementById("boss-menu");
+  if (!menu.contains(e.target)) closeBossMenu();
+});
+
+document.addEventListener("keydown", function(e) {
+  if (e.key === "Escape") {
+    closeBossClipsPanel();
+    closeClipModal();
+    closeBossMenu();
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
 // TIMER
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -1185,19 +2189,23 @@ function toggleFlag(flag) {
     showOnlyMain = !showOnlyMain;
     document.getElementById("btn-mainbosses").classList.toggle("active", showOnlyMain);
   } else if (flag === "done") {
+    // ── NEU ──────────────────────────────────────────────────────────────
     showOnlyDone = !showOnlyDone;
     if (showOnlyDone) {
       showOnlyOpen = false;
       document.getElementById("btn-open").classList.remove("active");
     }
     document.getElementById("btn-done").classList.toggle("active", showOnlyDone);
+    // ─────────────────────────────────────────────────────────────────────
   } else if (flag === "open") {
+    // ── NEU ──────────────────────────────────────────────────────────────
     showOnlyOpen = !showOnlyOpen;
     if (showOnlyOpen) {
       showOnlyDone = false;
       document.getElementById("btn-done").classList.remove("active");
     }
     document.getElementById("btn-open").classList.toggle("active", showOnlyOpen);
+    // ─────────────────────────────────────────────────────────────────────
   }
   renderFromCache();
 }
@@ -1344,9 +2352,8 @@ function renderRanking(allBosses) {
   }).join("");
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// CHART
-// ═══════════════════════════════════════════════════════════════════════════
+var chartCollapsed = false;
+var chartInstance  = null;
 
 function toggleChart() {
   chartCollapsed = !chartCollapsed;
@@ -1378,10 +2385,11 @@ function renderChart(allBosses) {
   document.getElementById("chart-subtitle").textContent =
     "— " + dates.length + " Tage, " + allBosses.filter(function(b){ return b.done && b.date; }).length + " Bosse erledigt";
 
-  var counts   = dates.map(function(d) { return byDate[d].length; });
+  var counts  = dates.map(function(d) { return byDate[d].length; });
   var bossList = dates.map(function(d) { return byDate[d]; });
 
   var ctx = document.getElementById("boss-chart").getContext("2d");
+
   if (chartInstance) { chartInstance.destroy(); }
 
   chartInstance = new Chart(ctx, {
@@ -1423,13 +2431,20 @@ function renderChart(allBosses) {
       },
       scales: {
         x: {
-          ticks: { color: "#a89880", font: { family: "Crimson Pro, serif", size: 12 } },
-          grid:  { color: "rgba(201,164,74,0.07)" }
+          ticks: {
+            color: "#a89880",
+            font: { family: "Crimson Pro, serif", size: 12 }
+          },
+          grid: { color: "rgba(201,164,74,0.07)" }
         },
         y: {
           beginAtZero: true,
-          ticks: { color: "#a89880", stepSize: 1, font: { family: "Cinzel, serif", size: 11 } },
-          grid:  { color: "rgba(201,164,74,0.07)" }
+          ticks: {
+            color: "#a89880",
+            stepSize: 1,
+            font: { family: "Cinzel, serif", size: 11 }
+          },
+          grid: { color: "rgba(201,164,74,0.07)" }
         }
       }
     }
@@ -1468,16 +2483,6 @@ function buildEmbedUrl(parsed) {
     return "https://player.twitch.tv/?video=" + parsed.id + "&parent=" + parent + "&autoplay=false";
   }
   return null;
-}
-
-function rebuildClipsByBoss() {
-  clipsByBoss = {};
-  clipsData.forEach(function(c) {
-    if (c.boss && MAIN_BOSSES.has(c.boss)) {
-      if (!clipsByBoss[c.boss]) clipsByBoss[c.boss] = [];
-      clipsByBoss[c.boss].push(c);
-    }
-  });
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1573,9 +2578,17 @@ function renderClipCard(clip, index) {
     ? '<p class="clip-title">' + escHtml(clip.title) + '</p>'
     : '';
 
-  var bossHtml = clip.boss
-    ? '<div class="clip-boss-label">🎮 ' + escHtml(clip.boss) + '</div>'
-    : '';
+  var bossEditHtml = '';
+  if (isAuthorized()) {
+    bossEditHtml = '<div class="clip-boss-row">'
+      + '<label>Boss:</label>'
+      + '<select class="clip-boss-select" onchange="updateClipBoss(\'' + escAttr(clip.url) + '\',this.value)">'
+      + getBossOptions(clip.boss || "")
+      + '</select>'
+      + '</div>';
+  } else if (clip.boss) {
+    bossEditHtml = '<div class="clip-boss-label">🎮 ' + escHtml(clip.boss) + '</div>';
+  }
 
   return '<div class="clip-card">'
     + embedHtml
@@ -1588,13 +2601,143 @@ function renderClipCard(clip, index) {
     + 'Auf Twitch</a>'
     + '</div>'
     + '</div>'
-    + bossHtml
+    + bossEditHtml
     + '</div>';
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// BOSS CLIPS OVERLAY
+// ADD CLIP (Editor only)
 // ═══════════════════════════════════════════════════════════════════════════
+
+var addClipPanelOpen = false;
+
+function toggleAddClipPanel() {
+  addClipPanelOpen = !addClipPanelOpen;
+  var panel = document.getElementById("add-clip-panel");
+  var btn   = document.getElementById("add-clip-btn");
+  panel.classList.toggle("open", addClipPanelOpen);
+  btn.classList.toggle("active", addClipPanelOpen);
+  if (addClipPanelOpen) {
+    var bossSelect = document.getElementById("clip-boss-select");
+    if (bossSelect && bossSelect.options.length <= 1) {
+      Array.from(MAIN_BOSSES).sort().forEach(function(b) {
+        var opt = document.createElement("option");
+        opt.value = b; opt.textContent = b;
+        bossSelect.appendChild(opt);
+      });
+    }
+    setTimeout(function() {
+      var inp = document.getElementById("clip-url-input");
+      if (inp) inp.focus();
+    }, 360);
+  }
+  document.getElementById("add-clip-feedback").textContent = "";
+}
+
+function submitNewClip() {
+  if (!isAuthorized()) return;
+
+  var urlEl     = document.getElementById("clip-url-input");
+  var catEl     = document.getElementById("clip-cat-select");
+  var titleEl   = document.getElementById("clip-title-input");
+  var bossEl    = document.getElementById("clip-boss-select");
+  var feedEl    = document.getElementById("add-clip-feedback");
+  var submitBtn = document.getElementById("add-clip-submit");
+
+  var url      = urlEl.value.trim();
+  var category = catEl.value;
+  var title    = titleEl.value.trim();
+  var boss     = bossEl ? bossEl.value : "";
+
+  feedEl.className = "add-clip-feedback";
+  if (!url) {
+    feedEl.textContent = "⚠ Bitte einen Twitch-Link eingeben.";
+    feedEl.classList.add("error");
+    urlEl.focus();
+    return;
+  }
+  var parsed = parseTwitchClip(url);
+  if (!parsed || parsed.type === "link") {
+    feedEl.textContent = "⚠ Kein gültiger Twitch-Clip- oder VOD-Link erkannt.";
+    feedEl.classList.add("error");
+    urlEl.focus();
+    return;
+  }
+
+  var isDupe = clipsData.some(function(c) { return c.url.trim() === url; });
+  if (isDupe) {
+    feedEl.textContent = "⚠ Dieser Clip ist bereits in der Sammlung.";
+    feedEl.classList.add("error");
+    return;
+  }
+
+  var newClip = { url: url, category: category, title: title, boss: boss };
+  clipsData.push(newClip);
+  rebuildClipsByBoss();
+
+  var countEl = document.getElementById("btn-clips-count");
+  if (countEl) countEl.textContent = "(" + clipsData.length + ")";
+  var modalCount = document.getElementById("modal-clip-count");
+  if (modalCount) modalCount.textContent = clipsData.length;
+
+  activeCategory = category;
+  renderClipModal();
+
+  feedEl.textContent = "✔ Clip gespeichert – wird gleich im Sheet hinterlegt.";
+  urlEl.value   = "";
+  titleEl.value = "";
+  catEl.value   = "Allgemein";
+  if (bossEl) bossEl.value = "";
+
+  setTimeout(function() {
+    addClipPanelOpen = false;
+    var panel = document.getElementById("add-clip-panel");
+    var btn   = document.getElementById("add-clip-btn");
+    if (panel) panel.classList.remove("open");
+    if (btn)   btn.classList.remove("active");
+    var fb = document.getElementById("add-clip-feedback");
+    if (fb) fb.textContent = "";
+  }, 2200);
+
+  writeClipToSheet(url, category, title, boss);
+}
+
+function writeClipToSheet(url, category, title, boss) {
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === "DEINE_APPS_SCRIPT_URL_HIER") {
+    console.warn("[Clips] Apps Script URL nicht konfiguriert – Clip nur lokal.");
+    return;
+  }
+  var reqUrl = APPS_SCRIPT_URL
+    + "?action=addClip"
+    + "&value="    + encodeURIComponent(url)
+    + "&category=" + encodeURIComponent(category)
+    + "&title="    + encodeURIComponent(title)
+    + "&boss="     + encodeURIComponent(boss || "");
+  fetch(reqUrl, { method: "GET", mode: "no-cors" })
+    .catch(function(err) { console.error("[Clips] Schreibfehler:", err); });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// BOSS CLIPS
+// ═══════════════════════════════════════════════════════════════════════════
+
+function rebuildClipsByBoss() {
+  clipsByBoss = {};
+  clipsData.forEach(function(c) {
+    if (c.boss && MAIN_BOSSES.has(c.boss)) {
+      if (!clipsByBoss[c.boss]) clipsByBoss[c.boss] = [];
+      clipsByBoss[c.boss].push(c);
+    }
+  });
+}
+
+function getBossOptions(selectedBoss) {
+  var opts = '<option value="">– Kein Boss –</option>';
+  Array.from(MAIN_BOSSES).sort().forEach(function(b) {
+    opts += '<option value="' + escAttr(b) + '"' + (b === selectedBoss ? ' selected' : '') + '>' + escHtml(b) + '</option>';
+  });
+  return opts;
+}
 
 function openBossClipsPanel(bossName, e) {
   if (e) e.stopPropagation();
@@ -1623,12 +2766,63 @@ function closeBossClipsPanel() {
   }
 }
 
-document.addEventListener("keydown", function(e) {
-  if (e.key === "Escape") {
-    closeBossClipsPanel();
-    closeClipModal();
+function updateClipBoss(clipUrl, newBoss) {
+  var clip = clipsData.find(function(c) { return c.url === clipUrl; });
+  if (!clip) return;
+
+  var oldBoss = clip.boss || "";
+  clip.boss   = newBoss;
+  rebuildClipsByBoss();
+
+  var panel = document.getElementById("boss-clips-modal");
+  if (panel && panel.classList.contains("open")) {
+    var heading  = document.getElementById("boss-clips-heading");
+    var panelBoss = heading ? heading.textContent : "";
+    if (panelBoss === oldBoss || panelBoss === newBoss) {
+      var clips = clipsByBoss[panelBoss] || [];
+      var body  = document.getElementById("boss-clips-body");
+      var badge = document.getElementById("boss-clips-badge");
+      if (clips.length === 0) {
+        closeBossClipsPanel();
+      } else {
+        badge.textContent = clips.length + (clips.length === 1 ? " Clip" : " Clips");
+        body.innerHTML = '<div class="clip-grid">'
+          + clips.map(function(c, i) { return renderClipCard(c, i); }).join("")
+          + '</div>';
+      }
+    }
   }
-});
+
+  if (document.getElementById("clip-modal").classList.contains("open")) {
+    renderClipModal();
+  }
+
+  renderFromCache();
+
+  writeBossTagToSheet(clipUrl, newBoss);
+  showToast(newBoss ? "🎮 Boss gesetzt: " + newBoss : "Boss-Zuordnung entfernt", 2500);
+}
+
+function writeBossTagToSheet(clipUrl, boss) {
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === "DEINE_APPS_SCRIPT_URL_HIER") return;
+  var reqUrl = APPS_SCRIPT_URL
+    + "?action=setBossTag"
+    + "&value=" + encodeURIComponent(clipUrl)
+    + "&boss="  + encodeURIComponent(boss || "");
+  fetch(reqUrl, { method: "GET", mode: "no-cors" })
+    .catch(function(err) { console.error("[Clips] BossTag Schreibfehler:", err); });
+}
+
+function updateAddClipButton() {
+  var btn = document.getElementById("add-clip-btn");
+  if (!btn) return;
+  if (isAuthorized()) {
+    btn.classList.add("editor-visible");
+  } else {
+    btn.classList.remove("editor-visible");
+    if (addClipPanelOpen) toggleAddClipPanel();
+  }
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CLIPS LADEN
@@ -1711,7 +2905,6 @@ function loadData() {
 
 function processData(rows) {
   cachedRows = rows;
-
   var baseGameFlag = isTrue(rows[0] && rows[0].c[16] ? rows[0].c[16].v : false);
   var dlcFlag      = isTrue(rows[1] && rows[1].c[16] ? rows[1].c[16].v : false);
 
@@ -1769,14 +2962,30 @@ function processData(rows) {
     if (isDLC      && !showDLC)  return;
     if (showOnlyMain && !MAIN_BOSSES.has(boss)) return;
 
-    var done   = isTrue(r.c[2] ? r.c[2].v : false);
-    var date   = r.c[3] && r.c[3].f ? r.c[3].f.trim() : "";
-    var deaths = Number(r.c[4] ? r.c[4].v : 0) || 0;
-    var pinned = isTrue(r.c[5] ? r.c[5].v : false);
+    var done           = isTrue(r.c[2] ? r.c[2].v : false);
+    var date           = r.c[3] && r.c[3].f ? r.c[3].f.trim() : "";
+    var deaths         = Number(r.c[4] ? r.c[4].v : 0) || 0;
+    var pinned         = isTrue(r.c[5] ? r.c[5].v : false);
 
+    // ── NEU: Erledigt / Offen Filter ──────────────────────────────────────
     if (showOnlyDone && !done) return;
-    if (showOnlyOpen && done)  return;
+    if (showOnlyOpen && done) return;
+    // ──────────────────────────────────────────────────────────────────────
 
+    var pendingKey = area + "|" + boss;
+    if (pendingLocalChanges[pendingKey]) {
+      var age = Date.now() - pendingLocalChanges[pendingKey];
+      if (age < 10000) {
+        var localBoss = currentAreas[area] && currentAreas[area].bosses.find(function(b) { return b.boss === boss; });
+        if (localBoss) {
+          deaths = localBoss.deaths;
+          done   = localBoss.done;
+          pinned = localBoss.pinned;
+        }
+      } else {
+        delete pendingLocalChanges[pendingKey];
+      }
+    }
     var sheetCollapsed = isTrue(r.c[6] ? r.c[6].v : false);
     var key            = area + "|" + boss;
 
@@ -1808,10 +3017,8 @@ function processData(rows) {
     pulseEl(document.getElementById("stat-bosses"));
     pulseEl(document.getElementById("stat-percent"));
   }
-
-  // Bosse-Anzeige: ohne Slash wenn Filter aktiv
   if (showOnlyDone || showOnlyOpen) {
-    document.getElementById("val-bosses").textContent = totalBosses;
+  document.getElementById("val-bosses").textContent = totalBosses;
   } else {
     document.getElementById("val-bosses").textContent = doneBosses + " / " + totalBosses;
   }
@@ -1854,10 +3061,10 @@ function renderFromCache() {
 function renderAreas(areas) {
   var grid = document.getElementById("areas-grid");
 
-  // Pinned
   var allPinned = [];
   Object.keys(areas).forEach(function(areaName) {
-    areas[areaName].bosses.forEach(function(b) {
+    var a = areas[areaName];
+    a.bosses.forEach(function(b) {
       if (b.pinned) allPinned.push(Object.assign({}, b, { area: areaName }));
     });
   });
@@ -1868,11 +3075,20 @@ function renderAreas(areas) {
     pinnedSection.style.display = "block";
     pinnedList.innerHTML = "";
     allPinned.forEach(function(b) {
-      var isMain = MAIN_BOSSES.has(b.boss);
-      var card   = document.createElement("div");
-      card.className = "pinned-card" + (b.done ? " done" : "");
+      var isMain    = MAIN_BOSSES.has(b.boss);
+      var editClass = isAuthorized() ? " editable" : "";
+      var card      = document.createElement("div");
+      card.className    = "pinned-card" + (b.done ? " done" : "") + editClass;
+      card.dataset.boss = b.boss;
+      card.dataset.area = b.area;
+      if (isAuthorized()) {
+        card.addEventListener("click", function(e) {
+          openBossMenu(e, b.area, b.boss);
+        });
+      }
       card.innerHTML = '<span class="pinned-deaths">📌 ' + (b.deaths > 0 ? b.deaths : "–") + '</span>'
-        + '<span class="pinned-name' + (isMain ? " main-boss" : "") + '">' + escHtml(b.boss) + '</span>';
+        + '<span class="pinned-name' + (isMain ? " main-boss" : "") + '">' + escHtml(b.boss) + '</span>'
+        + (isAuthorized() ? '<span class="boss-edit-hint" title="Bearbeiten">✏</span>' : '');
       pinnedList.appendChild(card);
     });
   } else {
@@ -1895,7 +3111,7 @@ function renderAreas(areas) {
 
     if (!card) {
       card = document.createElement("div");
-      card.className    = "area-card";
+      card.className  = "area-card";
       card.dataset.area = areaName;
     }
 
@@ -1920,7 +3136,7 @@ function renderAreas(areas) {
       + '<div class="area-progress-fill' + (complete ? " complete" : "") + '" style="width:' + pct + '%"></div>'
       + '</div></div></div>'
       + '<div class="boss-list">'
-      + data.bosses.map(function(b) { return renderBossRow(b); }).join("")
+      + data.bosses.map(function(b) { return renderBossRow(b, areaName); }).join("")
       + '</div>';
 
     var children     = Array.from(grid.children);
@@ -1937,21 +3153,29 @@ function renderAreas(areas) {
   if (searchQuery) applySearch();
 }
 
-function renderBossRow(b) {
+function renderBossRow(b, areaName) {
   var isMain     = MAIN_BOSSES.has(b.boss);
   var deathClass = b.deaths === 0 ? " boss-deaths-zero" : "";
+  var editClass  = isAuthorized() ? " editable" : "";
+
+  var clickAttr = isAuthorized()
+    ? ' onclick="openBossMenu(event,\'' + escAttr(areaName) + '\',\'' + escAttr(b.boss) + '\')"'
+    : '';
 
   var bossClipCount = (clipsByBoss[b.boss] || []).length;
   var clipBadge = bossClipCount > 0
     ? '<span class="boss-clip-badge" onclick="openBossClipsPanel(\'' + escAttr(b.boss) + '\',event)" title="' + bossClipCount + ' Clip' + (bossClipCount > 1 ? 's' : '') + ' ansehen">🎬 ' + bossClipCount + '</span>'
     : '';
 
-  return '<div class="boss-row' + (b.done ? " done" : "") + '"'
-    + ' data-boss="' + escAttr(b.boss) + '">'
+  return '<div class="boss-row' + (b.done ? " done" : "") + editClass + '"'
+    + ' data-boss="' + escAttr(b.boss) + '"'
+    + ' data-area="' + escAttr(areaName) + '"'
+    + clickAttr + '>'
     + '<span class="boss-deaths' + deathClass + '">' + (b.deaths > 0 ? "†" + b.deaths : "†–") + '</span>'
     + '<span class="boss-name' + (isMain ? " main" : "") + '">' + escHtml(b.boss) + '</span>'
     + clipBadge
     + '<span class="boss-check">✓</span>'
+    + (isAuthorized() ? '<span class="boss-edit-hint" title="Bearbeiten">✏</span>' : '')
     + '</div>';
 }
 
@@ -1961,10 +3185,21 @@ function toggleArea(areaName) {
   if (card) card.classList.toggle("collapsed", localCollapsed[areaName]);
 }
 
+document.addEventListener("keydown", function(e) {
+  if (e.key === "Enter" && addClipPanelOpen) {
+    var active = document.activeElement;
+    if (active && (active.id === "clip-url-input" || active.id === "clip-title-input" || active.id === "clip-cat-select")) {
+      e.preventDefault();
+      submitNewClip();
+    }
+  }
+});
+
 // ═══════════════════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════════════════
 
+checkAuthOnLoad();
 loadData();
 loadClips();
 setInterval(loadData,  5000);
