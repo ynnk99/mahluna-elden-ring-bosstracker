@@ -3017,7 +3017,11 @@ function processData(rows) {
     pulseEl(document.getElementById("stat-bosses"));
     pulseEl(document.getElementById("stat-percent"));
   }
-  document.getElementById("val-bosses").textContent = doneBosses + " / " + totalBosses;
+  if (showOnlyDone || showOnlyOpen) {
+  document.getElementById("val-bosses").textContent = totalBosses;
+  } else {
+    document.getElementById("val-bosses").textContent = doneBosses + " / " + totalBosses;
+  }
   var pct = totalBosses > 0 ? Math.round((doneBosses / totalBosses) * 100) : 0;
   document.getElementById("val-percent").textContent = pct + "%";
   prevDoneBosses = doneBosses;
