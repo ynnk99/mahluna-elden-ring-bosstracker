@@ -3018,13 +3018,17 @@ function processData(rows) {
     pulseEl(document.getElementById("stat-percent"));
   }
   if (showOnlyDone || showOnlyOpen) {
-  document.getElementById("val-bosses").textContent = totalBosses;
+    document.getElementById("val-bosses").textContent = totalBosses;
   } else {
     document.getElementById("val-bosses").textContent = doneBosses + " / " + totalBosses;
   }
   var pct = totalBosses > 0 ? Math.round((doneBosses / totalBosses) * 100) : 0;
   document.getElementById("val-percent").textContent = pct + "%";
   prevDoneBosses = doneBosses;
+
+  // Chips ein-/ausblenden je nach aktivem Filter
+  document.getElementById("stat-percent").style.display = (showOnlyOpen || showOnlyDone) ? "none" : "";
+  document.getElementById("stat-avg").style.display     = showOnlyOpen ? "none" : "";
 
   var rankingSnapshot = JSON.stringify(
     allBosses.map(function(b) { return b.boss + "|" + b.deaths + "|" + b.done; })
