@@ -2383,7 +2383,10 @@ function renderChart(allBosses) {
 
   document.getElementById("chart-section").style.display = "block";
   document.getElementById("chart-subtitle").textContent =
-    "— " + dates.length + " Tage, " + allBosses.filter(function(b){ return b.done && b.date; }).length + " Bosse erledigt";
+  var dayCount  = dates.length;
+  var bossCount = allBosses.filter(function(b){ return b.done && b.date; }).length;
+  document.getElementById("chart-subtitle").textContent =
+  "— " + dayCount + (dayCount === 1 ? " Tag, " : " Tage, ") + bossCount + (bossCount === 1 ? " Boss erledigt" : " Bosse erledigt");
 
   var counts  = dates.map(function(d) { return byDate[d].length; });
   var bossList = dates.map(function(d) { return byDate[d]; });
