@@ -2423,7 +2423,7 @@ function renderChart(allBosses) {
             title: function(items) { return items[0].label; },
             label: function(item) {
               var list = bossList[item.dataIndex];
-              return ["† " + list.length + " Boss" + (list.length > 1 ? "se" : "") + ":"]
+              return ["† " + list.length + " Boss" + (list.length > 1 ? "e" : "") + ":"]
                 .concat(list.map(function(n){ return "  · " + n; }));
             }
           }
