@@ -3230,10 +3230,12 @@ document.addEventListener("keydown", function(e) {
   var offset = 14;
 
   document.addEventListener("mouseover", function(e) {
-    var el = e.target.closest("[data-tip]");
-    if (!el) return;
-    tip.textContent = el.dataset.tip;
-    tip.classList.add("visible");
+  var el = e.target.closest("[data-tip]");
+  if (!el) return;
+  // Tooltip nur zeigen wenn Text wirklich abgeschnitten ist
+  if (el.scrollWidth <= el.offsetWidth) return;
+  tip.textContent = el.dataset.tip;
+  tip.classList.add("visible");
   });
 
   document.addEventListener("mouseout", function(e) {
