@@ -3178,7 +3178,7 @@ function renderBossRow(b, areaName) {
     + ' data-area="' + escAttr(areaName) + '"'
     + clickAttr + '>'
     + '<span class="boss-deaths' + deathClass + '">' + (b.deaths > 0 ? "†" + b.deaths : "†–") + '</span>'
-    + '<span class="boss-name' + (isMain ? " main" : "") + '">' + escHtml(b.boss) + '</span>'
+    + '<span class="boss-name' + (isMain ? " main" : "") + '" title="' + escAttr(b.boss) + '">' + escHtml(b.boss) + '</span>'
     + clipBadge
     + '<span class="boss-check">✓</span>'
     + (isAuthorized() ? '<span class="boss-edit-hint" title="Bearbeiten">✏</span>' : '')
