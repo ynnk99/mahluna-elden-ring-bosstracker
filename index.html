@@ -1337,6 +1337,27 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
   .boss-clips-inner { height: 100vh; max-height: none; border-radius: 0; width: 100%; margin: 0; }
   .boss-clips-body { padding: 14px; }
 }
+
+/* ─── CUSTOM TOOLTIP ─── */
+.custom-tooltip {
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none;
+  padding: 6px 14px;
+  background: linear-gradient(135deg, rgba(18,15,9,0.97), rgba(10,9,7,0.98));
+  border: 1px solid rgba(201,164,74,0.4);
+  border-radius: 5px;
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 15px;
+  color: var(--parchment);
+  letter-spacing: 0.03em;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.6), 0 0 12px rgba(201,164,74,0.08);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.custom-tooltip.visible { opacity: 1; }
+  
 </style>
 
   <!-- Google Analytics -->
@@ -1639,6 +1660,8 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
     <div class="boss-clips-body" id="boss-clips-body"></div>
   </div>
 </div>
+
+<div class="custom-tooltip" id="custom-tooltip"></div>
 
 <script>
 // ═══════════════════════════════════════════════════════════════════════════
@@ -2344,7 +2367,7 @@ function renderRanking(allBosses) {
     return '<div class="ranking-entry ' + entryClass + '" style="' + delayStyle + '">'
       + '<span class="rank-number ' + rankClass + '">' + rankLabel + '</span>'
       + '<div class="rank-bar-wrap">'
-      + '<span class="boss-name' + (isMain ? " main" : "") + '" title="' + escAttr(b.boss) + '">' + escHtml(b.boss) + '</span>'
+      + '<span class="boss-name' + (isMain ? " main" : "") + '" data-tip="' + escAttr(b.boss) + '">' + escHtml(b.boss) + '</span>'
       + '<div class="rank-bar-row">'
       + '<div class="rank-bar-bg"><div class="rank-bar-fill" style="width:' + pct + '%"></div></div>'
       + '<span class="rank-deaths">' + b.deaths.toLocaleString("de-DE") + '<span class="unit"> †</span></span>'
@@ -3134,7 +3157,7 @@ function renderAreas(areas) {
     card.innerHTML = '<div class="area-header" onclick="toggleArea(\'' + escAttr(areaName) + '\')">'
       + '<div class="area-header-left">'
       + '<span class="area-toggle-icon">▼</span>'
-      + '<span class="area-name" title="' + escAttr(areaName) + '">' + escHtml(areaName) + dlcLabel + '</span>'
+      + '<span class="area-name" data-tip="' + escAttr(areaName) + '">' + escHtml(areaName) + dlcLabel + '</span>'
       + '</div>'
       + '<div class="area-progress-wrap">'
       + '<span class="area-fraction">' + data.done + '/' + data.total + '</span>'
@@ -3178,7 +3201,7 @@ function renderBossRow(b, areaName) {
     + ' data-area="' + escAttr(areaName) + '"'
     + clickAttr + '>'
     + '<span class="boss-deaths' + deathClass + '">' + (b.deaths > 0 ? "†" + b.deaths : "†–") + '</span>'
-    + '<span class="boss-name' + (isMain ? " main" : "") + '" title="' + escAttr(b.boss) + '">' + escHtml(b.boss) + '</span>'
+    + '<span class="boss-name' + (isMain ? " main" : "") + '" data-tip="' + escAttr(b.boss) + '">' + escHtml(b.boss) + '</span>'
     + clipBadge
     + '<span class="boss-check">✓</span>'
     + (isAuthorized() ? '<span class="boss-edit-hint" title="Bearbeiten">✏</span>' : '')
@@ -3200,6 +3223,35 @@ document.addEventListener("keydown", function(e) {
     }
   }
 });
+
+// ─── CUSTOM TOOLTIP ───
+(function() {
+  var tip = document.getElementById("custom-tooltip");
+  var offset = 14;
+
+  document.addEventListener("mouseover", function(e) {
+    var el = e.target.closest("[data-tip]");
+    if (!el) return;
+    tip.textContent = el.dataset.tip;
+    tip.classList.add("visible");
+  });
+
+  document.addEventListener("mouseout", function(e) {
+    var el = e.target.closest("[data-tip]");
+    if (!el) return;
+    tip.classList.remove("visible");
+  });
+
+  document.addEventListener("mousemove", function(e) {
+    if (!tip.classList.contains("visible")) return;
+    var x = e.clientX + offset;
+    var y = e.clientY + offset;
+    if (x + tip.offsetWidth > window.innerWidth - 8) x = e.clientX - tip.offsetWidth - offset;
+    if (y + tip.offsetHeight > window.innerHeight - 8) y = e.clientY - tip.offsetHeight - offset;
+    tip.style.left = x + "px";
+    tip.style.top  = y + "px";
+  });
+})();
 
 // ═══════════════════════════════════════════════════════════════════════════
 // INIT
