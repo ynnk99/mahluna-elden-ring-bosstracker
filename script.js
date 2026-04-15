@@ -557,6 +557,8 @@ function toggleFlag(flag) {
       document.getElementById("btn-done").classList.remove("active");
     }
     document.getElementById("btn-open").classList.toggle("active", showOnlyOpen);
+    document.getElementById("ranking-panel").style.display = showOnlyOpen ? "none" : "";
+    document.getElementById("chart-section").style.display = showOnlyOpen ? "none" : "";
   }
   renderFromCache();
 }
