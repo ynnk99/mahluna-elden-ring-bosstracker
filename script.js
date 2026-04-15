@@ -1345,6 +1345,16 @@ function processData(rows) {
 
   var globalDeaths = allBosses.reduce(function(s, b) { return s + b.deaths; }, 0);
 
+  if (prevDeaths !== null && globalDeaths !== prevDeaths) {
+    pulseEl(document.getElementById("stat-deaths"));
+    var el = document.getElementById("stat-deaths");
+    el.classList.remove("death-flash");
+    void el.offsetWidth;
+    el.classList.add("death-flash");
+  }
+  document.getElementById("val-deaths").textContent = globalDeaths.toLocaleString("de-DE");
+  prevDeaths = globalDeaths;
+
   currentAreas = areas;
 
   var totalBosses = 0, doneBosses = 0;
