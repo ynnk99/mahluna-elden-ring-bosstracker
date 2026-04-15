@@ -1379,6 +1379,7 @@ function processData(rows) {
 
   document.getElementById("stat-percent").style.display = (showOnlyOpen || showOnlyDone) ? "none" : "";
   document.getElementById("stat-avg").style.display     = showOnlyOpen ? "none" : "";
+  document.getElementById("ranking-panel").style.display = showOnlyOpen ? "none" : "";
 
   var rankingSnapshot = JSON.stringify(
     allBosses.map(function(b) { return b.boss + "|" + b.deaths + "|" + b.done; })
