@@ -1274,12 +1274,7 @@ function processData(rows) {
   timerVisible = isTrue(rows[0] && rows[0].c[13] ? rows[0].c[13].v : false);
   updateTimerDisplay();
 
-  var baseDeaths   = Number(rows[1] && rows[1].c[10] ? rows[1].c[10].v : 0) || 0;
-  var dlcDeaths    = Number(rows[168] && rows[168].c[10] ? rows[168].c[10].v : 0) || 0;
-  var globalDeaths = 0;
-  if (showBase && showDLC)  globalDeaths = baseDeaths + dlcDeaths;
-  else if (showBase)         globalDeaths = baseDeaths;
-  else if (showDLC)          globalDeaths = dlcDeaths;
+  var globalDeaths = allBosses.reduce(function(s, b) { return s + b.deaths; }, 0);
 
   if (prevDeaths !== null && globalDeaths !== prevDeaths) {
     pulseEl(document.getElementById("stat-deaths"));
