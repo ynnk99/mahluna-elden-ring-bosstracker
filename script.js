@@ -1274,8 +1274,6 @@ function processData(rows) {
   timerVisible = isTrue(rows[0] && rows[0].c[13] ? rows[0].c[13].v : false);
   updateTimerDisplay();
 
-  var globalDeaths = allBosses.reduce(function(s, b) { return s + b.deaths; }, 0);
-
   if (prevDeaths !== null && globalDeaths !== prevDeaths) {
     pulseEl(document.getElementById("stat-deaths"));
     var el = document.getElementById("stat-deaths");
@@ -1354,6 +1352,8 @@ function processData(rows) {
 
     allBosses.push({ boss: boss, deaths: deaths, done: done, area: area, date: date });
   });
+
+  var globalDeaths = allBosses.reduce(function(s, b) { return s + b.deaths; }, 0);
 
   currentAreas = areas;
 
