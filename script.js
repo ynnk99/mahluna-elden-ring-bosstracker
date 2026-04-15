@@ -141,7 +141,7 @@ function escAttr(str) {
 // ═══════════════════════════════════════════════════════════════════════════
 
 function loginWithTwitch() {
-  if (TWITCH_CLIENT_ID === "DEINE_TWITCH_CLIENT_ID_HIER") {
+  if (TWITCH_CLIENT_ID === "n3oqt780bnsi3lb2gzinxdbrrazork") {
     showToast("⚠ Twitch Client ID nicht konfiguriert!", 4000);
     return;
   }
