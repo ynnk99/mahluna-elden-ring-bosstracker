@@ -1380,7 +1380,13 @@ function processData(rows) {
     allBosses.push({ boss: boss, deaths: deaths, done: done, area: area, date: date });
   });
 
-  var globalDeaths = allBosses.reduce(function(s, b) { return s + b.deaths; }, 0);
+  var kBase = rows[1]   && rows[1].c[10]   ? (Number(rows[1].c[10].v)   || 0) : 0;
+  var kDlc  = rows[168] && rows[168].c[10] ? (Number(rows[168].c[10].v) || 0) : 0;
+  var globalDeaths;
+  if (showBase && showDLC)       globalDeaths = kBase + kDlc;
+  else if (showBase && !showDLC) globalDeaths = kBase;
+  else if (!showBase && showDLC) globalDeaths = kDlc;
+  else                           globalDeaths = 0;
 
   if (prevDeaths !== null && globalDeaths !== prevDeaths) {
     pulseEl(document.getElementById("stat-deaths"));
