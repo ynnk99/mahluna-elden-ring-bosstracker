@@ -557,8 +557,7 @@ function toggleFlag(flag) {
       document.getElementById("btn-done").classList.remove("active");
     }
     document.getElementById("btn-open").classList.toggle("active", showOnlyOpen);
-    document.getElementById("ranking-panel").style.display = showOnlyOpen ? "none" : "";
-    document.getElementById("chart-section").style.display = showOnlyOpen ? "none" : "";
+    document.body.classList.toggle("filter-open", showOnlyOpen);
   }
   renderFromCache();
 }
@@ -1381,7 +1380,6 @@ function processData(rows) {
 
   document.getElementById("stat-percent").style.display = (showOnlyOpen || showOnlyDone) ? "none" : "";
   document.getElementById("stat-avg").style.display     = showOnlyOpen ? "none" : "";
-  document.getElementById("ranking-panel").style.display = showOnlyOpen ? "none" : "";
 
   var rankingSnapshot = JSON.stringify(
     allBosses.map(function(b) { return b.boss + "|" + b.deaths + "|" + b.done; })
