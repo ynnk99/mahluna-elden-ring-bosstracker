@@ -1338,3 +1338,8 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
   transition: opacity 0.15s ease;
 }
 .custom-tooltip.visible { opacity: 1; }
+
+body.filter-open #ranking-panel,
+body.filter-open #chart-section {
+  display: none !important;
+}
