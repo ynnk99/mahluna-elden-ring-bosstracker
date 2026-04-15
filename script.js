@@ -1274,16 +1274,6 @@ function processData(rows) {
   timerVisible = isTrue(rows[0] && rows[0].c[13] ? rows[0].c[13].v : false);
   updateTimerDisplay();
 
-  if (prevDeaths !== null && globalDeaths !== prevDeaths) {
-    pulseEl(document.getElementById("stat-deaths"));
-    var el = document.getElementById("stat-deaths");
-    el.classList.remove("death-flash");
-    void el.offsetWidth;
-    el.classList.add("death-flash");
-  }
-  document.getElementById("val-deaths").textContent = globalDeaths.toLocaleString("de-DE");
-  prevDeaths = globalDeaths;
-
   var separatorIndex = -1;
   for (var si = 0; si < rows.length; si++) {
     if (rows[si] && rows[si].c[1] && rows[si].c[1].v && rows[si].c[1].v.trim() === "SHADOW OF THE ERDTREE DLC") {
