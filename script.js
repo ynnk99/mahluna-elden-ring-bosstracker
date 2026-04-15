@@ -18,7 +18,7 @@ const SHEET_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
   + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json";
 
 const CLIPS_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
-  + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&range=W10:Z100";
+  + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&range=W9:Z1000";
 
 const RANKING_TOP_N = 10;
 
