@@ -1275,7 +1275,7 @@ function processData(rows) {
   updateTimerDisplay();
 
   var baseDeaths   = Number(rows[1] && rows[1].c[10] ? rows[1].c[10].v : 0) || 0;
-  var dlcDeaths    = Number(rows[168] && rows[168].c[10] ? rows[168].c[10].v : 0) || 0;
+  var dlcDeaths    = Number(rows[166] && rows[166].c[10] ? rows[166].c[10].v : 0) || 0;
   var globalDeaths = 0;
   if (showBase && showDLC)  globalDeaths = baseDeaths + dlcDeaths;
   else if (showBase)         globalDeaths = baseDeaths;
