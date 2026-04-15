@@ -79,6 +79,8 @@ var prevChartSnapshot = "";
 var clipsByBoss         = {};
 var deathsWriteTimer = null;
 var pendingLocalChanges = {};
+var fieldDeaths = { base: 0, dlc: 0 };
+var fieldDeathsTimer = { base: null, dlc: null };
 
 // Auth state
 var currentUser = null;
@@ -258,6 +260,9 @@ function updateLoginUI() {
     authNotice.classList.remove("visible");
   }
   updateAddClipButton();
+
+  var bar = document.getElementById("field-deaths-bar");
+  if (bar) bar.style.display = isAuthorized() ? "flex" : "none";
 }
 
 function isAuthorized() {
@@ -309,6 +314,29 @@ function applyLocalBossChange(area, boss, field, value) {
   if (field === "done" && value === true && !oldDone && MAIN_BOSSES.has(boss)) {
     showToast("✔ " + boss + " besiegt!");
   }
+}
+
+function adjustFieldDeaths(type, delta) {
+  if (!isAuthorized()) return;
+  var newVal = Math.max(0, fieldDeaths[type] + delta);
+  fieldDeaths[type] = newVal;
+  document.getElementById("fdeath-val-" + type).textContent = newVal;
+  if (fieldDeathsTimer[type]) clearTimeout(fieldDeathsTimer[type]);
+  var t = type, v = newVal;
+  fieldDeathsTimer[type] = setTimeout(function() {
+    writeFieldDeathsToSheet(t, v);
+    fieldDeathsTimer[t] = null;
+  }, 600);
+}
+
+function writeFieldDeathsToSheet(type, value) {
+  if (!APPS_SCRIPT_URL) return;
+  fetch(APPS_SCRIPT_URL
+    + "?action=setFieldDeaths"
+    + "&type="  + encodeURIComponent(type)
+    + "&value=" + encodeURIComponent(value),
+    { method: "GET", mode: "no-cors" }
+  ).catch(function(err) { console.error("[FieldDeaths]", err); });
 }
 
 function updateBossRow(areaName, bossName, bossData) {
@@ -1259,6 +1287,15 @@ function loadData() {
 
 function processData(rows) {
   cachedRows = rows;
+  if (isAuthorized()) {
+    var fdBase = rows[1]   && rows[1].c[9]   ? (Number(rows[1].c[9].v)   || 0) : 0;
+    var fdDlc  = rows[168] && rows[168].c[9] ? (Number(rows[168].c[9].v) || 0) : 0;
+    if (!fieldDeathsTimer.base) { fieldDeaths.base = fdBase; document.getElementById("fdeath-val-base").textContent = fdBase; }
+    if (!fieldDeathsTimer.dlc)  { fieldDeaths.dlc  = fdDlc;  document.getElementById("fdeath-val-dlc").textContent  = fdDlc; }
+    document.getElementById("field-deaths-bar").style.display = "flex";
+  } else {
+    document.getElementById("field-deaths-bar").style.display = "none";
+  }
   var baseGameFlag = isTrue(rows[0] && rows[0].c[16] ? rows[0].c[16].v : false);
   var dlcFlag      = isTrue(rows[1] && rows[1].c[16] ? rows[1].c[16].v : false);
 
