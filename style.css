@@ -1146,10 +1146,10 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 
 .add-clip-field label {
   font-family: 'Cinzel', serif;
-  font-size: 10px;
-  letter-spacing: 0.12em;
+  font-size: 13px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--gold-dim);
+  color: #c8a850;
 }
 
 .add-clip-input,
