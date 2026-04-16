@@ -263,6 +263,7 @@ function updateLoginUI() {
 
   var bar = document.getElementById("field-deaths-bar");
   if (bar) bar.style.display = isAuthorized() ? "flex" : "none";
+  updateFieldDeathsVisibility();
 }
 
 function isAuthorized() {
@@ -327,6 +328,18 @@ function adjustFieldDeaths(type, delta) {
     writeFieldDeathsToSheet(t, v);
     fieldDeathsTimer[t] = null;
   }, 600);
+}
+
+function updateFieldDeathsVisibility() {
+  var chipBase    = document.getElementById("fdeath-chip-base");
+  var chipDlc     = document.getElementById("fdeath-chip-dlc");
+  var divider     = document.getElementById("fdeath-divider");
+  if (!chipBase || !chipDlc) return;
+
+  chipBase.style.display = showBase ? "" : "none";
+  chipDlc.style.display  = showDLC  ? "" : "none";
+  // Trenner nur anzeigen wenn beide sichtbar sind
+  if (divider) divider.style.display = (showBase && showDLC) ? "" : "none";
 }
 
 function writeFieldDeathsToSheet(type, value) {
@@ -587,6 +600,8 @@ function toggleFlag(flag) {
     document.getElementById("btn-open").classList.toggle("active", showOnlyOpen);
     document.body.classList.toggle("filter-open", showOnlyOpen);
   }
+  updateFieldDeathsVisibility();
+  renderFromCache();
   renderFromCache();
 }
 
