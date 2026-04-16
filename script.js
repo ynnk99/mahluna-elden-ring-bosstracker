@@ -10,6 +10,7 @@ const ALLOWED_USERS = [
   "ynnk99",
   "mahluna",
   "der_gude_nico",
+  "Deeichkind",
 ];
 
 const SPREADSHEET_ID = "1r9BzZJYFrk4rQLlMn4ZPBBUuc8u_peqwThTi1UTCQcE";
