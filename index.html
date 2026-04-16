@@ -87,7 +87,7 @@
   <!-- ── FELDTODE (nur Editoren) ── -->
   <div class="field-deaths-bar" id="field-deaths-bar">
     <span class="ctrl-label">Sonstige Tode:</span>
-    <div class="field-deaths-chip">
+    <div class="field-deaths-chip" id="fdeath-chip-base">
       <span class="field-deaths-label">⚔ Base Game</span>
       <div class="field-deaths-controls">
         <button class="fdeath-btn fdeath-minus" onclick="adjustFieldDeaths('base',-1)">−</button>
@@ -95,8 +95,8 @@
         <button class="fdeath-btn fdeath-plus" onclick="adjustFieldDeaths('base',+1)">+</button>
       </div>
     </div>
-    <div class="divider"></div>
-    <div class="field-deaths-chip">
+    <div class="divider" id="fdeath-divider"></div>
+    <div class="field-deaths-chip" id="fdeath-chip-dlc">
       <span class="field-deaths-label">🌑 DLC</span>
       <div class="field-deaths-controls">
         <button class="fdeath-btn fdeath-minus" onclick="adjustFieldDeaths('dlc',-1)">−</button>
