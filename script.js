@@ -1320,6 +1320,7 @@ function processData(rows) {
     showDLC  = dlcFlag;
     document.getElementById("btn-basegame").classList.toggle("active", showBase);
     document.getElementById("btn-dlc").classList.toggle("active", showDLC);
+    updateFieldDeathsVisibility(); // ← neu
   }
 
   timerStartTs = Number(rows[0] && rows[0].c[22] ? rows[0].c[22].v : 0) || 0;
