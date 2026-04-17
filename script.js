@@ -22,7 +22,7 @@ const CLIPS_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
   + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&range=W9:Z1000";
 
 const RANKING_TOP_N = 10;
-const STREAMER_LOGIN = "mahluna";
+const STREAMER_LOGIN = "kadditv";
 
 const MAIN_BOSSES = new Set([
   "Margit, das Grausame Mal",
