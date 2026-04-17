@@ -22,6 +22,7 @@ const CLIPS_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
   + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&range=W9:Z1000";
 
 const RANKING_TOP_N = 10;
+const STREAMER_LOGIN = "mahluna";
 
 const MAIN_BOSSES = new Set([
   "Margit, das Grausame Mal",
@@ -82,6 +83,7 @@ var deathsWriteTimer = null;
 var pendingLocalChanges = {};
 var fieldDeaths = { base: 0, dlc: 0 };
 var fieldDeathsTimer = { base: null, dlc: null };
+var liveCheckInterval = null;
 
 // Auth state
 var currentUser = null;
@@ -165,6 +167,7 @@ function logout() {
   userIsEditor = false;
   updateLoginUI();
   renderFromCache();
+  checkLiveStatus();
 }
 
 function checkAuthOnLoad() {
@@ -217,6 +220,7 @@ function fetchTwitchUser(token) {
     showToast(userIsEditor
       ? "✔ Willkommen " + currentUser.display_name + " — Bearbeitungsrechte aktiv"
       : "👁 Eingeloggt als " + currentUser.display_name + " (nur lesen)", 4000);
+    checkLiveStatus();
   })
   .catch(function(err) {
     console.error("[Auth] Fehler:", err);
@@ -269,6 +273,56 @@ function updateLoginUI() {
 
 function isAuthorized() {
   return userIsEditor && currentUser !== null;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TWITCH LIVE STATUS
+// ═══════════════════════════════════════════════════════════════════════════
+
+function checkLiveStatus() {
+  var token = localStorage.getItem("twitch_token");
+  var badge = document.getElementById("live-badge");
+  if (!badge) return;
+
+  if (!token) {
+    badge.className = "live-badge no-token";
+    badge.innerHTML = '<a class="live-link" href="https://twitch.tv/' + STREAMER_LOGIN + '" target="_blank" rel="noopener">'
+      + '<svg width="12" height="12" viewBox="0 0 24 24" fill="#9146ff" style="flex-shrink:0"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>'
+      + 'twitch.tv/' + STREAMER_LOGIN + '</a>';
+    return;
+  }
+
+  fetch("https://api.twitch.tv/helix/streams?user_login=" + encodeURIComponent(STREAMER_LOGIN), {
+    headers: {
+      "Authorization": "Bearer " + token,
+      "Client-Id":     TWITCH_CLIENT_ID
+    }
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    var el = document.getElementById("live-badge");
+    if (!el) return;
+    if (data.data && data.data.length > 0) {
+      var stream  = data.data[0];
+      var viewers = stream.viewer_count.toLocaleString("de-DE");
+      el.className = "live-badge is-live";
+      el.innerHTML = '<a class="live-link" href="https://twitch.tv/' + STREAMER_LOGIN + '" target="_blank" rel="noopener">'
+        + '<span class="live-dot"></span>'
+        + 'LIVE &mdash; ' + viewers + ' Zuschauer</a>';
+    } else {
+      el.className = "live-badge is-offline";
+      el.innerHTML = '<a class="live-link" href="https://twitch.tv/' + STREAMER_LOGIN + '" target="_blank" rel="noopener">'
+        + '<span class="offline-dot"></span>Offline</a>';
+    }
+  })
+  .catch(function() {
+    var el = document.getElementById("live-badge");
+    if (!el) return;
+    el.className = "live-badge no-token";
+    el.innerHTML = '<a class="live-link" href="https://twitch.tv/' + STREAMER_LOGIN + '" target="_blank" rel="noopener">'
+      + '<svg width="12" height="12" viewBox="0 0 24 24" fill="#9146ff" style="flex-shrink:0"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>'
+      + 'twitch.tv/' + STREAMER_LOGIN + '</a>';
+  });
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -544,10 +598,40 @@ document.addEventListener("click", function(e) {
 });
 
 document.addEventListener("keydown", function(e) {
+  // ── Esc: alle Modals schließen, Suche leeren ──
   if (e.key === "Escape") {
     closeBossClipsPanel();
     closeClipModal();
     closeBossMenu();
+    if (searchQuery) clearSearch();
+    return;
+  }
+
+  // ── Strg+F / Cmd+F: Suche fokussieren ──
+  if ((e.ctrlKey || e.metaKey) && e.key === "f") {
+    var searchInput = document.getElementById("search-input");
+    if (searchInput) {
+      e.preventDefault();
+      searchInput.focus();
+      searchInput.select();
+    }
+    return;
+  }
+
+  // ── +/− : Tode im offenen Boss-Menü anpassen ──
+  if (menuOpen) {
+    var tag = (e.target && e.target.tagName) ? e.target.tagName.toUpperCase() : "";
+    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+    if (e.key === "+" || e.key === "=") {
+      e.preventDefault();
+      menuAdjustDeaths(1);
+      return;
+    }
+    if (e.key === "-" || e.key === "_") {
+      e.preventDefault();
+      menuAdjustDeaths(-1);
+      return;
+    }
   }
 });
 
@@ -1645,3 +1729,5 @@ loadClips();
 setInterval(loadData,  5000);
 setInterval(loadClips, 15000);
 startTimerTick();
+checkLiveStatus();
+liveCheckInterval = setInterval(checkLiveStatus, 60000);
