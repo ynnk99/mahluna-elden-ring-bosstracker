@@ -21,6 +21,11 @@ const SHEET_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
 const CLIPS_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
   + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&range=W9:Z1000";
 
+const BINGO_TEXT_URL  = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
+  + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&range=N15:R19";
+const BINGO_STATE_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
+  + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&range=N20:R24";
+
 const RANKING_TOP_N = 10;
 const STREAMER_LOGIN = "mahluna";
 
@@ -97,6 +102,12 @@ var menuState = {
   done: false,
   pinned: false
 };
+
+var bingoCells          = [];
+var bingoChecked        = [];
+var bingoPanelCollapsed = false;
+var prevBingoTextSnap   = "";
+var prevBingoStateSnap  = "";
 
 // ═══════════════════════════════════════════════════════════════════════════
 // UTILS
@@ -1720,6 +1731,162 @@ document.addEventListener("keydown", function(e) {
 })();
 
 // ═══════════════════════════════════════════════════════════════════════════
+// BINGO
+// ═══════════════════════════════════════════════════════════════════════════
+
+function toggleBingoPanel() {
+  bingoPanelCollapsed = !bingoPanelCollapsed;
+  var panel = document.getElementById("bingo-panel");
+  if (panel) panel.classList.toggle("collapsed", bingoPanelCollapsed);
+}
+
+function loadBingo() {
+  fetch(BINGO_TEXT_URL + "&nocache=" + Date.now())
+    .then(function(r) { return r.text(); })
+    .then(function(text) {
+      var json  = JSON.parse(text.substring(47).slice(0, -2));
+      var rows  = (json.table && json.table.rows) ? json.table.rows : [];
+      var cells = [];
+      for (var r = 0; r < 5; r++) {
+        var row = [];
+        for (var c = 0; c < 5; c++) {
+          var cell = (rows[r] && rows[r].c && rows[r].c[c]) ? rows[r].c[c] : null;
+          row.push(cell && cell.v !== null && cell.v !== undefined ? String(cell.v).trim() : "");
+        }
+        cells.push(row);
+      }
+      var snap = JSON.stringify(cells);
+      if (snap !== prevBingoTextSnap) {
+        prevBingoTextSnap = snap;
+        bingoCells = cells;
+        renderBingo();
+      }
+    })
+    .catch(function(e) { console.error("[Bingo] Text-Fehler:", e); });
+
+  fetch(BINGO_STATE_URL + "&nocache=" + Date.now())
+    .then(function(r) { return r.text(); })
+    .then(function(text) {
+      var json    = JSON.parse(text.substring(47).slice(0, -2));
+      var rows    = (json.table && json.table.rows) ? json.table.rows : [];
+      var checked = [];
+      for (var r = 0; r < 5; r++) {
+        var row = [];
+        for (var c = 0; c < 5; c++) {
+          var cell = (rows[r] && rows[r].c && rows[r].c[c]) ? rows[r].c[c] : null;
+          row.push(isTrue(cell ? cell.v : null));
+        }
+        checked.push(row);
+      }
+      var snap = JSON.stringify(checked);
+      if (snap !== prevBingoStateSnap) {
+        prevBingoStateSnap = snap;
+        bingoChecked = checked;
+        renderBingo();
+      }
+    })
+    .catch(function(e) { console.error("[Bingo] State-Fehler:", e); });
+}
+
+function getBingoWinLines() {
+  var lines = [];
+  var chk   = bingoChecked;
+  function allChecked(coords) {
+    return coords.every(function(rc) { return chk[rc[0]] && chk[rc[0]][rc[1]]; });
+  }
+  for (var r = 0; r < 5; r++) {
+    if (allChecked([[r,0],[r,1],[r,2],[r,3],[r,4]])) lines.push([[r,0],[r,1],[r,2],[r,3],[r,4]]);
+  }
+  for (var c = 0; c < 5; c++) {
+    if (allChecked([[0,c],[1,c],[2,c],[3,c],[4,c]])) lines.push([[0,c],[1,c],[2,c],[3,c],[4,c]]);
+  }
+  if (allChecked([[0,0],[1,1],[2,2],[3,3],[4,4]])) lines.push([[0,0],[1,1],[2,2],[3,3],[4,4]]);
+  if (allChecked([[0,4],[1,3],[2,2],[3,1],[4,0]])) lines.push([[0,4],[1,3],[2,2],[3,1],[4,0]]);
+  return lines;
+}
+
+function renderBingo() {
+  var section  = document.getElementById("bingo-section");
+  var grid     = document.getElementById("bingo-grid");
+  var banner   = document.getElementById("bingo-win-banner");
+  var subtitle = document.getElementById("bingo-subtitle");
+  if (!section || !grid) return;
+
+  // Sichtbar machen – auch wenn noch keine Texte geladen sind
+  section.style.display = "block";
+
+  if (!bingoCells.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:30px;'
+      + 'font-family:\'Crimson Pro\',serif;font-style:italic;color:var(--parchment-dim);opacity:0.5;">'
+      + 'Bingo-Felder werden geladen…</div>';
+    return;
+  }
+
+  var winLines = getBingoWinLines();
+  var winCells = {};
+  winLines.forEach(function(line) {
+    line.forEach(function(rc) { winCells[rc[0] + "," + rc[1]] = true; });
+  });
+
+  var totalChecked = 0;
+  var html = "";
+
+  for (var r = 0; r < 5; r++) {
+    for (var c = 0; c < 5; c++) {
+      var text    = (bingoCells[r] && bingoCells[r][c]) ? bingoCells[r][c] : "";
+      var checked = (bingoChecked[r] && bingoChecked[r][c]) || false;
+      var isWin   = !!winCells[r + "," + c];
+      var isFree  = /^free$/i.test(text.trim());
+
+      if (checked || isFree) totalChecked++;
+
+      var cls = "bingo-cell";
+      if (isFree)       cls += " free-cell checked";
+      else if (isWin)   cls += " checked bingo-line";
+      else if (checked) cls += " checked";
+      if (isAuthorized() && !isFree) cls += " editable";
+
+      var click = (isAuthorized() && !isFree)
+        ? ' onclick="toggleBingoCell(' + r + ',' + c + ')"' : '';
+
+      html += '<div class="' + cls + '"' + click + '>'
+        + '<span class="bingo-cell-text">' + escHtml(text) + '</span>'
+        + '</div>';
+    }
+  }
+
+  grid.innerHTML = html;
+
+  if (subtitle) {
+    subtitle.textContent = winLines.length > 0
+      ? "— ✨ BINGO! " + winLines.length + (winLines.length === 1 ? " Linie" : " Linien") + " abgeschlossen"
+      : "— " + totalChecked + " / 25 Felder markiert";
+  }
+  if (banner) banner.style.display = winLines.length > 0 ? "block" : "none";
+}
+
+function toggleBingoCell(row, col) {
+  if (!isAuthorized()) return;
+  if (!bingoChecked[row]) bingoChecked[row] = Array(5).fill(false);
+  bingoChecked[row][col] = !bingoChecked[row][col];
+  prevBingoStateSnap = JSON.stringify(bingoChecked);
+  renderBingo();
+  showToast((bingoChecked[row][col] ? "✔ " : "○ ") + (bingoCells[row] ? bingoCells[row][col] : ""), 2000);
+  writeBingoCellToSheet(row, col, bingoChecked[row][col]);
+}
+
+function writeBingoCellToSheet(row, col, value) {
+  if (!APPS_SCRIPT_URL) return;
+  fetch(APPS_SCRIPT_URL
+    + "?action=setBingo"
+    + "&row="   + encodeURIComponent(row)
+    + "&col="   + encodeURIComponent(col)
+    + "&value=" + encodeURIComponent(value ? "TRUE" : "FALSE"),
+    { method: "GET", mode: "no-cors" }
+  ).catch(function(e) { console.error("[Bingo] Schreibfehler:", e); });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -1731,3 +1898,5 @@ setInterval(loadClips, 15000);
 startTimerTick();
 checkLiveStatus();
 liveCheckInterval = setInterval(checkLiveStatus, 60000);
+loadBingo();
+setInterval(loadBingo, 10000);
