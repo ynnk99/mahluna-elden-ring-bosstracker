@@ -355,6 +355,18 @@
 
 <div class="custom-tooltip" id="custom-tooltip"></div>
 
+<!-- ── BINGO EDIT POPUP ── -->
+<div class="bingo-edit-backdrop" id="bingo-edit-backdrop" onclick="closeBingoEdit()"></div>
+<div class="bingo-edit-popup" id="bingo-edit-popup">
+  <div class="bingo-edit-header">Bingo-Feld bearbeiten</div>
+  <textarea class="bingo-edit-input" id="bingo-edit-input" rows="3" maxlength="80"
+    placeholder="Text eingeben…"></textarea>
+  <div class="bingo-edit-actions">
+    <button class="bingo-edit-cancel" onclick="closeBingoEdit()">Abbrechen</button>
+    <button class="bingo-edit-save" onclick="saveBingoEdit()">✓ Speichern</button>
+  </div>
+</div>
+
 <script src="script.js"></script>
 </body>
 </html>
