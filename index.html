@@ -140,6 +140,25 @@
     </button>
   </div>
 
+  <!-- ── BINGO ── -->
+  <section class="bingo-section" id="bingo-section" style="display:none;">
+    <div class="bingo-panel" id="bingo-panel">
+      <div class="bingo-panel-header" onclick="toggleBingoPanel()">
+        <div class="ranking-header-left">
+          <span class="ranking-toggle-icon" id="bingo-toggle-icon">▼</span>
+          <span class="ranking-title">⬜ Mahluna Bingo</span>
+          <span class="ranking-subtitle" id="bingo-subtitle">— Felder werden geladen…</span>
+        </div>
+      </div>
+      <div class="bingo-panel-body" id="bingo-panel-body">
+        <div class="bingo-grid" id="bingo-grid"></div>
+        <div class="bingo-win-banner" id="bingo-win-banner" style="display:none;">
+          ⚔&nbsp;&nbsp;B I N G O&nbsp;&nbsp;⚔
+        </div>
+      </div>
+    </div>
+  </section>
+
   <div class="refresh-indicator" id="refresh-indicator">
     <span class="refresh-dot" id="refresh-dot"></span>
     <span id="refresh-text">Verbunden</span>
