@@ -1548,7 +1548,7 @@ body.filter-open #chart-section {
   border: 1px solid rgba(201,164,74,0.18);
   border-radius: 5px;
   font-family: 'Crimson Pro', serif;
-  font-size: 12.5px;
+  font-size: 16px;
   line-height: 1.35;
   color: var(--parchment-dim);
   position: relative;
