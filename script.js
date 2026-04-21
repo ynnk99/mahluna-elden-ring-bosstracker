@@ -612,6 +612,7 @@ document.addEventListener("keydown", function(e) {
   // ── Esc: alle Modals schließen, Suche leeren ──
   if (e.key === "Escape") {
     closeBossClipsPanel();
+    closeBingoEdit();
     closeClipModal();
     closeBossMenu();
     if (searchQuery) clearSearch();
@@ -1847,7 +1848,8 @@ function renderBingo() {
       if (isAuthorized() && !isFree) cls += " editable";
 
       var click = (isAuthorized() && !isFree)
-        ? ' onclick="toggleBingoCell(' + r + ',' + c + ')"' : '';
+        ? ' onclick="toggleBingoCell(' + r + ',' + c + ')"'
+        + ' oncontextmenu="openBingoEdit(event,' + r + ',' + c + ')"' : '';
 
       html += '<div class="' + cls + '"' + click + '>'
         + '<span class="bingo-cell-text">' + escHtml(text) + '</span>'
@@ -1884,6 +1886,62 @@ function writeBingoCellToSheet(row, col, value) {
     + "&value=" + encodeURIComponent(value ? "TRUE" : "FALSE"),
     { method: "GET", mode: "no-cors" }
   ).catch(function(e) { console.error("[Bingo] Schreibfehler:", e); });
+}
+
+// ──────────── NEU: BINGO EDIT ────────────
+var bingoEditState = { row: -1, col: -1 };
+
+function openBingoEdit(e, row, col) {
+  e.preventDefault();
+  e.stopPropagation();
+  if (!isAuthorized()) return;
+  bingoEditState = { row: row, col: col };
+  var input = document.getElementById("bingo-edit-input");
+  var popup = document.getElementById("bingo-edit-popup");
+  input.value = (bingoCells[row] && bingoCells[row][col]) ? bingoCells[row][col] : "";
+  var vw = window.innerWidth, vh = window.innerHeight;
+  var pw = 300, ph = 160;
+  var left = e.clientX + 10, top = e.clientY + 4;
+  if (left + pw > vw - 12) left = e.clientX - pw - 10;
+  if (top  + ph > vh - 12) top  = e.clientY - ph - 4;
+  if (left < 8) left = 8;
+  if (top  < 8) top  = 8;
+  popup.style.left = left + "px";
+  popup.style.top  = top  + "px";
+  document.getElementById("bingo-edit-backdrop").classList.add("open");
+  popup.classList.add("open");
+  setTimeout(function() { input.focus(); input.select(); }, 120);
+}
+
+function closeBingoEdit() {
+  document.getElementById("bingo-edit-backdrop").classList.remove("open");
+  document.getElementById("bingo-edit-popup").classList.remove("open");
+  bingoEditState = { row: -1, col: -1 };
+}
+
+function saveBingoEdit() {
+  var row = bingoEditState.row;
+  var col = bingoEditState.col;
+  if (row < 0 || col < 0) return;
+  var newText = document.getElementById("bingo-edit-input").value.trim();
+  if (!bingoCells[row]) bingoCells[row] = Array(5).fill("");
+  bingoCells[row][col] = newText;
+  prevBingoTextSnap = JSON.stringify(bingoCells);
+  closeBingoEdit();
+  renderBingo();
+  showToast("✏ Bingo-Feld gespeichert", 2000);
+  writeBingoTextToSheet(row, col, newText);
+}
+
+function writeBingoTextToSheet(row, col, text) {
+  if (!APPS_SCRIPT_URL) return;
+  fetch(APPS_SCRIPT_URL
+    + "?action=setBingoText"
+    + "&row="   + encodeURIComponent(row)
+    + "&col="   + encodeURIComponent(col)
+    + "&value=" + encodeURIComponent(text),
+    { method: "GET", mode: "no-cors" }
+  ).catch(function(e) { console.error("[Bingo] Text-Schreibfehler:", e); });
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
