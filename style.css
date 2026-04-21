@@ -1645,3 +1645,100 @@ body.filter-open #chart-section {
   .bingo-cell { min-height: 68px; font-size: 10.5px; padding: 7px 5px; }
   .bingo-grid { gap: 5px; }
 }
+
+/* ─── BINGO EDIT POPUP ─── */
+.bingo-edit-backdrop {
+  position: fixed; inset: 0; z-index: 600;
+  opacity: 0; pointer-events: none;
+}
+.bingo-edit-backdrop.open { opacity: 1; pointer-events: all; }
+
+.bingo-edit-popup {
+  position: fixed;
+  z-index: 601;
+  min-width: 220px;
+  max-width: 300px;
+  background: linear-gradient(160deg, rgba(18,15,9,0.99) 0%, rgba(10,9,7,0.99) 100%);
+  border: 1px solid rgba(201,164,74,0.5);
+  border-radius: 8px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.8), 0 0 20px rgba(201,164,74,0.1);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  opacity: 0;
+  transform: scale(0.92) translateY(-4px);
+  transition: opacity 0.18s ease, transform 0.18s cubic-bezier(0.22,1,0.36,1);
+  pointer-events: none;
+}
+
+.bingo-edit-popup.open {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  pointer-events: all;
+}
+
+.bingo-edit-header {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+}
+
+.bingo-edit-input {
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(201,164,74,0.3);
+  border-radius: 5px;
+  color: var(--parchment);
+  font-family: 'Crimson Pro', serif;
+  font-size: 14px;
+  line-height: 1.4;
+  padding: 8px 10px;
+  outline: none;
+  resize: none;
+  width: 100%;
+  transition: border-color 0.2s ease;
+}
+
+.bingo-edit-input:focus {
+  border-color: rgba(201,164,74,0.65);
+  box-shadow: 0 0 10px rgba(201,164,74,0.1);
+}
+
+.bingo-edit-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.bingo-edit-cancel {
+  padding: 6px 14px;
+  background: transparent;
+  border: 1px solid rgba(201,164,74,0.2);
+  border-radius: 4px;
+  color: var(--parchment-dim);
+  font-family: 'Crimson Pro', serif;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.bingo-edit-cancel:hover { border-color: var(--gold-dim); color: var(--parchment); }
+
+.bingo-edit-save {
+  padding: 6px 16px;
+  background: rgba(201,164,74,0.15);
+  border: 1px solid rgba(201,164,74,0.45);
+  border-radius: 4px;
+  color: var(--gold-light);
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.bingo-edit-save:hover {
+  background: rgba(201,164,74,0.25);
+  border-color: var(--gold);
+  box-shadow: 0 0 12px rgba(201,164,74,0.2);
+}
