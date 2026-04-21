@@ -1491,3 +1491,157 @@ body.filter-open #chart-section {
 .fdeath-btn:active { transform: scale(0.9); }
 .fdeath-btn.fdeath-minus { color: var(--red-bright); border-color: rgba(196,74,58,0.3); }
 .fdeath-btn.fdeath-minus:hover { background: rgba(196,74,58,0.15); }
+
+/* ─── BINGO ─── */
+.bingo-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: border-color 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.bingo-panel:hover { border-color: rgba(201,164,74,0.4); }
+
+.bingo-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid transparent;
+  transition: background 0.2s ease, border-color 0.25s ease;
+}
+
+.bingo-panel-header:hover { background: rgba(201,164,74,0.04); }
+.bingo-panel:not(.collapsed) .bingo-panel-header { border-bottom-color: var(--border); }
+
+.bingo-panel.collapsed #bingo-toggle-icon { transform: rotate(-90deg); }
+.bingo-panel.collapsed .bingo-panel-body  { max-height: 0; padding: 0 20px; }
+
+.bingo-panel-body {
+  max-height: 900px;
+  overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.3s ease;
+  padding: 20px;
+}
+
+/* ── Grid ── */
+.bingo-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.bingo-cell {
+  min-height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 10px 7px;
+  background: rgba(5, 4, 2, 0.45);
+  border: 1px solid rgba(201,164,74,0.18);
+  border-radius: 5px;
+  font-family: 'Crimson Pro', serif;
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: var(--parchment-dim);
+  position: relative;
+  word-break: break-word;
+  transition: background 0.25s ease, border-color 0.25s ease,
+              box-shadow 0.25s ease, color 0.25s ease;
+  cursor: default;
+}
+
+/* Editor: Hover-Feedback */
+.bingo-cell.editable { cursor: pointer; }
+.bingo-cell.editable:hover {
+  border-color: rgba(201,164,74,0.4);
+  background: rgba(201,164,74,0.05);
+  color: var(--parchment);
+}
+
+/* Abgehakt */
+.bingo-cell.checked {
+  background: rgba(201,164,74,0.13);
+  border-color: rgba(201,164,74,0.55);
+  color: var(--gold-light);
+}
+
+.bingo-cell.checked::before {
+  content: "✓";
+  position: absolute;
+  top: 5px;
+  right: 7px;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  color: var(--gold);
+  opacity: 0.75;
+}
+
+.bingo-cell.checked .bingo-cell-text {
+  text-decoration: line-through;
+  text-decoration-color: rgba(201,164,74,0.35);
+  text-underline-offset: 2px;
+  opacity: 0.7;
+}
+
+/* Gewinn-Linie */
+.bingo-cell.bingo-line {
+  background: rgba(201,164,74,0.2);
+  border-color: var(--gold);
+  color: var(--gold-light);
+  animation: bingoCellGlow 1.8s ease-in-out infinite;
+}
+
+.bingo-cell.bingo-line::before {
+  color: var(--gold-light);
+  opacity: 1;
+}
+
+@keyframes bingoCellGlow {
+  0%, 100% { box-shadow: 0 0 8px  rgba(201,164,74,0.2); }
+  50%       { box-shadow: 0 0 22px rgba(201,164,74,0.55); }
+}
+
+/* FREE-Feld */
+.bingo-cell.free-cell {
+  background: rgba(201,164,74,0.1);
+  border-color: rgba(201,164,74,0.45);
+  color: var(--gold-dim);
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+/* Mittelpunkt-Ornament */
+.bingo-cell.free-cell .bingo-cell-text::before { content: "⚔ "; }
+.bingo-cell.free-cell .bingo-cell-text::after  { content: " ⚔"; }
+
+/* ── Gewinn-Banner ── */
+.bingo-win-banner {
+  text-align: center;
+  margin-top: 18px;
+  padding: 10px 0 4px;
+  font-family: 'Cinzel', serif;
+  font-size: 20px;
+  letter-spacing: 0.25em;
+  color: var(--gold-light);
+  text-shadow: 0 0 30px rgba(201,164,74,0.6), 0 2px 8px rgba(0,0,0,0.8);
+  animation: bingoBannerPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes bingoBannerPulse {
+  0%, 100% { opacity: 1; text-shadow: 0 0 30px rgba(201,164,74,0.6); }
+  50%       { opacity: 0.55; text-shadow: 0 0 10px rgba(201,164,74,0.2); }
+}
+
+@media (max-width: 700px) {
+  .bingo-cell { min-height: 68px; font-size: 10.5px; padding: 7px 5px; }
+  .bingo-grid { gap: 5px; }
+}
