@@ -164,6 +164,22 @@
     <span id="refresh-text">Verbunden</span>
   </div>
 
+  <!-- RANKING PANEL -->
+  <div class="ranking-panel" id="ranking-panel">
+    <div class="ranking-header" onclick="toggleRanking()">
+      <div class="ranking-header-left">
+        <span class="ranking-toggle-icon">▼</span>
+        <span class="ranking-title">☠ Tode-Ranking</span>
+        <span class="ranking-subtitle" id="ranking-subtitle">— die härtesten Begegnungen</span>
+      </div>
+    </div>
+    <div class="ranking-body">
+      <div class="ranking-list" id="ranking-list">
+        <div class="ranking-empty">Noch keine Daten geladen…</div>
+      </div>
+    </div>
+  </div>
+
   <!-- SEARCH BAR -->
   <div class="search-bar">
     <span class="search-icon">🔍</span>
@@ -179,22 +195,6 @@
     <span class="search-result-count" id="search-result-count"></span>
     <span class="search-clear" id="search-clear" onclick="clearSearch()" title="Suche leeren">✕</span>
     <span class="search-shortcut-hint" title="Tastenkürzel: Strg+F = Suche, Esc = Schließen, +/− = Tode (im Boss-Menü)">⌨</span>
-  </div>
-
-  <!-- RANKING PANEL -->
-  <div class="ranking-panel" id="ranking-panel">
-    <div class="ranking-header" onclick="toggleRanking()">
-      <div class="ranking-header-left">
-        <span class="ranking-toggle-icon">▼</span>
-        <span class="ranking-title">☠ Tode-Ranking</span>
-        <span class="ranking-subtitle" id="ranking-subtitle">— die härtesten Begegnungen</span>
-      </div>
-    </div>
-    <div class="ranking-body">
-      <div class="ranking-list" id="ranking-list">
-        <div class="ranking-empty">Noch keine Daten geladen…</div>
-      </div>
-    </div>
   </div>
 
   <section id="pinned-section">
