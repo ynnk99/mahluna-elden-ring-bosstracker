@@ -507,11 +507,13 @@ function positionMenu(e) {
   var menu   = document.getElementById("boss-menu");
   menu.style.display = "block";
   var mw     = 240;
-  var mh     = 260;
+  var mh     = 280;
   var vw     = window.innerWidth;
   var vh     = window.innerHeight;
-  var cx     = e.clientX;
-  var cy     = e.clientY;
+  // Touch-Koordinaten bevorzugen falls vorhanden
+  var touch  = e.changedTouches && e.changedTouches[0];
+  var cx     = touch ? touch.clientX : e.clientX;
+  var cy     = touch ? touch.clientY : e.clientY;
 
   var left   = cx + 10;
   var top    = cy + 4;
@@ -608,6 +610,17 @@ document.addEventListener("click", function(e) {
   if (!menu.contains(e.target)) closeBossMenu();
 });
 
+// Touch-Support für Boss-Rows (Event Delegation auf dem Grid)
+document.addEventListener("touchend", function(e) {
+  if (!isAuthorized()) return;
+  var row = e.target.closest(".boss-row[data-boss]");
+  if (!row) return;
+  // Clip-Badge nicht triggern
+  if (e.target.closest(".boss-clip-badge")) return;
+  e.preventDefault();
+  openBossMenu(e, row.dataset.area, row.dataset.boss);
+}, { passive: false });
+
 document.addEventListener("keydown", function(e) {
   // ── Esc: alle Modals schließen, Suche leeren ──
   if (e.key === "Escape") {
@@ -698,7 +711,6 @@ function toggleFlag(flag) {
     document.body.classList.toggle("filter-open", showOnlyOpen);
   }
   updateFieldDeathsVisibility();
-  renderFromCache();
   renderFromCache();
 }
 
@@ -1589,6 +1601,11 @@ function renderAreas(areas) {
       card.dataset.area = b.area;
       if (isAuthorized()) {
         card.addEventListener("click", function(e) {
+          openBossMenu(e, b.area, b.boss);
+        });
+        // Touch-Support: touchend statt click, damit Koordinaten stimmen
+        card.addEventListener("touchend", function(e) {
+          e.preventDefault(); // verhindert nachfolgenden Mausklick
           openBossMenu(e, b.area, b.boss);
         });
       }
