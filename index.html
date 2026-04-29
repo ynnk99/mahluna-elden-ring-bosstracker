@@ -266,6 +266,34 @@
   </div>
 </div>
 
+<!-- ── QUICK CLIP MENU (Rechtsklick auf Boss) ── -->
+<div class="quick-clip-menu" id="quick-clip-menu" role="dialog">
+  <div class="quick-clip-header">
+    <span class="quick-clip-icon">🎬</span>
+    <span class="quick-clip-title">Clip hinzufügen</span>
+    <button class="quick-clip-close" onclick="closeQuickClipMenu()" title="Schließen">✕</button>
+  </div>
+  <div class="quick-clip-boss-label" id="quick-clip-boss-name">–</div>
+  <div class="quick-clip-body">
+    <input
+      type="text"
+      id="quick-clip-url"
+      class="quick-clip-input"
+      placeholder="Twitch-Clip-Link…"
+      onkeydown="if(event.key==='Enter')submitQuickClip()"
+    />
+    <select id="quick-clip-cat" class="quick-clip-select">
+      <option value="Allgemein">Allgemein</option>
+      <option value="Bosskill">Bosskill</option>
+      <option value="Funny Moment">Funny Moment</option>
+      <option value="Rage">Rage</option>
+      <option value="Sonstige">Sonstige</option>
+    </select>
+    <div id="quick-clip-feedback" class="quick-clip-feedback"></div>
+    <button class="quick-clip-submit" onclick="submitQuickClip()">Clip speichern</button>
+  </div>
+</div>
+
 <!-- ── CLIP MODAL ── -->
 <div class="clip-modal-backdrop" id="clip-backdrop" onclick="closeClipModal()"></div>
 

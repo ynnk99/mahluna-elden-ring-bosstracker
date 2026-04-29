@@ -610,6 +610,116 @@ document.addEventListener("click", function(e) {
   if (!menu.contains(e.target)) closeBossMenu();
 });
 
+// ═══════════════════════════════════════════════════════════════════════════
+// QUICK CLIP MENU (Rechtsklick auf Boss)
+// ═══════════════════════════════════════════════════════════════════════════
+
+var quickClipMenuOpen = false;
+var quickClipBoss     = "";
+
+function openQuickClipMenu(e, bossName) {
+  if (!isAuthorized()) return;
+  e.preventDefault();
+  e.stopPropagation();
+
+  // Close regular boss menu if open
+  if (menuOpen) closeBossMenu();
+
+  quickClipBoss = bossName;
+  document.getElementById("quick-clip-boss-name").textContent = bossName;
+  document.getElementById("quick-clip-url").value             = "";
+  document.getElementById("quick-clip-cat").value             = "Allgemein";
+  document.getElementById("quick-clip-feedback").textContent  = "";
+  document.getElementById("quick-clip-feedback").className    = "quick-clip-feedback";
+
+  var menu = document.getElementById("quick-clip-menu");
+  var mw   = 272;
+  var mh   = 200;
+  var vw   = window.innerWidth;
+  var vh   = window.innerHeight;
+  var left = e.clientX + 10;
+  var top  = e.clientY + 4;
+  if (left + mw > vw - 12) left = e.clientX - mw - 10;
+  if (top  + mh > vh - 12) top  = e.clientY - mh - 4;
+  if (left < 8) left = 8;
+  if (top  < 8) top  = 8;
+  menu.style.left = left + "px";
+  menu.style.top  = top  + "px";
+
+  menu.classList.add("open");
+  quickClipMenuOpen = true;
+
+  setTimeout(function() {
+    var inp = document.getElementById("quick-clip-url");
+    if (inp) inp.focus();
+  }, 80);
+}
+
+function closeQuickClipMenu() {
+  document.getElementById("quick-clip-menu").classList.remove("open");
+  quickClipMenuOpen = false;
+}
+
+function submitQuickClip() {
+  if (!isAuthorized()) return;
+
+  var urlEl  = document.getElementById("quick-clip-url");
+  var catEl  = document.getElementById("quick-clip-cat");
+  var feedEl = document.getElementById("quick-clip-feedback");
+
+  var url      = urlEl.value.trim();
+  var category = catEl.value;
+  var boss     = quickClipBoss;
+
+  feedEl.className = "quick-clip-feedback";
+
+  if (!url) {
+    feedEl.textContent = "⚠ Bitte einen Twitch-Link eingeben.";
+    feedEl.classList.add("error");
+    urlEl.focus();
+    return;
+  }
+
+  var parsed = parseTwitchClip(url);
+  if (!parsed || parsed.type === "link") {
+    feedEl.textContent = "⚠ Kein gültiger Twitch-Clip- oder VOD-Link.";
+    feedEl.classList.add("error");
+    urlEl.focus();
+    return;
+  }
+
+  var isDupe = clipsData.some(function(c) { return c.url.trim() === url; });
+  if (isDupe) {
+    feedEl.textContent = "⚠ Clip bereits in der Sammlung vorhanden.";
+    feedEl.classList.add("error");
+    return;
+  }
+
+  var newClip = { url: url, category: category, title: "", boss: boss };
+  clipsData.push(newClip);
+  rebuildClipsByBoss();
+
+  var countEl = document.getElementById("btn-clips-count");
+  if (countEl) countEl.textContent = "(" + clipsData.length + ")";
+  var modalCount = document.getElementById("modal-clip-count");
+  if (modalCount) modalCount.textContent = clipsData.length;
+
+  renderAreas(currentAreas);
+
+  feedEl.textContent = "✔ Clip gespeichert!";
+  feedEl.classList.add("success");
+
+  writeClipToSheet(url, category, "", boss);
+
+  setTimeout(closeQuickClipMenu, 1400);
+}
+
+document.addEventListener("click", function(e) {
+  if (!quickClipMenuOpen) return;
+  var menu = document.getElementById("quick-clip-menu");
+  if (!menu.contains(e.target)) closeQuickClipMenu();
+});
+
 // Touch-Support für Boss-Rows (Event Delegation auf dem Grid)
 document.addEventListener("touchend", function(e) {
   if (!isAuthorized()) return;
@@ -627,6 +737,7 @@ document.addEventListener("keydown", function(e) {
     closeBossClipsPanel();
     closeBingoEdit();
     closeClipModal();
+    closeQuickClipMenu();
     closeBossMenu();
     if (searchQuery) clearSearch();
     return;
@@ -1685,6 +1796,10 @@ function renderBossRow(b, areaName) {
     ? ' onclick="openBossMenu(event,\'' + escAttr(areaName) + '\',\'' + escAttr(b.boss) + '\')"'
     : '';
 
+  var ctxAttr = isAuthorized()
+    ? ' oncontextmenu="openQuickClipMenu(event,\'' + escAttr(b.boss) + '\')"'
+    : '';
+
   var bossClipCount = (clipsByBoss[b.boss] || []).length;
   var clipBadge = bossClipCount > 0
     ? '<span class="boss-clip-badge" onclick="openBossClipsPanel(\'' + escAttr(b.boss) + '\',event)" title="' + bossClipCount + ' Clip' + (bossClipCount > 1 ? 's' : '') + ' ansehen">🎬 ' + bossClipCount + '</span>'
@@ -1693,7 +1808,7 @@ function renderBossRow(b, areaName) {
   return '<div class="boss-row' + (b.done ? " done" : "") + editClass + '"'
     + ' data-boss="' + escAttr(b.boss) + '"'
     + ' data-area="' + escAttr(areaName) + '"'
-    + clickAttr + '>'
+    + clickAttr + ctxAttr + '>'
     + '<span class="boss-deaths' + deathClass + '">' + (b.deaths > 0 ? "†" + b.deaths : "†–") + '</span>'
     + '<span class="boss-name' + (isMain ? " main" : "") + '" data-tip="' + escAttr(b.boss) + '">' + escHtml(b.boss) + '</span>'
     + clipBadge
