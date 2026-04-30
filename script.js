@@ -1341,7 +1341,7 @@ function writeClipToSheet(url, category, title, boss) {
 function rebuildClipsByBoss() {
   clipsByBoss = {};
   clipsData.forEach(function(c) {
-    if (c.boss && MAIN_BOSSES.has(c.boss)) {
+    if (c.boss) {
       if (!clipsByBoss[c.boss]) clipsByBoss[c.boss] = [];
       clipsByBoss[c.boss].push(c);
     }
