@@ -1237,7 +1237,7 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 /* Datum-Badge auf Clip-Karten */
 .clip-date {
   font-size: 10px;
-  color: rgba(145,70,255,0.45);
+  color: var(--gold-dim);
   font-family: 'Cinzel', serif;
   letter-spacing: 0.04em;
   margin-left: auto;
@@ -1245,7 +1245,7 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 }
 .clip-creator {
   font-size: 10px;
-  color: rgba(145,70,255,0.38);
+  color: var(--gold-dim);
   font-family: 'Cinzel', serif;
   letter-spacing: 0.04em;
   white-space: nowrap;
@@ -1318,7 +1318,7 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 }
 .clip-title:empty { display: none; }
 
-.clip-number { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 0.08em; color: rgba(145,70,255,0.5); }
+.clip-number { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 0.08em; color: var(--gold-dim); }
 
 .clip-open-link {
   display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px;
