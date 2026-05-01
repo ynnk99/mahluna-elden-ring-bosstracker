@@ -19,7 +19,7 @@ const SHEET_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
   + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json";
 
 const CLIPS_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
-  + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&range=W9:AA1000";
+  + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&range=W9:AB1000";
 
 const BINGO_TEXT_URL  = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
   + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&range=N15:R19";
@@ -240,6 +240,45 @@ function fetchTwitchUser(token) {
     console.error("[Auth] Fehler:", err);
     showToast("⚠ Twitch-Anmeldung fehlgeschlagen", 3500);
   });
+}
+
+// ── Twitch Clip-Erstelldatum abrufen ─────────────────────────────────────────
+// Nutzt den bereits vorhandenen OAuth-Token aus dem localStorage.
+// Gibt ein Promise<string> zurück: ISO-Timestamp (UTC) oder Fallback = jetzt.
+// Gibt { addedAt: string, creatorName: string } zurück – beides aus einem einzigen API-Call.
+function fetchTwitchClipData(slug) {
+  return new Promise(function(resolve) {
+    var fallback = { addedAt: new Date().toISOString(), creatorName: "" };
+    var token = localStorage.getItem("twitch_token");
+    if (!token || !slug || slug === "") { resolve(fallback); return; }
+    fetch("https://api.twitch.tv/helix/clips?id=" + encodeURIComponent(slug), {
+      headers: {
+        "Authorization": "Bearer " + token,
+        "Client-Id":     TWITCH_CLIENT_ID
+      }
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.data && data.data[0]) {
+        resolve({
+          addedAt:     data.data[0].created_at  || fallback.addedAt,
+          creatorName: data.data[0].creator_name || ""
+        });
+      } else {
+        console.warn("[Clips] Keine Clip-Daten in Twitch-Antwort:", data);
+        resolve(fallback);
+      }
+    })
+    .catch(function(err) {
+      console.warn("[Clips] Twitch-API-Fehler:", err);
+      resolve(fallback);
+    });
+  });
+}
+
+// Rückwärtskompatibilität – wird intern nicht mehr direkt benötigt
+function fetchTwitchClipDate(slug) {
+  return fetchTwitchClipData(slug).then(function(d) { return d.addedAt; });
 }
 
 function updateLoginUI() {
@@ -698,23 +737,27 @@ function submitQuickClip() {
     return;
   }
 
-  var newClip = { url: url, category: category, title: "", boss: boss, addedAt: new Date().toISOString() };
-  clipsData.push(newClip);
-  rebuildClipsByBoss();
+  feedEl.textContent = "⏳ Clip-Datum wird abgerufen…";
 
-  var countEl = document.getElementById("btn-clips-count");
-  if (countEl) countEl.textContent = "(" + clipsData.length + ")";
-  var modalCount = document.getElementById("modal-clip-count");
-  if (modalCount) modalCount.textContent = clipsData.length;
+  fetchTwitchClipData(parsed.slug).then(function(clipData) {
+    var newClip = { url: url, category: category, title: "", boss: boss, addedAt: clipData.addedAt, creatorName: clipData.creatorName };
+    clipsData.push(newClip);
+    rebuildClipsByBoss();
 
-  renderAreas(currentAreas);
+    var countEl = document.getElementById("btn-clips-count");
+    if (countEl) countEl.textContent = "(" + clipsData.length + ")";
+    var modalCount = document.getElementById("modal-clip-count");
+    if (modalCount) modalCount.textContent = clipsData.length;
 
-  feedEl.textContent = "✔ Clip gespeichert!";
-  feedEl.classList.add("success");
+    renderAreas(currentAreas);
 
-  writeClipToSheet(url, category, "", boss);
+    feedEl.textContent = "✔ Clip gespeichert!";
+    feedEl.classList.add("success");
 
-  setTimeout(closeQuickClipMenu, 1400);
+    writeClipToSheet(url, category, "", boss, clipData.addedAt, clipData.creatorName);
+
+    setTimeout(closeQuickClipMenu, 1400);
+  });
 }
 
 document.addEventListener("click", function(e) {
@@ -1165,7 +1208,12 @@ function formatClipDate(iso) {
   if (!iso) return "";
   var d = new Date(iso);
   if (isNaN(d)) return "";
-  return d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" });
+  return d.toLocaleDateString("de-DE", {
+    day:      "2-digit",
+    month:    "2-digit",
+    year:     "numeric",
+    timeZone: "Europe/Berlin"
+  });
 }
 
 // CLIP MODAL
@@ -1288,6 +1336,7 @@ function renderClipCard(clip, index) {
     + '<div class="clip-card-footer-row">'
     + '<span class="clip-number">Clip ' + String(index + 1).padStart(2, "0") + '</span>'
     + (clip.addedAt ? '<span class="clip-date">📅 ' + formatClipDate(clip.addedAt) + '</span>' : '')
+    + (clip.creatorName ? '<span class="clip-creator">✂ ' + escHtml(clip.creatorName) + '</span>' : '')
     + '<a href="' + escAttr(linkUrl) + '" target="_blank" rel="noopener" class="clip-open-link">'
     + '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42L17.59 5H14V3zM5 5h6v2H7v10h10v-4h2v6H5V5z"/></svg>'
     + 'Auf Twitch</a>'
@@ -1363,51 +1412,67 @@ function submitNewClip() {
     return;
   }
 
-  var newClip = { url: url, category: category, title: title, boss: boss, addedAt: new Date().toISOString() };
-  clipsData.push(newClip);
-  rebuildClipsByBoss();
+  feedEl.textContent = "⏳ Clip-Datum wird abgerufen…";
 
-  var countEl = document.getElementById("btn-clips-count");
-  if (countEl) countEl.textContent = "(" + clipsData.length + ")";
-  var modalCount = document.getElementById("modal-clip-count");
-  if (modalCount) modalCount.textContent = clipsData.length;
+  fetchTwitchClipData(parsed.slug).then(function(clipData) {
+    var newClip = { url: url, category: category, title: title, boss: boss, addedAt: clipData.addedAt, creatorName: clipData.creatorName };
+    clipsData.push(newClip);
+    rebuildClipsByBoss();
 
-  activeCategory = category;
-  renderClipModal();
+    var countEl = document.getElementById("btn-clips-count");
+    if (countEl) countEl.textContent = "(" + clipsData.length + ")";
+    var modalCount = document.getElementById("modal-clip-count");
+    if (modalCount) modalCount.textContent = clipsData.length;
 
-  feedEl.textContent = "✔ Clip gespeichert – wird gleich im Sheet hinterlegt.";
-  urlEl.value   = "";
-  titleEl.value = "";
-  catEl.value   = "Allgemein";
-  if (bossEl) bossEl.value = "";
+    activeCategory = category;
+    renderClipModal();
 
-  setTimeout(function() {
-    addClipPanelOpen = false;
-    var panel = document.getElementById("add-clip-panel");
-    var btn   = document.getElementById("add-clip-btn");
-    if (panel) panel.classList.remove("open");
-    if (btn)   btn.classList.remove("active");
-    var fb = document.getElementById("add-clip-feedback");
-    if (fb) fb.textContent = "";
-  }, 2200);
+    feedEl.textContent = "✔ Clip gespeichert – wird gleich im Sheet hinterlegt.";
+    urlEl.value   = "";
+    titleEl.value = "";
+    catEl.value   = "Allgemein";
+    if (bossEl) bossEl.value = "";
 
-  writeClipToSheet(url, category, title, boss);
+    setTimeout(function() {
+      addClipPanelOpen = false;
+      var panel = document.getElementById("add-clip-panel");
+      var btn   = document.getElementById("add-clip-btn");
+      if (panel) panel.classList.remove("open");
+      if (btn)   btn.classList.remove("active");
+      var fb = document.getElementById("add-clip-feedback");
+      if (fb) fb.textContent = "";
+    }, 2200);
+
+    writeClipToSheet(url, category, title, boss, clipData.addedAt, clipData.creatorName);
+  });
 }
 
-function writeClipToSheet(url, category, title, boss) {
+function writeClipToSheet(url, category, title, boss, addedAt, creatorName) {
   if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === "DEINE_APPS_SCRIPT_URL_HIER") {
     console.warn("[Clips] Apps Script URL nicht konfiguriert – Clip nur lokal.");
     return;
   }
   var reqUrl = APPS_SCRIPT_URL
     + "?action=addClip"
-    + "&value="    + encodeURIComponent(url)
-    + "&category=" + encodeURIComponent(category)
-    + "&title="    + encodeURIComponent(title)
-    + "&boss="     + encodeURIComponent(boss || "")
-    + "&addedAt="  + encodeURIComponent(new Date().toISOString()); // Spalte E im Sheet
+    + "&value="       + encodeURIComponent(url)
+    + "&category="    + encodeURIComponent(category)
+    + "&title="       + encodeURIComponent(title)
+    + "&boss="        + encodeURIComponent(boss || "")
+    + "&addedAt="     + encodeURIComponent(addedAt || getNowISO())
+    + "&creatorName=" + encodeURIComponent(creatorName || ""); // Spalte AB im Sheet
   fetch(reqUrl, { method: "GET", mode: "no-cors" })
     .catch(function(err) { console.error("[Clips] Schreibfehler:", err); });
+}
+
+// Gibt aktuellen Zeitstempel mit lokalem UTC-Offset zurück (z.B. 2026-05-02T00:27:40.440+02:00)
+function getNowISO() {
+  var d   = new Date();
+  var off = -d.getTimezoneOffset();
+  var sign = off >= 0 ? "+" : "-";
+  var hh   = String(Math.floor(Math.abs(off) / 60)).padStart(2, "0");
+  var mm   = String(Math.abs(off) % 60).padStart(2, "0");
+  var local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+  return local.toISOString().slice(0, -1) + sign + hh + ":" + mm;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1531,12 +1596,13 @@ function loadClips() {
 
       rows.forEach(function(row) {
         if (!row || !row.c) return;
-        var url      = row.c[0] && row.c[0].v ? String(row.c[0].v).trim() : "";
-        var category = row.c[1] && row.c[1].v ? String(row.c[1].v).trim() : "Sonstige";
-        var title    = row.c[2] && row.c[2].v ? String(row.c[2].v).trim() : "";
-        var boss     = row.c[3] && row.c[3].v ? String(row.c[3].v).trim() : "";
-        var addedAt  = row.c[4] && row.c[4].v ? String(row.c[4].v).trim() : "";
-        if (url) newClips.push({ url: url, category: category, title: title, boss: boss, addedAt: addedAt });
+        var url         = row.c[0] && row.c[0].v ? String(row.c[0].v).trim() : "";
+        var category    = row.c[1] && row.c[1].v ? String(row.c[1].v).trim() : "Sonstige";
+        var title       = row.c[2] && row.c[2].v ? String(row.c[2].v).trim() : "";
+        var boss        = row.c[3] && row.c[3].v ? String(row.c[3].v).trim() : "";
+        var addedAt     = row.c[4] && row.c[4].v ? String(row.c[4].v).trim() : "";
+        var creatorName = row.c[5] && row.c[5].v ? String(row.c[5].v).trim() : "";
+        if (url) newClips.push({ url: url, category: category, title: title, boss: boss, addedAt: addedAt, creatorName: creatorName });
       });
 
       var clipsChanged = JSON.stringify(newClips) !== JSON.stringify(clipsData);
