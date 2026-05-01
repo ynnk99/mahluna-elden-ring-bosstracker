@@ -19,7 +19,7 @@ const SHEET_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
   + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json";
 
 const CLIPS_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
-  + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&range=W9:Z1000";
+  + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&range=W9:AA1000";
 
 const BINGO_TEXT_URL  = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
   + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&range=N15:R19";
@@ -78,6 +78,9 @@ var timerVisible  = false;
 var timerInterval = null;
 
 var clipsData      = [];
+var clipDateFilter = 'all';
+var clipDateFrom   = null;
+var clipDateTo     = null;
 var activeCategory = null;
 var currentAreas   = {};
 var searchQuery    = "";
@@ -695,7 +698,7 @@ function submitQuickClip() {
     return;
   }
 
-  var newClip = { url: url, category: category, title: "", boss: boss };
+  var newClip = { url: url, category: category, title: "", boss: boss, addedAt: new Date().toISOString() };
   clipsData.push(newClip);
   rebuildClipsByBoss();
 
@@ -1103,6 +1106,68 @@ function buildEmbedUrl(parsed) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
+// CLIP DATUM-FILTER
+// ═══════════════════════════════════════════════════════════════════════════
+
+function setClipDateFilter(f) {
+  clipDateFilter = f;
+  document.querySelectorAll(".clip-date-btn").forEach(function(btn) {
+    btn.classList.toggle("active", btn.dataset.filter === f);
+  });
+  var rangeEl = document.getElementById("clip-date-range");
+  if (rangeEl) rangeEl.style.display = (f === "custom") ? "flex" : "none";
+  if (f !== "custom") {
+    clipDateFrom = null;
+    clipDateTo   = null;
+  }
+  if (document.getElementById("clip-modal").classList.contains("open")) {
+    renderClipModal();
+  }
+}
+
+function applyCustomDateFilter() {
+  var fromEl = document.getElementById("clip-date-from");
+  var toEl   = document.getElementById("clip-date-to");
+  clipDateFrom = fromEl && fromEl.value ? new Date(fromEl.value) : null;
+  clipDateTo   = toEl   && toEl.value   ? new Date(toEl.value + "T23:59:59") : null;
+  if (document.getElementById("clip-modal").classList.contains("open")) {
+    renderClipModal();
+  }
+}
+
+function getFilteredClips() {
+  if (clipDateFilter === "all") return clipsData;
+  var now = new Date();
+  var from, to;
+  if (clipDateFilter === "today") {
+    from = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    to   = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+  } else if (clipDateFilter === "7d") {
+    from = new Date(now - 7 * 24 * 60 * 60 * 1000);
+  } else if (clipDateFilter === "30d") {
+    from = new Date(now - 30 * 24 * 60 * 60 * 1000);
+  } else if (clipDateFilter === "custom") {
+    from = clipDateFrom;
+    to   = clipDateTo;
+  }
+  return clipsData.filter(function(c) {
+    if (!c.addedAt) return false; // Clips ohne Datum nur in "Alle Clips"
+    var d = new Date(c.addedAt);
+    if (isNaN(d)) return false;
+    if (from && d < from) return false;
+    if (to   && d > to  ) return false;
+    return true;
+  });
+}
+
+function formatClipDate(iso) {
+  if (!iso) return "";
+  var d = new Date(iso);
+  if (isNaN(d)) return "";
+  return d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" });
+}
+
 // CLIP MODAL
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -1133,8 +1198,17 @@ function renderClipModal() {
 
   if (loadEl) loadEl.style.display = "none";
 
+  var filtered = getFilteredClips();
+
+  if (filtered.length === 0) {
+    tabsEl.innerHTML = "";
+    var filterLabel = { "today": "heute", "7d": "in den letzten 7 Tagen", "30d": "in den letzten 30 Tagen", "custom": "in diesem Zeitraum" }[clipDateFilter] || "";
+    bodyEl.innerHTML = '<div class="clip-empty"><span class="clip-empty-icon">📅</span><span>Keine Clips ' + filterLabel + ' vorhanden.</span></div>';
+    return;
+  }
+
   var categories = {};
-  clipsData.forEach(function(c) {
+  filtered.forEach(function(c) {
     var cat = c.category || "Sonstige";
     if (!categories[cat]) categories[cat] = [];
     categories[cat].push(c);
@@ -1213,6 +1287,7 @@ function renderClipCard(clip, index) {
     + titleHtml
     + '<div class="clip-card-footer-row">'
     + '<span class="clip-number">Clip ' + String(index + 1).padStart(2, "0") + '</span>'
+    + (clip.addedAt ? '<span class="clip-date">📅 ' + formatClipDate(clip.addedAt) + '</span>' : '')
     + '<a href="' + escAttr(linkUrl) + '" target="_blank" rel="noopener" class="clip-open-link">'
     + '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42L17.59 5H14V3zM5 5h6v2H7v10h10v-4h2v6H5V5z"/></svg>'
     + 'Auf Twitch</a>'
@@ -1288,7 +1363,7 @@ function submitNewClip() {
     return;
   }
 
-  var newClip = { url: url, category: category, title: title, boss: boss };
+  var newClip = { url: url, category: category, title: title, boss: boss, addedAt: new Date().toISOString() };
   clipsData.push(newClip);
   rebuildClipsByBoss();
 
@@ -1329,7 +1404,8 @@ function writeClipToSheet(url, category, title, boss) {
     + "&value="    + encodeURIComponent(url)
     + "&category=" + encodeURIComponent(category)
     + "&title="    + encodeURIComponent(title)
-    + "&boss="     + encodeURIComponent(boss || "");
+    + "&boss="     + encodeURIComponent(boss || "")
+    + "&addedAt="  + encodeURIComponent(new Date().toISOString()); // Spalte E im Sheet
   fetch(reqUrl, { method: "GET", mode: "no-cors" })
     .catch(function(err) { console.error("[Clips] Schreibfehler:", err); });
 }
@@ -1459,7 +1535,8 @@ function loadClips() {
         var category = row.c[1] && row.c[1].v ? String(row.c[1].v).trim() : "Sonstige";
         var title    = row.c[2] && row.c[2].v ? String(row.c[2].v).trim() : "";
         var boss     = row.c[3] && row.c[3].v ? String(row.c[3].v).trim() : "";
-        if (url) newClips.push({ url: url, category: category, title: title, boss: boss });
+        var addedAt  = row.c[4] && row.c[4].v ? String(row.c[4].v).trim() : "";
+        if (url) newClips.push({ url: url, category: category, title: title, boss: boss, addedAt: addedAt });
       });
 
       var clipsChanged = JSON.stringify(newClips) !== JSON.stringify(clipsData);

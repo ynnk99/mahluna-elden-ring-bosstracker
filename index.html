@@ -356,6 +356,20 @@
       <div class="add-clip-feedback" id="add-clip-feedback"></div>
     </div>
 
+    <!-- ── DATUM-FILTER ── -->
+    <div class="clip-date-filter" id="clip-date-filter">
+      <button class="clip-date-btn active" onclick="setClipDateFilter('all')" data-filter="all">Alle Clips</button>
+      <button class="clip-date-btn" onclick="setClipDateFilter('today')" data-filter="today">Heute</button>
+      <button class="clip-date-btn" onclick="setClipDateFilter('7d')" data-filter="7d">7 Tage</button>
+      <button class="clip-date-btn" onclick="setClipDateFilter('30d')" data-filter="30d">30 Tage</button>
+      <button class="clip-date-btn" onclick="setClipDateFilter('custom')" data-filter="custom">Zeitraum …</button>
+      <div class="clip-date-range" id="clip-date-range">
+        <input type="date" id="clip-date-from" class="clip-date-input" onchange="applyCustomDateFilter()">
+        <span class="clip-date-range-sep">–</span>
+        <input type="date" id="clip-date-to" class="clip-date-input" onchange="applyCustomDateFilter()">
+      </div>
+    </div>
+
     <div class="clip-tabs" id="clip-tabs"></div>
     <div class="clip-body" id="clip-body">
       <div class="clip-loading" id="clip-modal-loading">

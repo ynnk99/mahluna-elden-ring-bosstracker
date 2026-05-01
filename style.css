@@ -1188,6 +1188,62 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 }
 .clip-close-btn:hover { border-color: var(--gold-dim); color: var(--gold); background: rgba(201,164,74,0.08); }
 
+/* ── CLIP DATUM-FILTER ── */
+.clip-date-filter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  background: rgba(8,6,4,0.4);
+  flex-wrap: wrap;
+}
+.clip-date-btn {
+  padding: 4px 13px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: rgba(200,180,130,0.5);
+  font-size: 11px;
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.clip-date-btn:hover { border-color: rgba(145,70,255,0.4); color: var(--parchment); background: rgba(145,70,255,0.04); }
+.clip-date-btn.active { border-color: rgba(145,70,255,0.6); color: #c4a8ff; background: rgba(145,70,255,0.1); box-shadow: 0 0 8px rgba(145,70,255,0.12); }
+.clip-date-range {
+  display: none;
+  align-items: center;
+  gap: 7px;
+  margin-left: 4px;
+}
+.clip-date-range-sep { color: rgba(200,180,130,0.4); font-size: 12px; }
+.clip-date-input {
+  background: rgba(20,17,10,0.9);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--parchment);
+  font-size: 11px;
+  padding: 3px 8px;
+  cursor: pointer;
+  font-family: 'Crimson Pro', serif;
+}
+.clip-date-input:focus { outline: none; border-color: rgba(145,70,255,0.5); }
+.clip-date-input::-webkit-calendar-picker-indicator { filter: invert(0.6) sepia(1) hue-rotate(240deg); cursor: pointer; }
+
+/* Datum-Badge auf Clip-Karten */
+.clip-date {
+  font-size: 10px;
+  color: rgba(145,70,255,0.45);
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.04em;
+  margin-left: auto;
+  margin-right: 4px;
+}
+
 .clip-tabs {
   display: flex; gap: 0; overflow-x: auto; border-bottom: 1px solid rgba(145,70,255,0.15);
   flex-shrink: 0; background: rgba(8,6,4,0.5); scrollbar-width: none;
