@@ -1655,7 +1655,7 @@ function loadData() {
       processData(rows);
       setRefreshState("ok");
       document.getElementById("loading-overlay").style.display = "none";
-      document.getElementById("areas-grid").style.display      = "flex";
+      document.getElementById("areas-grid").style.display      = "grid";
     })
     .catch(function(err) {
       console.error("[Main] Fehler beim Laden:", err);
@@ -1882,18 +1882,6 @@ function renderAreas(areas) {
     if (!areas[k]) existingCards[k].remove();
   });
 
-  // Ensure 3 column divs exist
-  var numCols = 3;
-  while (grid.querySelectorAll(".areas-col").length < numCols) {
-    var col = document.createElement("div");
-    col.className = "areas-col";
-    grid.appendChild(col);
-  }
-  var cols = grid.querySelectorAll(".areas-col");
-
-  // Clear columns (but keep the col divs)
-  cols.forEach(function(col) { col.innerHTML = ""; });
-
   newKeys.forEach(function(areaName, idx) {
     var data = areas[areaName];
     var card = existingCards[areaName];
@@ -1914,11 +1902,31 @@ function renderAreas(areas) {
       ? ' <span style="font-size:11px;color:var(--gold-dim);font-family:\'Crimson Pro\',serif;font-style:italic;">DLC</span>'
       : "";
 
-    card.innerHTML = '<div class="area-header" onclick="toggleArea(\'' + escAttr(areaName) + '\')"><div class="area-header-left"><span class="area-toggle-icon">▼</span><span class="area-name" data-tip="' + escAttr(areaName) + '">' + escHtml(areaName) + dlcLabel + '</span></div><div class="area-progress-wrap"><span class="area-fraction">' + data.done + '/' + data.total + '</span><div class="area-progress-bar"><div class="area-progress-fill' + (complete ? " complete" : "") + '" style="width:' + pct + '%"></div></div></div></div><div class="boss-list">' + data.bosses.map(function(b) { return renderBossRow(b, areaName); }).join("") + '</div>';
+    card.innerHTML = '<div class="area-header" onclick="toggleArea(\'' + escAttr(areaName) + '\')">'
+      + '<div class="area-header-left">'
+      + '<span class="area-toggle-icon">▼</span>'
+      + '<span class="area-name" data-tip="' + escAttr(areaName) + '">' + escHtml(areaName) + dlcLabel + '</span>'
+      + '</div>'
+      + '<div class="area-progress-wrap">'
+      + '<span class="area-fraction">' + data.done + '/' + data.total + '</span>'
+      + '<div class="area-progress-bar">'
+      + '<div class="area-progress-fill' + (complete ? " complete" : "") + '" style="width:' + pct + '%"></div>'
+      + '</div></div></div>'
+      + '<div class="boss-list">'
+      + data.bosses.map(function(b) { return renderBossRow(b, areaName); }).join("")
+      + '</div>';
 
-    // Distribute round-robin across 3 columns
-    cols[idx % numCols].appendChild(card);
+    var children     = Array.from(grid.children);
+    var currentIndex = children.indexOf(card);
+    if (currentIndex !== idx) {
+      if (idx >= grid.children.length) {
+        grid.appendChild(card);
+      } else {
+        grid.insertBefore(card, grid.children[idx]);
+      }
+    }
   });
+
   if (searchQuery) applySearch();
 }
 
