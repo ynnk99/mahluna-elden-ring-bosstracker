@@ -667,11 +667,18 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 
 /* ─── AREA CARDS ─── */
 .areas-grid {
-  columns: 3;
-  column-gap: 16px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
 }
 
-@media (max-width: 1100px) { .areas-grid { columns: 2; } }
+.areas-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
 
 .area-card {
   background: var(--bg-card);
@@ -679,8 +686,6 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
   border-radius: var(--radius);
   overflow: hidden;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  break-inside: avoid;
-  margin-bottom: 16px;
 }
 
 .area-card:hover { border-color: rgba(201,164,74,0.4); box-shadow: 0 4px 30px rgba(0,0,0,0.4), 0 0 20px rgba(201,164,74,0.05); }
@@ -1124,7 +1129,8 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 @media (max-width: 700px) {
   .login-widget { position: static; justify-content: flex-end; margin-bottom: 12px; }
   .site-header { padding-top: 20px; }
-  .areas-grid { columns: 1; }
+  .areas-grid { flex-direction: column; }
+  .areas-col { width: 100%; }
   .controls-bar { flex-direction: column; align-items: flex-start; }
   .refresh-indicator { margin-left: 0; }
   .divider { display: none; }
