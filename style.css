@@ -680,8 +680,6 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
   overflow: hidden;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
   break-inside: avoid;
-  display: inline-block;
-  width: 100%;
   margin-bottom: 16px;
 }
 
