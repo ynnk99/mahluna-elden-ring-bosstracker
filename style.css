@@ -666,7 +666,12 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 .pinned-deaths { font-family: 'Cinzel', serif; font-size: 13px; color: var(--gold); }
 
 /* ─── AREA CARDS ─── */
-.areas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+.areas-grid {
+  columns: 3;
+  column-gap: 16px;
+}
+
+@media (max-width: 1100px) { .areas-grid { columns: 2; } }
 
 .area-card {
   background: var(--bg-card);
@@ -674,6 +679,10 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
   border-radius: var(--radius);
   overflow: hidden;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  break-inside: avoid;
+  display: inline-block;
+  width: 100%;
+  margin-bottom: 16px;
 }
 
 .area-card:hover { border-color: rgba(201,164,74,0.4); box-shadow: 0 4px 30px rgba(0,0,0,0.4), 0 0 20px rgba(201,164,74,0.05); }
@@ -1117,7 +1126,7 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 @media (max-width: 700px) {
   .login-widget { position: static; justify-content: flex-end; margin-bottom: 12px; }
   .site-header { padding-top: 20px; }
-  .areas-grid { grid-template-columns: 1fr; }
+  .areas-grid { columns: 1; }
   .controls-bar { flex-direction: column; align-items: flex-start; }
   .refresh-indicator { margin-left: 0; }
   .divider { display: none; }
