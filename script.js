@@ -2226,7 +2226,7 @@ function writeBingoTextToSheet(row, col, text) {
 checkAuthOnLoad();
 loadData();
 loadClips();
-setInterval(loadData,  5000);
+setInterval(loadData,  3000);
 setInterval(loadClips, 15000);
 startTimerTick();
 checkLiveStatus();
