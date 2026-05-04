@@ -79,10 +79,8 @@ var timerVisible  = false;
 var timerInterval = null;
 
 // ─── EDITOR TOOLBOX ────────────────────────────────────────────────────────
-var toolboxExpanded   = true;
-var toolboxTimerTick  = null;
-// tracks current state of toggle buttons: cell -> bool
-var toolboxCellState  = { N1: false, N2: false, Q1: true, Q2: true, S1: false, S2: false, Y1: false };
+var toolboxTimerTick = null;
+var toolboxCellState = { N1: false, N2: false, Q1: true, Q2: true, S1: false, S2: false, Y1: false };
 
 function toolboxInit() {
   var box = document.getElementById("editor-toolbox");
@@ -92,21 +90,16 @@ function toolboxInit() {
   document.body.classList.toggle("editor-mode", show);
 }
 
-// Open/close flyout panels – clicking same button again closes it
 function toolboxOpenPanel(name) {
   var panels = ['timer', 'obs', 'filter'];
   panels.forEach(function(p) {
     var item = document.getElementById('etb-item-' + p);
     if (!item) return;
-    if (p === name) {
-      item.classList.toggle('open');
-    } else {
-      item.classList.remove('open');
-    }
+    item.classList.toggle('open', p === name && !item.classList.contains('open'));
+    if (p !== name) item.classList.remove('open');
   });
 }
 
-// Close panels when clicking outside
 document.addEventListener('click', function(e) {
   var toolbox = document.getElementById('editor-toolbox');
   if (toolbox && !toolbox.contains(e.target)) {
@@ -117,64 +110,22 @@ document.addEventListener('click', function(e) {
   }
 });
 
-// Send a cell value to the toolbox Apps Script
 function toolboxWriteCell(cell, value) {
   if (!isAuthorized() || !TOOLBOX_SCRIPT_URL) return;
   fetch(TOOLBOX_SCRIPT_URL
-    + "?action=setCell"
-    + "&cell="  + encodeURIComponent(cell)
+    + "?action=setCell&cell=" + encodeURIComponent(cell)
     + "&value=" + encodeURIComponent(value),
     { method: "GET", mode: "no-cors" }
-  ).catch(function(e) { console.error("[Toolbox] setCell error:", e); });
+  ).catch(function(e) { console.error("[Toolbox] setCell:", e); });
 }
 
-// Toggle button handler – flips the stored state and writes to sheet
-function toolboxToggleCell(cell, btnId) {
-  if (!isAuthorized()) return;
-  toolboxCellState[cell] = !toolboxCellState[cell];
-  var newVal = toolboxCellState[cell];
-  toolboxWriteCell(cell, newVal ? "TRUE" : "FALSE");
-  toolboxSetBtnActive(btnId, newVal);
-  toolboxPatchAndRefresh();
-}
-
-// Immediately reflect toolbox changes in the page UI without waiting for refresh
-function toolboxApplyLocally(cell, newVal) {
-  switch (cell) {
-    case 'Q1': // Base Game
-      showBase = newVal;
-      document.getElementById('btn-basegame').classList.toggle('active', showBase);
-      updateFieldDeathsVisibility();
-      renderAreas(currentAreas);
-      break;
-    case 'Q2': // DLC
-      showDLC = newVal;
-      document.getElementById('btn-dlc').classList.toggle('active', showDLC);
-      updateFieldDeathsVisibility();
-      renderAreas(currentAreas);
-      break;
-    case 'S1': // Nur Offen
-      showOnlyOpen = newVal;
-      if (newVal) { showOnlyDone = false; toolboxCellState['S2'] = false; toolboxSetBtnActive('etb-btn-S2', false); }
-      document.getElementById('btn-open').classList.toggle('active', showOnlyOpen);
-      document.getElementById('btn-done').classList.toggle('active', showOnlyDone);
-      document.body.classList.toggle('filter-open', showOnlyOpen);
-      renderAreas(currentAreas);
-      break;
-    case 'S2': // Nur Erledigt
-      showOnlyDone = newVal;
-      if (newVal) { showOnlyOpen = false; toolboxCellState['S1'] = false; toolboxSetBtnActive('etb-btn-S1', false); }
-      document.getElementById('btn-done').classList.toggle('active', showOnlyDone);
-      document.getElementById('btn-open').classList.toggle('active', showOnlyOpen);
-      document.body.classList.toggle('filter-open', showOnlyOpen);
-      renderAreas(currentAreas);
-      break;
-    case 'N1': // Timer einblenden
-      timerVisible = newVal;
-      updateTimerDisplay();
-      if (newVal && timerStartTs > 0) startTimerTick();
-      break;
-  }
+function toolboxWriteTimerCells(startTs, elapsed) {
+  if (!isAuthorized() || !TOOLBOX_SCRIPT_URL) return;
+  fetch(TOOLBOX_SCRIPT_URL
+    + "?action=setTimer&startTs=" + encodeURIComponent(startTs)
+    + "&elapsed=" + encodeURIComponent(elapsed),
+    { method: "GET", mode: "no-cors" }
+  ).catch(function(e) { console.error("[Toolbox] setTimer:", e); });
 }
 
 function toolboxSetBtnActive(btnId, active) {
@@ -182,22 +133,25 @@ function toolboxSetBtnActive(btnId, active) {
   if (btn) btn.classList.toggle("active", active);
 }
 
-// Timer: L1=TRUE starts, L1=FALSE pauses; L2=TRUE resets
-function toolboxWriteTimerCells(startTs, elapsed) {
-  if (!isAuthorized() || !TOOLBOX_SCRIPT_URL) return;
-  fetch(TOOLBOX_SCRIPT_URL
-    + "?action=setTimer"
-    + "&startTs=" + encodeURIComponent(startTs)
-    + "&elapsed=" + encodeURIComponent(elapsed),
-    { method: "GET", mode: "no-cors" }
-  ).catch(function(e) { console.error("[Toolbox] setTimer error:", e); });
+// ── Cell toggle (N1, N2, Q1, Q2, S1, S2, Y1) ────────────────────────────
+function toolboxToggleCell(cell, btnId) {
+  if (!isAuthorized()) return;
+  toolboxCellState[cell] = !toolboxCellState[cell];
+  var v = toolboxCellState[cell];
+  // S1 und S2 schließen sich gegenseitig aus
+  if (cell === 'S1' && v) { toolboxCellState.S2 = false; toolboxSetBtnActive('etb-btn-S2', false); toolboxWriteCell('S2', 'FALSE'); }
+  if (cell === 'S2' && v) { toolboxCellState.S1 = false; toolboxSetBtnActive('etb-btn-S1', false); toolboxWriteCell('S1', 'FALSE'); }
+  toolboxWriteCell(cell, v ? "TRUE" : "FALSE");
+  toolboxSetBtnActive(btnId, v);
+  toolboxPatchCell(cell, v);
+  toolboxRefresh();
 }
 
+// ── Timer Start/Pause ────────────────────────────────────────────────────
 function toolboxToggleTimer() {
   if (!isAuthorized()) return;
-  var isRunning = timerStartTs > 0;
-  if (isRunning) {
-    timerElapsed = timerElapsed + (Date.now() - timerStartTs);
+  if (timerStartTs > 0) {
+    timerElapsed += Date.now() - timerStartTs;
     timerStartTs = 0;
     toolboxWriteCell("L1", "FALSE");
     toolboxWriteTimerCells(0, timerElapsed);
@@ -206,66 +160,75 @@ function toolboxToggleTimer() {
     toolboxWriteCell("L1", "TRUE");
     toolboxWriteTimerCells(timerStartTs, timerElapsed);
   }
-  toolboxPatchAndRefresh();
+  // Only patch timer cells
+  toolboxPatchTimerCells();
+  toolboxRefresh();
 }
 
+// ── Timer Reset ──────────────────────────────────────────────────────────
 function toolboxTimerReset() {
   if (!isAuthorized()) return;
   timerStartTs = 0;
   timerElapsed = 0;
   if (TOOLBOX_SCRIPT_URL) {
     fetch(TOOLBOX_SCRIPT_URL + "?action=pulseCell&cell=L2", { method: "GET", mode: "no-cors" })
-      .catch(function(e) { console.error("[Toolbox] pulseCell error:", e); });
+      .catch(function(e) { console.error("[Toolbox] pulseCell:", e); });
   }
   toolboxWriteTimerCells(0, 0);
-  toolboxPatchAndRefresh();
+  toolboxPatchTimerCells();
+  toolboxRefresh();
 }
 
-// Patch cachedRows with current toolbox state and re-run processData so the
-// page updates instantly without waiting for the next sheet poll.
-function toolboxPatchAndRefresh() {
+// ── Patch helpers ─────────────────────────────────────────────────────────
+var CELL_MAP = {
+  N1: [0, 13], N2: [1, 13],
+  Q1: [0, 16], Q2: [1, 16],
+  S1: [0, 18], S2: [1, 18],
+  Y1: [0, 24]
+};
+
+function toolboxPatchCell(cell, value) {
   if (!cachedRows) return;
+  var pos = CELL_MAP[cell];
+  if (!pos) return;
+  var r = pos[0], c = pos[1];
+  if (!cachedRows[r]) return;
+  if (!cachedRows[r].c) cachedRows[r].c = [];
+  if (!cachedRows[r].c[c]) cachedRows[r].c[c] = {};
+  cachedRows[r].c[c].v = value;
+}
 
-  function ensureCell(rowIdx, colIdx, val) {
-    if (!cachedRows[rowIdx]) return;
-    if (!cachedRows[rowIdx].c) cachedRows[rowIdx].c = [];
-    if (!cachedRows[rowIdx].c[colIdx]) cachedRows[rowIdx].c[colIdx] = {};
-    cachedRows[rowIdx].c[colIdx].v = val;
+function toolboxPatchTimerCells() {
+  if (!cachedRows) return;
+  function set(r, c, v) {
+    if (!cachedRows[r]) return;
+    if (!cachedRows[r].c) cachedRows[r].c = [];
+    if (!cachedRows[r].c[c]) cachedRows[r].c[c] = {};
+    cachedRows[r].c[c].v = v;
   }
+  set(0, 22, timerStartTs);
+  set(2, 22, timerElapsed);
+}
 
-  // ── Timer (processData reads these from rows) ──────────────────────────
-  ensureCell(0, 22, timerStartTs);
-  ensureCell(2, 22, timerElapsed);
-  ensureCell(0, 13, toolboxCellState.N1); // timerVisible
-
-  // ── Q1/Q2: processData only applies these on first load (prevDeaths===null)
-  //    → update state vars AND buttons directly ─────────────────────────────
-  showBase = toolboxCellState.Q1;
-  showDLC  = toolboxCellState.Q2;
-  ensureCell(0, 16, toolboxCellState.Q1);
-  ensureCell(1, 16, toolboxCellState.Q2);
+// ── Re-run processData with patched cachedRows ───────────────────────────
+function toolboxRefresh() {
+  if (!cachedRows) return;
+  // Q1/Q2 are only applied on first load in processData → set directly
+  showBase = isTrue(cachedRows[0] && cachedRows[0].c && cachedRows[0].c[16] ? cachedRows[0].c[16].v : true);
+  showDLC  = isTrue(cachedRows[1] && cachedRows[1].c && cachedRows[1].c[16] ? cachedRows[1].c[16].v : true);
   var btnBase = document.getElementById('btn-basegame');
   var btnDlc  = document.getElementById('btn-dlc');
   if (btnBase) btnBase.classList.toggle('active', showBase);
   if (btnDlc)  btnDlc.classList.toggle('active', showDLC);
-  updateFieldDeathsVisibility();
-
-  // ── S1/S2: not read from rows at all → update state vars directly ────────
+  // S1/S2 are not in rows at all → sync from toolboxCellState
   showOnlyOpen = toolboxCellState.S1;
   showOnlyDone = toolboxCellState.S2;
-  ensureCell(0, 18, toolboxCellState.S1);
-  ensureCell(1, 18, toolboxCellState.S2);
   var btnOpen = document.getElementById('btn-open');
   var btnDone = document.getElementById('btn-done');
   if (btnOpen) btnOpen.classList.toggle('active', showOnlyOpen);
   if (btnDone) btnDone.classList.toggle('active', showOnlyDone);
   document.body.classList.toggle('filter-open', showOnlyOpen);
-
-  // ── N2, Y1 (OBS-only, patch rows for consistency) ────────────────────────
-  ensureCell(1, 13, toolboxCellState.N2);
-  ensureCell(0, 24, toolboxCellState.Y1);
-
-  // Re-render everything through the same path as a normal refresh
+  updateFieldDeathsVisibility();
   processData(cachedRows);
 }
 
@@ -273,34 +236,29 @@ function toolboxSyncTimerUI() {
   var btn  = document.getElementById("etb-btn-L1");
   var disp = document.getElementById("etb-timer-display");
   if (!btn || !disp) return;
-  var isRunning = timerStartTs > 0;
-  btn.classList.toggle("timer-running", isRunning);
-  btn.innerHTML = isRunning
+  var running = timerStartTs > 0;
+  btn.classList.toggle("timer-running", running);
+  btn.innerHTML = running
     ? '<span class="etb-btn-icon">⏸</span><span class="etb-btn-text">Pause</span>'
     : '<span class="etb-btn-icon">▶</span><span class="etb-btn-text">Start</span>';
-  disp.classList.toggle("running", isRunning);
-
+  disp.classList.toggle("running", running);
   if (toolboxTimerTick) clearInterval(toolboxTimerTick);
-  if (isRunning) toolboxTimerTick = setInterval(toolboxUpdateTimerDisplay, 500);
+  if (running) toolboxTimerTick = setInterval(toolboxUpdateTimerDisplay, 500);
   toolboxUpdateTimerDisplay();
 }
 
 function toolboxUpdateTimerDisplay() {
   var disp = document.getElementById("etb-timer-display");
   if (!disp) return;
-  var elapsed = timerStartTs > 0
-    ? timerElapsed + (Date.now() - timerStartTs)
-    : timerElapsed;
-  disp.textContent = fmtTime(elapsed);
+  var ms = timerStartTs > 0 ? timerElapsed + (Date.now() - timerStartTs) : timerElapsed;
+  disp.textContent = fmtTime(ms);
 }
 
 function toolboxSyncFromRows(rows) {
   if (!isAuthorized()) return;
-  function getCell(rowIdx, colIdx) {
-    return rows[rowIdx] && rows[rowIdx].c && rows[rowIdx].c[colIdx]
-      ? rows[rowIdx].c[colIdx].v : null;
+  function getCell(r, c) {
+    return rows[r] && rows[r].c && rows[r].c[c] ? rows[r].c[c].v : null;
   }
-  // L = col 11, N = col 13, Q = col 16, S = col 18, Y = col 24
   toolboxCellState.N1 = isTrue(getCell(0, 13));
   toolboxCellState.N2 = isTrue(getCell(1, 13));
   toolboxCellState.Q1 = isTrue(getCell(0, 16));
@@ -308,7 +266,6 @@ function toolboxSyncFromRows(rows) {
   toolboxCellState.S1 = isTrue(getCell(0, 18));
   toolboxCellState.S2 = isTrue(getCell(1, 18));
   toolboxCellState.Y1 = isTrue(getCell(0, 24));
-
   toolboxSetBtnActive("etb-btn-N1", toolboxCellState.N1);
   toolboxSetBtnActive("etb-btn-N2", toolboxCellState.N2);
   toolboxSetBtnActive("etb-btn-Q1", toolboxCellState.Q1);
@@ -316,11 +273,11 @@ function toolboxSyncFromRows(rows) {
   toolboxSetBtnActive("etb-btn-S1", toolboxCellState.S1);
   toolboxSetBtnActive("etb-btn-S2", toolboxCellState.S2);
   toolboxSetBtnActive("etb-btn-Y1", toolboxCellState.Y1);
-
   toolboxSyncTimerUI();
   toolboxInit();
 }
 // ─── END TOOLBOX ───────────────────────────────────────────────────────────
+
 
 var clipsData      = [];
 var clipDateFilter = 'all';
