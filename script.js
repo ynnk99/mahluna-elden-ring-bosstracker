@@ -135,6 +135,46 @@ function toolboxToggleCell(cell, btnId) {
   var newVal = toolboxCellState[cell];
   toolboxWriteCell(cell, newVal ? "TRUE" : "FALSE");
   toolboxSetBtnActive(btnId, newVal);
+  toolboxApplyLocally(cell, newVal);
+}
+
+// Immediately reflect toolbox changes in the page UI without waiting for refresh
+function toolboxApplyLocally(cell, newVal) {
+  switch (cell) {
+    case 'Q1': // Base Game
+      showBase = newVal;
+      document.getElementById('btn-basegame').classList.toggle('active', showBase);
+      updateFieldDeathsVisibility();
+      renderAreas(currentAreas);
+      break;
+    case 'Q2': // DLC
+      showDLC = newVal;
+      document.getElementById('btn-dlc').classList.toggle('active', showDLC);
+      updateFieldDeathsVisibility();
+      renderAreas(currentAreas);
+      break;
+    case 'S1': // Nur Offen
+      showOnlyOpen = newVal;
+      if (newVal) { showOnlyDone = false; toolboxCellState['S2'] = false; toolboxSetBtnActive('etb-btn-S2', false); }
+      document.getElementById('btn-open').classList.toggle('active', showOnlyOpen);
+      document.getElementById('btn-done').classList.toggle('active', showOnlyDone);
+      document.body.classList.toggle('filter-open', showOnlyOpen);
+      renderAreas(currentAreas);
+      break;
+    case 'S2': // Nur Erledigt
+      showOnlyDone = newVal;
+      if (newVal) { showOnlyOpen = false; toolboxCellState['S1'] = false; toolboxSetBtnActive('etb-btn-S1', false); }
+      document.getElementById('btn-done').classList.toggle('active', showOnlyDone);
+      document.getElementById('btn-open').classList.toggle('active', showOnlyOpen);
+      document.body.classList.toggle('filter-open', showOnlyOpen);
+      renderAreas(currentAreas);
+      break;
+    case 'N1': // Timer einblenden
+      timerVisible = newVal;
+      updateTimerDisplay();
+      if (newVal && timerStartTs > 0) startTimerTick();
+      break;
+  }
 }
 
 function toolboxSetBtnActive(btnId, active) {
@@ -162,12 +202,15 @@ function toolboxToggleTimer() {
     timerStartTs = 0;
     toolboxWriteCell("L1", "FALSE");
     toolboxWriteTimerCells(0, timerElapsed);
+    if (timerInterval) clearInterval(timerInterval); // stop main tick
   } else {
     // Start/Resume → L1=TRUE
     timerStartTs = Date.now();
     toolboxWriteCell("L1", "TRUE");
     toolboxWriteTimerCells(timerStartTs, timerElapsed);
+    startTimerTick(); // start main page tick
   }
+  updateTimerDisplay(); // sync main stats bar immediately
   toolboxSyncTimerUI();
 }
 
@@ -181,6 +224,8 @@ function toolboxTimerReset() {
       .catch(function(e) { console.error("[Toolbox] pulseCell error:", e); });
   }
   toolboxWriteTimerCells(0, 0);
+  if (timerInterval) clearInterval(timerInterval); // stop main tick
+  updateTimerDisplay(); // reset main stats bar immediately
   toolboxSyncTimerUI();
 }
 
