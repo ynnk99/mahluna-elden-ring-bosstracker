@@ -23,86 +23,61 @@
 
 <!-- ── EDITOR TOOLBOX ── -->
 <div class="editor-toolbox" id="editor-toolbox" style="display:none;">
-  <div class="etb-header" id="etb-toggle" onclick="toolboxToggle()">
-    <span class="etb-icon">⚙</span>
-    <span class="etb-title">Toolbox</span>
-    <span class="etb-chevron" id="etb-chevron">◀</span>
+
+  <div class="etb-label">⚙ Editor</div>
+
+  <!-- TIMER -->
+  <div class="etb-group">
+    <div class="etb-group-label">Timer</div>
+    <div class="etb-timer-display" id="etb-timer-display">00:00:00</div>
+    <button class="etb-action-btn" id="etb-btn-L1" onclick="toolboxToggleTimer()" title="L1">
+      <span class="etb-btn-icon">▶</span>
+      <span class="etb-btn-text">Start</span>
+    </button>
+    <button class="etb-action-btn etb-btn-reset" onclick="toolboxTimerReset()" title="L2">
+      <span class="etb-btn-icon">↺</span>
+      <span class="etb-btn-text">Reset</span>
+    </button>
+    <button class="etb-action-btn etb-btn-toggle" id="etb-btn-N1" onclick="toolboxToggleCell('N1', 'etb-btn-N1')" title="N1">
+      <span class="etb-btn-icon">👁</span>
+      <span class="etb-btn-text">Einblenden</span>
+    </button>
   </div>
-  <div class="etb-body" id="etb-body">
 
-    <!-- TIMER -->
-    <div class="etb-section">
-      <div class="etb-section-label">⏳ Timer</div>
-      <label class="etb-checkbox-row" title="Sheet-Zelle L1">
-        <input type="checkbox" id="etb-L1" onchange="toolboxSetCell('L1', this.checked)">
-        <span class="etb-cb-box"></span>
-        <span class="etb-cb-label">L1</span>
-      </label>
-      <label class="etb-checkbox-row" title="Sheet-Zelle L2">
-        <input type="checkbox" id="etb-L2" onchange="toolboxSetCell('L2', this.checked)">
-        <span class="etb-cb-box"></span>
-        <span class="etb-cb-label">L2</span>
-      </label>
-      <label class="etb-checkbox-row" title="Sheet-Zelle N1 – Timer einblenden">
-        <input type="checkbox" id="etb-N1" onchange="toolboxSetCell('N1', this.checked)">
-        <span class="etb-cb-box"></span>
-        <span class="etb-cb-label">N1 – Einblenden</span>
-      </label>
-      <div class="etb-timer-display" id="etb-timer-display">00:00:00</div>
-      <div class="etb-btn-row">
-        <button class="etb-btn etb-btn-primary" id="etb-timer-playpause" onclick="toolboxTimerPlayPause()">
-          <span id="etb-pp-icon">▶</span> Start
-        </button>
-        <button class="etb-btn etb-btn-danger" onclick="toolboxTimerReset()">↺ Reset</button>
-      </div>
-    </div>
-
-    <!-- OVERLAY -->
-    <div class="etb-section">
-      <div class="etb-section-label">📺 Overlay</div>
-      <label class="etb-checkbox-row" title="Sheet-Zelle N2 – Kleines / Volles Overlay">
-        <input type="checkbox" id="etb-N2" onchange="toolboxSetCell('N2', this.checked)">
-        <span class="etb-cb-box"></span>
-        <span class="etb-cb-label">N2 – Klein / Voll</span>
-      </label>
-    </div>
-
-    <!-- FILTER -->
-    <div class="etb-section">
-      <div class="etb-section-label">🗺 Filter</div>
-      <label class="etb-checkbox-row" title="Sheet-Zelle Q1 – Base Game anzeigen">
-        <input type="checkbox" id="etb-Q1" onchange="toolboxSetCell('Q1', this.checked)">
-        <span class="etb-cb-box"></span>
-        <span class="etb-cb-label">Q1 – Base Game</span>
-      </label>
-      <label class="etb-checkbox-row" title="Sheet-Zelle Q2 – DLC anzeigen">
-        <input type="checkbox" id="etb-Q2" onchange="toolboxSetCell('Q2', this.checked)">
-        <span class="etb-cb-box"></span>
-        <span class="etb-cb-label">Q2 – DLC</span>
-      </label>
-    </div>
-
-    <!-- OBS QUELLEN -->
-    <div class="etb-section">
-      <div class="etb-section-label">🎥 OBS Quellen</div>
-      <label class="etb-checkbox-row" title="Sheet-Zelle S1">
-        <input type="checkbox" id="etb-S1" onchange="toolboxSetCell('S1', this.checked)">
-        <span class="etb-cb-box"></span>
-        <span class="etb-cb-label">S1</span>
-      </label>
-      <label class="etb-checkbox-row" title="Sheet-Zelle S2">
-        <input type="checkbox" id="etb-S2" onchange="toolboxSetCell('S2', this.checked)">
-        <span class="etb-cb-box"></span>
-        <span class="etb-cb-label">S2</span>
-      </label>
-      <label class="etb-checkbox-row" title="Sheet-Zelle Y1">
-        <input type="checkbox" id="etb-Y1" onchange="toolboxSetCell('Y1', this.checked)">
-        <span class="etb-cb-box"></span>
-        <span class="etb-cb-label">Y1</span>
-      </label>
-    </div>
-
+  <!-- OBS -->
+  <div class="etb-group">
+    <div class="etb-group-label">OBS</div>
+    <button class="etb-action-btn etb-btn-toggle" id="etb-btn-N2" onclick="toolboxToggleCell('N2', 'etb-btn-N2')" title="N2">
+      <span class="etb-btn-icon">📺</span>
+      <span class="etb-btn-text">Kleines Overlay</span>
+    </button>
+    <button class="etb-action-btn etb-btn-toggle etb-btn-danger-toggle" id="etb-btn-Y1" onclick="toolboxToggleCell('Y1', 'etb-btn-Y1')" title="Y1">
+      <span class="etb-btn-icon">🚫</span>
+      <span class="etb-btn-text">Overlay aus</span>
+    </button>
   </div>
+
+  <!-- FILTER -->
+  <div class="etb-group">
+    <div class="etb-group-label">Filter</div>
+    <button class="etb-action-btn etb-btn-toggle" id="etb-btn-S1" onclick="toolboxToggleCell('S1', 'etb-btn-S1')" title="S1">
+      <span class="etb-btn-icon">○</span>
+      <span class="etb-btn-text">Nur Offen</span>
+    </button>
+    <button class="etb-action-btn etb-btn-toggle" id="etb-btn-S2" onclick="toolboxToggleCell('S2', 'etb-btn-S2')" title="S2">
+      <span class="etb-btn-icon">✓</span>
+      <span class="etb-btn-text">Nur Erledigt</span>
+    </button>
+    <button class="etb-action-btn etb-btn-toggle" id="etb-btn-Q1" onclick="toolboxToggleCell('Q1', 'etb-btn-Q1')" title="Q1">
+      <span class="etb-btn-icon">⚔</span>
+      <span class="etb-btn-text">Base Game</span>
+    </button>
+    <button class="etb-action-btn etb-btn-toggle" id="etb-btn-Q2" onclick="toolboxToggleCell('Q2', 'etb-btn-Q2')" title="Q2">
+      <span class="etb-btn-icon">🌑</span>
+      <span class="etb-btn-text">DLC</span>
+    </button>
+  </div>
+
 </div>
 
 <div class="page-wrapper">

@@ -1920,186 +1920,144 @@ body.filter-open #chart-section {
   box-shadow: 0 0 12px rgba(201,164,74,0.2);
 }
 
+
 /* ═══════════════════════════════════════════════════════════════════════
-   EDITOR TOOLBOX
+   EDITOR TOOLBOX – Action Sidebar
 ═══════════════════════════════════════════════════════════════════════ */
 
 .editor-toolbox {
   position: fixed;
-  top: 50%;
-  left: max(8px, calc(50vw - 615px));
-  transform: translateY(-50%);
-  width: 188px;
+  left: max(8px, calc(50vw - 620px));
+  top: 180px;
+  width: 148px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   z-index: 900;
   font-family: 'Crimson Pro', serif;
-  user-select: none;
 }
 
-.etb-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 9px 12px;
-  background: rgba(12, 10, 6, 0.97);
-  border: 1px solid var(--border-bright);
-  border-bottom: none;
-  cursor: pointer;
-  border-radius: var(--radius) var(--radius) 0 0;
-  transition: background 0.2s;
-}
-.etb-header:hover { background: rgba(201,164,74,0.08); }
-
-.etb-icon {
-  font-size: 13px;
-  opacity: 0.7;
-}
-.etb-title {
+/* Small "Editor" label at top */
+.etb-label {
   font-family: 'Cinzel', serif;
-  font-size: 11px;
-  letter-spacing: 0.15em;
-  color: var(--gold);
-  text-transform: uppercase;
-  flex: 1;
-}
-.etb-chevron {
   font-size: 9px;
+  letter-spacing: 0.2em;
   color: var(--gold-dim);
-  transition: transform 0.25s;
-}
-.etb-chevron.open { transform: rotate(180deg); }
-
-.etb-body {
-  background: rgba(10, 9, 6, 0.97);
-  border: 1px solid var(--border-bright);
-  border-radius: 0 0 var(--radius) var(--radius);
-  overflow: hidden;
-  max-height: 600px;
-  transition: max-height 0.3s ease, opacity 0.25s;
-  opacity: 1;
-}
-.etb-body.collapsed {
-  max-height: 0;
-  opacity: 0;
+  text-transform: uppercase;
+  opacity: 0.6;
+  padding-left: 2px;
+  margin-bottom: -2px;
 }
 
-.etb-section {
-  padding: 10px 12px;
-  border-bottom: 1px solid rgba(201,164,74,0.12);
+/* Group container */
+.etb-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  background: rgba(10, 9, 6, 0.88);
+  border: 1px solid rgba(201,164,74,0.2);
+  border-radius: 6px;
+  padding: 8px 8px 8px;
+  backdrop-filter: blur(4px);
 }
-.etb-section:last-child { border-bottom: none; }
 
-.etb-section-label {
+.etb-group-label {
   font-family: 'Cinzel', serif;
-  font-size: 9.5px;
+  font-size: 8.5px;
   letter-spacing: 0.18em;
   color: var(--gold-dim);
   text-transform: uppercase;
-  margin-bottom: 8px;
-  opacity: 0.8;
+  margin-bottom: 4px;
+  opacity: 0.7;
 }
 
-/* Checkbox rows */
-.etb-checkbox-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 3px 0;
-  cursor: pointer;
-  transition: color 0.15s;
-}
-.etb-checkbox-row:hover .etb-cb-label { color: var(--gold-light); }
-.etb-checkbox-row input[type="checkbox"] {
-  display: none;
-}
-.etb-cb-box {
-  width: 14px;
-  height: 14px;
-  border: 1.5px solid var(--gold-dim);
-  border-radius: 2px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.15s, border-color 0.15s;
-  position: relative;
-}
-.etb-checkbox-row input:checked + .etb-cb-box {
-  background: var(--gold-dim);
-  border-color: var(--gold);
-}
-.etb-checkbox-row input:checked + .etb-cb-box::after {
-  content: "✓";
-  font-size: 9px;
-  color: var(--bg-deep);
-  font-weight: 900;
-  line-height: 1;
-}
-.etb-cb-label {
-  font-size: 13px;
-  color: var(--parchment-dim);
-  line-height: 1;
-  transition: color 0.15s;
-}
-
-/* Timer display */
+/* Timer display inside timer group */
 .etb-timer-display {
   font-family: 'Cinzel', serif;
-  font-size: 20px;
-  letter-spacing: 0.08em;
+  font-size: 17px;
+  letter-spacing: 0.06em;
   color: var(--gold-light);
   text-align: center;
-  padding: 8px 0 6px;
-  text-shadow: 0 0 20px rgba(201,164,74,0.4);
+  padding: 4px 0 6px;
+  text-shadow: 0 0 16px rgba(201,164,74,0.35);
+}
+.etb-timer-display.running {
+  color: #6ab86a;
+  text-shadow: 0 0 16px rgba(100,200,100,0.4);
+  animation: etb-pulse 2s ease-in-out infinite;
+}
+@keyframes etb-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.55; }
 }
 
-/* Buttons */
-.etb-btn-row {
+/* Action buttons */
+.etb-action-btn {
   display: flex;
-  gap: 6px;
-  margin-top: 2px;
-}
-.etb-btn {
-  flex: 1;
-  padding: 5px 6px;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  padding: 6px 9px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(201,164,74,0.18);
   border-radius: 4px;
-  font-family: 'Cinzel', serif;
-  font-size: 10px;
-  letter-spacing: 0.06em;
+  color: var(--parchment-dim);
   cursor: pointer;
-  border: 1px solid transparent;
+  font-family: 'Cinzel', serif;
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  text-align: left;
   transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
-.etb-btn-primary {
-  background: rgba(201,164,74,0.15);
-  border-color: var(--gold-dim);
+.etb-action-btn:hover {
+  background: rgba(201,164,74,0.1);
+  border-color: rgba(201,164,74,0.4);
   color: var(--gold-light);
 }
-.etb-btn-primary:hover {
-  background: rgba(201,164,74,0.28);
-  border-color: var(--gold);
+.etb-btn-icon {
+  font-size: 11px;
+  width: 14px;
+  text-align: center;
+  flex-shrink: 0;
 }
-.etb-btn-primary.running {
-  background: rgba(100,180,100,0.15);
+.etb-btn-text {
+  flex: 1;
+  line-height: 1.1;
+}
+
+/* Reset button – reddish */
+.etb-btn-reset {
+  border-color: rgba(196,74,58,0.25);
+  color: rgba(224,90,79,0.75);
+}
+.etb-btn-reset:hover {
+  background: rgba(196,74,58,0.15);
+  border-color: var(--red);
+  color: var(--red-bright);
+}
+
+/* Toggle buttons – glow gold when active */
+.etb-btn-toggle.active {
+  background: rgba(201,164,74,0.15);
+  border-color: var(--gold);
+  color: var(--gold-light);
+  box-shadow: 0 0 8px rgba(201,164,74,0.2);
+}
+
+/* Timer running state */
+.etb-action-btn.timer-running {
+  background: rgba(74,140,74,0.15);
   border-color: var(--green);
   color: var(--green-bright);
 }
-.etb-btn-danger {
-  background: rgba(196,74,58,0.12);
-  border-color: rgba(196,74,58,0.4);
-  color: var(--red-bright);
-}
-.etb-btn-danger:hover {
-  background: rgba(196,74,58,0.25);
-  border-color: var(--red);
+.etb-action-btn.timer-running:hover {
+  background: rgba(74,140,74,0.25);
 }
 
-/* Pulse animation for running timer */
-@keyframes etb-pulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.5; }
-}
-.etb-timer-display.running {
-  animation: etb-pulse 2s ease-in-out infinite;
-  color: var(--green-bright);
-  text-shadow: 0 0 20px rgba(100,200,100,0.4);
+/* Danger toggle (Overlay aus) – red when active */
+.etb-btn-danger-toggle.active {
+  background: rgba(196,74,58,0.18);
+  border-color: var(--red);
+  color: var(--red-bright);
+  box-shadow: 0 0 8px rgba(196,74,58,0.2);
 }
