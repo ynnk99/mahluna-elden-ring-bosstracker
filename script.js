@@ -233,22 +233,39 @@ function toolboxPatchAndRefresh() {
     cachedRows[rowIdx].c[colIdx].v = val;
   }
 
-  // Timer state  (W1 = col 22 row 0, W3 = col 22 row 2)
+  // ── Timer (processData reads these from rows) ──────────────────────────
   ensureCell(0, 22, timerStartTs);
   ensureCell(2, 22, timerElapsed);
-  // N1 timerVisible (col 13 row 0)
-  ensureCell(0, 13, toolboxCellState.N1);
-  // N2 overlay (col 13 row 1)
-  ensureCell(1, 13, toolboxCellState.N2);
-  // Q1 Base Game (col 16 row 0), Q2 DLC (col 16 row 1)
+  ensureCell(0, 13, toolboxCellState.N1); // timerVisible
+
+  // ── Q1/Q2: processData only applies these on first load (prevDeaths===null)
+  //    → update state vars AND buttons directly ─────────────────────────────
+  showBase = toolboxCellState.Q1;
+  showDLC  = toolboxCellState.Q2;
   ensureCell(0, 16, toolboxCellState.Q1);
   ensureCell(1, 16, toolboxCellState.Q2);
-  // S1 nur offen (col 18 row 0), S2 nur erledigt (col 18 row 1)
+  var btnBase = document.getElementById('btn-basegame');
+  var btnDlc  = document.getElementById('btn-dlc');
+  if (btnBase) btnBase.classList.toggle('active', showBase);
+  if (btnDlc)  btnDlc.classList.toggle('active', showDLC);
+  updateFieldDeathsVisibility();
+
+  // ── S1/S2: not read from rows at all → update state vars directly ────────
+  showOnlyOpen = toolboxCellState.S1;
+  showOnlyDone = toolboxCellState.S2;
   ensureCell(0, 18, toolboxCellState.S1);
   ensureCell(1, 18, toolboxCellState.S2);
-  // Y1 (col 24 row 0)
+  var btnOpen = document.getElementById('btn-open');
+  var btnDone = document.getElementById('btn-done');
+  if (btnOpen) btnOpen.classList.toggle('active', showOnlyOpen);
+  if (btnDone) btnDone.classList.toggle('active', showOnlyDone);
+  document.body.classList.toggle('filter-open', showOnlyOpen);
+
+  // ── N2, Y1 (OBS-only, patch rows for consistency) ────────────────────────
+  ensureCell(1, 13, toolboxCellState.N2);
   ensureCell(0, 24, toolboxCellState.Y1);
 
+  // Re-render everything through the same path as a normal refresh
   processData(cachedRows);
 }
 
@@ -1918,6 +1935,7 @@ function processData(rows) {
   timerElapsed = Number(rows[2] && rows[2].c[22] ? rows[2].c[22].v : 0) || 0;
   timerVisible = isTrue(rows[0] && rows[0].c[13] ? rows[0].c[13].v : false);
   updateTimerDisplay();
+  if (timerStartTs > 0) startTimerTick(); else if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
   toolboxSyncFromRows(rows);
 
   var separatorIndex = -1;
