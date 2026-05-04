@@ -24,58 +24,62 @@
 <!-- ── EDITOR TOOLBOX ── -->
 <div class="editor-toolbox" id="editor-toolbox" style="display:none;">
 
-  <div class="etb-label">⚙ Editor</div>
-
-  <!-- TIMER -->
-  <div class="etb-group">
-    <div class="etb-group-label">Timer</div>
-    <div class="etb-timer-display" id="etb-timer-display">00:00:00</div>
-    <button class="etb-action-btn" id="etb-btn-L1" onclick="toolboxToggleTimer()" title="L1">
-      <span class="etb-btn-icon">▶</span>
-      <span class="etb-btn-text">Start</span>
+  <!-- Button: Timer -->
+  <div class="etb-item" id="etb-item-timer">
+    <button class="etb-icon-btn" onclick="toolboxOpenPanel('timer')" title="Timer">
+      <span>⏳</span>
     </button>
-    <button class="etb-action-btn etb-btn-reset" onclick="toolboxTimerReset()" title="L2">
-      <span class="etb-btn-icon">↺</span>
-      <span class="etb-btn-text">Reset</span>
-    </button>
-    <button class="etb-action-btn etb-btn-toggle" id="etb-btn-N1" onclick="toolboxToggleCell('N1', 'etb-btn-N1')" title="N1">
-      <span class="etb-btn-icon">👁</span>
-      <span class="etb-btn-text">Einblenden</span>
-    </button>
+    <div class="etb-panel" id="etb-panel-timer">
+      <div class="etb-panel-title">Timer</div>
+      <div class="etb-timer-display" id="etb-timer-display">00:00:00</div>
+      <button class="etb-action-btn" id="etb-btn-L1" onclick="toolboxToggleTimer()">
+        <span class="etb-btn-icon">▶</span><span class="etb-btn-text">Start</span>
+      </button>
+      <button class="etb-action-btn etb-btn-reset" onclick="toolboxTimerReset()">
+        <span class="etb-btn-icon">↺</span><span class="etb-btn-text">Reset</span>
+      </button>
+      <button class="etb-action-btn etb-btn-toggle" id="etb-btn-N1" onclick="toolboxToggleCell('N1','etb-btn-N1')">
+        <span class="etb-btn-icon">👁</span><span class="etb-btn-text">Einblenden</span>
+      </button>
+    </div>
   </div>
 
-  <!-- OBS -->
-  <div class="etb-group">
-    <div class="etb-group-label">OBS</div>
-    <button class="etb-action-btn etb-btn-toggle" id="etb-btn-N2" onclick="toolboxToggleCell('N2', 'etb-btn-N2')" title="N2">
-      <span class="etb-btn-icon">📺</span>
-      <span class="etb-btn-text">Kleines Overlay</span>
+  <!-- Button: OBS -->
+  <div class="etb-item" id="etb-item-obs">
+    <button class="etb-icon-btn" onclick="toolboxOpenPanel('obs')" title="OBS">
+      <span>📺</span>
     </button>
-    <button class="etb-action-btn etb-btn-toggle etb-btn-danger-toggle" id="etb-btn-Y1" onclick="toolboxToggleCell('Y1', 'etb-btn-Y1')" title="Y1">
-      <span class="etb-btn-icon">🚫</span>
-      <span class="etb-btn-text">Overlay aus</span>
-    </button>
+    <div class="etb-panel" id="etb-panel-obs">
+      <div class="etb-panel-title">OBS</div>
+      <button class="etb-action-btn etb-btn-toggle" id="etb-btn-N2" onclick="toolboxToggleCell('N2','etb-btn-N2')">
+        <span class="etb-btn-icon">▣</span><span class="etb-btn-text">Kleines Overlay</span>
+      </button>
+      <button class="etb-action-btn etb-btn-danger-toggle" id="etb-btn-Y1" onclick="toolboxToggleCell('Y1','etb-btn-Y1')">
+        <span class="etb-btn-icon">⊘</span><span class="etb-btn-text">Overlay aus</span>
+      </button>
+    </div>
   </div>
 
-  <!-- FILTER -->
-  <div class="etb-group">
-    <div class="etb-group-label">Filter</div>
-    <button class="etb-action-btn etb-btn-toggle" id="etb-btn-S1" onclick="toolboxToggleCell('S1', 'etb-btn-S1')" title="S1">
-      <span class="etb-btn-icon">○</span>
-      <span class="etb-btn-text">Nur Offen</span>
+  <!-- Button: Filter -->
+  <div class="etb-item" id="etb-item-filter">
+    <button class="etb-icon-btn" onclick="toolboxOpenPanel('filter')" title="Filter">
+      <span>⚔</span>
     </button>
-    <button class="etb-action-btn etb-btn-toggle" id="etb-btn-S2" onclick="toolboxToggleCell('S2', 'etb-btn-S2')" title="S2">
-      <span class="etb-btn-icon">✓</span>
-      <span class="etb-btn-text">Nur Erledigt</span>
-    </button>
-    <button class="etb-action-btn etb-btn-toggle" id="etb-btn-Q1" onclick="toolboxToggleCell('Q1', 'etb-btn-Q1')" title="Q1">
-      <span class="etb-btn-icon">⚔</span>
-      <span class="etb-btn-text">Base Game</span>
-    </button>
-    <button class="etb-action-btn etb-btn-toggle" id="etb-btn-Q2" onclick="toolboxToggleCell('Q2', 'etb-btn-Q2')" title="Q2">
-      <span class="etb-btn-icon">🌑</span>
-      <span class="etb-btn-text">DLC</span>
-    </button>
+    <div class="etb-panel" id="etb-panel-filter">
+      <div class="etb-panel-title">Filter</div>
+      <button class="etb-action-btn etb-btn-toggle" id="etb-btn-S1" onclick="toolboxToggleCell('S1','etb-btn-S1')">
+        <span class="etb-btn-icon">○</span><span class="etb-btn-text">Nur Offen</span>
+      </button>
+      <button class="etb-action-btn etb-btn-toggle" id="etb-btn-S2" onclick="toolboxToggleCell('S2','etb-btn-S2')">
+        <span class="etb-btn-icon">✓</span><span class="etb-btn-text">Nur Erledigt</span>
+      </button>
+      <button class="etb-action-btn etb-btn-toggle" id="etb-btn-Q1" onclick="toolboxToggleCell('Q1','etb-btn-Q1')">
+        <span class="etb-btn-icon">⚔</span><span class="etb-btn-text">Base Game</span>
+      </button>
+      <button class="etb-action-btn etb-btn-toggle" id="etb-btn-Q2" onclick="toolboxToggleCell('Q2','etb-btn-Q2')">
+        <span class="etb-btn-icon">●</span><span class="etb-btn-text">DLC</span>
+      </button>
+    </div>
   </div>
 
 </div>

@@ -92,6 +92,31 @@ function toolboxInit() {
   document.body.classList.toggle("editor-mode", show);
 }
 
+// Open/close flyout panels – clicking same button again closes it
+function toolboxOpenPanel(name) {
+  var panels = ['timer', 'obs', 'filter'];
+  panels.forEach(function(p) {
+    var item = document.getElementById('etb-item-' + p);
+    if (!item) return;
+    if (p === name) {
+      item.classList.toggle('open');
+    } else {
+      item.classList.remove('open');
+    }
+  });
+}
+
+// Close panels when clicking outside
+document.addEventListener('click', function(e) {
+  var toolbox = document.getElementById('editor-toolbox');
+  if (toolbox && !toolbox.contains(e.target)) {
+    ['timer','obs','filter'].forEach(function(p) {
+      var item = document.getElementById('etb-item-' + p);
+      if (item) item.classList.remove('open');
+    });
+  }
+});
+
 // Send a cell value to the toolbox Apps Script
 function toolboxWriteCell(cell, value) {
   if (!isAuthorized() || !TOOLBOX_SCRIPT_URL) return;

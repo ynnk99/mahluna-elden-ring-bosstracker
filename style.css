@@ -1922,99 +1922,120 @@ body.filter-open #chart-section {
 
 
 /* ═══════════════════════════════════════════════════════════════════════
-   EDITOR TOOLBOX – Action Sidebar
+   EDITOR TOOLBOX – Icon strip + flyout panels
 ═══════════════════════════════════════════════════════════════════════ */
 
+/* No body padding needed – toolbox is icon-only, doesn't overlap */
 body.editor-mode {
-  padding-left: 162px;
+  padding-left: 0;
 }
 
+/* Outer container: thin strip on left edge */
 .editor-toolbox {
   position: fixed;
   left: 0;
-  top: 0;
-  width: 155px;
-  height: 100vh;
-  overflow-y: auto;
-  overflow-x: hidden;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 14px 8px 20px;
+  gap: 4px;
+  padding: 6px 4px;
   z-index: 900;
-  font-family: 'Crimson Pro', serif;
-  background: rgba(8, 7, 4, 0.96);
-  border-right: 1px solid rgba(201,164,74,0.15);
+  background: rgba(8, 7, 4, 0.92);
+  border-right: 1px solid rgba(201,164,74,0.2);
+  border-radius: 0 6px 6px 0;
 }
 
-/* Small "Editor" label at top */
-.etb-label {
+/* Each item: icon button + hidden panel side by side */
+.etb-item {
+  position: relative;
+}
+
+/* The icon button itself */
+.etb-icon-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid rgba(201,164,74,0.15);
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: background 0.15s, border-color 0.15s;
+  color: var(--gold-dim);
+}
+.etb-icon-btn:hover,
+.etb-item.open .etb-icon-btn {
+  background: rgba(201,164,74,0.12);
+  border-color: rgba(201,164,74,0.5);
+}
+
+/* Flyout panel – hidden by default, pops out to the right */
+.etb-panel {
+  position: absolute;
+  left: 42px;
+  top: 0;
+  width: 160px;
+  background: rgba(8, 7, 4, 0.97);
+  border: 1px solid rgba(201,164,74,0.25);
+  border-radius: 6px;
+  padding: 10px 9px;
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 901;
+}
+.etb-item.open .etb-panel {
+  display: flex;
+}
+
+.etb-panel-title {
   font-family: 'Cinzel', serif;
   font-size: 9px;
   letter-spacing: 0.2em;
-  color: var(--gold-dim);
-  text-transform: uppercase;
-  opacity: 0.6;
-  padding-left: 2px;
-  margin-bottom: -2px;
-}
-
-/* Group container */
-.etb-group {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  background: rgba(10, 9, 6, 0.88);
-  border: 1px solid rgba(201,164,74,0.2);
-  border-radius: 6px;
-  padding: 8px 8px 8px;
-  backdrop-filter: blur(4px);
-}
-
-.etb-group-label {
-  font-family: 'Cinzel', serif;
-  font-size: 8.5px;
-  letter-spacing: 0.18em;
   color: var(--gold-dim);
   text-transform: uppercase;
   margin-bottom: 4px;
   opacity: 0.7;
 }
 
-/* Timer display inside timer group */
+/* Timer display */
 .etb-timer-display {
   font-family: 'Cinzel', serif;
-  font-size: 17px;
+  font-size: 16px;
   letter-spacing: 0.06em;
   color: var(--gold-light);
   text-align: center;
-  padding: 4px 0 6px;
-  text-shadow: 0 0 16px rgba(201,164,74,0.35);
+  padding: 2px 0 6px;
+  text-shadow: 0 0 14px rgba(201,164,74,0.3);
 }
 .etb-timer-display.running {
   color: #6ab86a;
-  text-shadow: 0 0 16px rgba(100,200,100,0.4);
+  text-shadow: 0 0 14px rgba(100,200,100,0.35);
   animation: etb-pulse 2s ease-in-out infinite;
 }
 @keyframes etb-pulse {
   0%, 100% { opacity: 1; }
-  50%       { opacity: 0.55; }
+  50%       { opacity: 0.5; }
 }
 
-/* Action buttons */
+/* Action buttons inside panels */
 .etb-action-btn {
   display: flex;
   align-items: center;
   gap: 7px;
   width: 100%;
-  padding: 6px 9px;
+  padding: 5px 8px;
   background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(201,164,74,0.18);
+  border: 1px solid rgba(201,164,74,0.15);
   border-radius: 4px;
   color: var(--parchment-dim);
   cursor: pointer;
   font-family: 'Cinzel', serif;
-  font-size: 10.5px;
+  font-size: 10px;
   letter-spacing: 0.04em;
   text-align: left;
   transition: background 0.15s, border-color 0.15s, color 0.15s;
@@ -2024,50 +2045,33 @@ body.editor-mode {
   border-color: rgba(201,164,74,0.4);
   color: var(--gold-light);
 }
-.etb-btn-icon {
-  font-size: 11px;
-  width: 14px;
-  text-align: center;
-  flex-shrink: 0;
-}
-.etb-btn-text {
-  flex: 1;
-  line-height: 1.1;
-}
+.etb-btn-icon { width: 13px; font-size: 11px; text-align: center; flex-shrink: 0; }
+.etb-btn-text { flex: 1; line-height: 1.1; }
 
-/* Reset button – reddish */
 .etb-btn-reset {
-  border-color: rgba(196,74,58,0.25);
-  color: rgba(224,90,79,0.75);
+  border-color: rgba(196,74,58,0.2);
+  color: rgba(224,90,79,0.7);
 }
 .etb-btn-reset:hover {
-  background: rgba(196,74,58,0.15);
+  background: rgba(196,74,58,0.12);
   border-color: var(--red);
   color: var(--red-bright);
 }
 
-/* Toggle buttons – glow gold when active */
 .etb-btn-toggle.active {
-  background: rgba(201,164,74,0.15);
+  background: rgba(201,164,74,0.13);
   border-color: var(--gold);
   color: var(--gold-light);
-  box-shadow: 0 0 8px rgba(201,164,74,0.2);
 }
 
-/* Timer running state */
 .etb-action-btn.timer-running {
-  background: rgba(74,140,74,0.15);
+  background: rgba(74,140,74,0.13);
   border-color: var(--green);
   color: var(--green-bright);
 }
-.etb-action-btn.timer-running:hover {
-  background: rgba(74,140,74,0.25);
-}
 
-/* Danger toggle (Overlay aus) – red when active */
 .etb-btn-danger-toggle.active {
-  background: rgba(196,74,58,0.18);
+  background: rgba(196,74,58,0.15);
   border-color: var(--red);
   color: var(--red-bright);
-  box-shadow: 0 0 8px rgba(196,74,58,0.2);
 }
