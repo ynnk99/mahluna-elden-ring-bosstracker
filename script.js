@@ -5,6 +5,7 @@
 const TWITCH_CLIENT_ID   = "n3oqt780bnsi3lb2gzinxdbrrazork";
 const TWITCH_REDIRECT_URI = window.location.origin + window.location.pathname;
 const APPS_SCRIPT_URL    = "https://script.google.com/macros/s/AKfycbwBW3krabNJWaNzIApY2be5dKenM5gyu03LpDggwiQOvyvA6cir2rCgE8Hxc01ZV-L8/exec";
+const TOOLBOX_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzTt2y1Cgt7wzQpBGJC57LFa8B2o90MmkeJXuf83lDxC8aUyJPhzu6O_jJm4J65j5ri/exec";
 
 const ALLOWED_USERS = [
   "ynnk99",
@@ -76,6 +77,124 @@ var timerStartTs  = 0;
 var timerElapsed  = 0;
 var timerVisible  = false;
 var timerInterval = null;
+
+// ─── EDITOR TOOLBOX ────────────────────────────────────────────────────────
+var toolboxExpanded   = true;
+var toolboxTimerTick  = null;
+
+function toolboxInit() {
+  var box = document.getElementById("editor-toolbox");
+  if (!box) return;
+  box.style.display = isAuthorized() ? "block" : "none";
+}
+
+function toolboxToggle() {
+  toolboxExpanded = !toolboxExpanded;
+  var body = document.getElementById("etb-body");
+  var chev = document.getElementById("etb-chevron");
+  if (body) body.classList.toggle("collapsed", !toolboxExpanded);
+  if (chev) chev.classList.toggle("open", !toolboxExpanded);
+}
+
+function toolboxSetCell(cell, checked) {
+  if (!isAuthorized() || !TOOLBOX_SCRIPT_URL) return;
+  var value = checked ? "TRUE" : "FALSE";
+  fetch(TOOLBOX_SCRIPT_URL
+    + "?action=setCell"
+    + "&cell="  + encodeURIComponent(cell)
+    + "&value=" + encodeURIComponent(value),
+    { method: "GET", mode: "no-cors" }
+  ).catch(function(e) { console.error("[Toolbox] setCell error:", e); });
+}
+
+function toolboxWriteTimerCells(startTs, elapsed) {
+  if (!isAuthorized() || !TOOLBOX_SCRIPT_URL) return;
+  // W1 = timerStartTs, W3 = timerElapsed
+  fetch(TOOLBOX_SCRIPT_URL
+    + "?action=setTimer"
+    + "&startTs=" + encodeURIComponent(startTs)
+    + "&elapsed=" + encodeURIComponent(elapsed),
+    { method: "GET", mode: "no-cors" }
+  ).catch(function(e) { console.error("[Toolbox] setTimer error:", e); });
+}
+
+function toolboxTimerPlayPause() {
+  if (!isAuthorized()) return;
+  var isRunning = timerStartTs > 0;
+  if (isRunning) {
+    // Pause: compute elapsed, stop
+    timerElapsed = timerElapsed + (Date.now() - timerStartTs);
+    timerStartTs = 0;
+    toolboxWriteTimerCells(0, timerElapsed);
+  } else {
+    // Start / Resume
+    timerStartTs = Date.now();
+    toolboxWriteTimerCells(timerStartTs, timerElapsed);
+  }
+  toolboxSyncTimerUI();
+}
+
+function toolboxTimerReset() {
+  if (!isAuthorized()) return;
+  timerStartTs = 0;
+  timerElapsed = 0;
+  toolboxWriteTimerCells(0, 0);
+  toolboxSyncTimerUI();
+}
+
+function toolboxSyncTimerUI() {
+  var btn    = document.getElementById("etb-timer-playpause");
+  var icon   = document.getElementById("etb-pp-icon");
+  var disp   = document.getElementById("etb-timer-display");
+  if (!btn || !disp) return;
+  var isRunning = timerStartTs > 0;
+  btn.classList.toggle("running", isRunning);
+  if (icon) icon.textContent = isRunning ? "⏸" : "▶";
+  btn.innerHTML = "<span id=\"etb-pp-icon\">" + (isRunning ? "⏸" : "▶") + "</span> " + (isRunning ? "Pause" : "Start");
+  disp.classList.toggle("running", isRunning);
+
+  // tick interval for toolbox display
+  if (toolboxTimerTick) clearInterval(toolboxTimerTick);
+  if (isRunning) {
+    toolboxTimerTick = setInterval(toolboxUpdateTimerDisplay, 500);
+  }
+  toolboxUpdateTimerDisplay();
+}
+
+function toolboxUpdateTimerDisplay() {
+  var disp = document.getElementById("etb-timer-display");
+  if (!disp) return;
+  var elapsed = timerStartTs > 0
+    ? timerElapsed + (Date.now() - timerStartTs)
+    : timerElapsed;
+  disp.textContent = fmtTime(elapsed);
+}
+
+function toolboxSyncFromRows(rows) {
+  if (!isAuthorized()) return;
+  function getCell(rowIdx, colIdx) {
+    return rows[rowIdx] && rows[rowIdx].c && rows[rowIdx].c[colIdx]
+      ? rows[rowIdx].c[colIdx].v : null;
+  }
+  function syncCb(id, val) {
+    var el = document.getElementById(id);
+    if (el) el.checked = isTrue(val);
+  }
+  // L = col 11, N = col 13, Q = col 16, S = col 18, Y = col 24
+  syncCb("etb-L1", getCell(0, 11));
+  syncCb("etb-L2", getCell(1, 11));
+  syncCb("etb-N1", getCell(0, 13));  // timerVisible
+  syncCb("etb-N2", getCell(1, 13));
+  syncCb("etb-Q1", getCell(0, 16));  // Base Game
+  syncCb("etb-Q2", getCell(1, 16));  // DLC
+  syncCb("etb-S1", getCell(0, 18));
+  syncCb("etb-S2", getCell(1, 18));
+  syncCb("etb-Y1", getCell(0, 24));
+
+  toolboxSyncTimerUI();
+  toolboxInit();
+}
+// ─── END TOOLBOX ───────────────────────────────────────────────────────────
 
 var clipsData      = [];
 var clipDateFilter = 'all';
@@ -322,6 +441,7 @@ function updateLoginUI() {
   var bar = document.getElementById("field-deaths-bar");
   if (bar) bar.style.display = isAuthorized() ? "flex" : "none";
   updateFieldDeathsVisibility();
+  toolboxInit();
 }
 
 function isAuthorized() {
@@ -1689,6 +1809,7 @@ function processData(rows) {
   timerElapsed = Number(rows[2] && rows[2].c[22] ? rows[2].c[22].v : 0) || 0;
   timerVisible = isTrue(rows[0] && rows[0].c[13] ? rows[0].c[13].v : false);
   updateTimerDisplay();
+  toolboxSyncFromRows(rows);
 
   var separatorIndex = -1;
   for (var si = 0; si < rows.length; si++) {
