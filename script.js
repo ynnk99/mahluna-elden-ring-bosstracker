@@ -225,6 +225,7 @@ function toolboxRefresh() {
 function toolboxApplyCell(cell, val) {
   switch (cell) {
     case 'N1':
+      pendingLocalTimer = Date.now();
       timerVisible = val;
       updateTimerDisplay();
       if (val && timerStartTs > 0) startTimerTick();
