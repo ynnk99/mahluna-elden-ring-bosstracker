@@ -5,7 +5,7 @@
 const TWITCH_CLIENT_ID   = "n3oqt780bnsi3lb2gzinxdbrrazork";
 const TWITCH_REDIRECT_URI = window.location.origin + window.location.pathname;
 const APPS_SCRIPT_URL    = "https://script.google.com/macros/s/AKfycbwBW3krabNJWaNzIApY2be5dKenM5gyu03LpDggwiQOvyvA6cir2rCgE8Hxc01ZV-L8/exec";
-const TOOLBOX_SCRIPT_URL = "DEINE_NEUE_TOOLBOX_URL_HIER";
+const TOOLBOX_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzTt2y1Cgt7wzQpBGJC57LFa8B2o90MmkeJXuf83lDxC8aUyJPhzu6O_jJm4J65j5ri/exec";
 
 const ALLOWED_USERS = [
   "ynnk99",
@@ -87,7 +87,9 @@ var toolboxCellState  = { N1: false, N2: false, Q1: true, Q2: true, S1: false, S
 function toolboxInit() {
   var box = document.getElementById("editor-toolbox");
   if (!box) return;
-  box.style.display = isAuthorized() ? "flex" : "none";
+  var show = isAuthorized();
+  box.style.display = show ? "flex" : "none";
+  document.body.classList.toggle("editor-mode", show);
 }
 
 // Send a cell value to the toolbox Apps Script

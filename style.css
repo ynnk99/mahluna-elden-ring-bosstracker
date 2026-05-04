@@ -1925,16 +1925,26 @@ body.filter-open #chart-section {
    EDITOR TOOLBOX – Action Sidebar
 ═══════════════════════════════════════════════════════════════════════ */
 
+body.editor-mode {
+  padding-left: 162px;
+}
+
 .editor-toolbox {
   position: fixed;
-  left: max(8px, calc(50vw - 620px));
-  top: 180px;
-  width: 148px;
+  left: 0;
+  top: 0;
+  width: 155px;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   gap: 6px;
+  padding: 14px 8px 20px;
   z-index: 900;
   font-family: 'Crimson Pro', serif;
+  background: rgba(8, 7, 4, 0.96);
+  border-right: 1px solid rgba(201,164,74,0.15);
 }
 
 /* Small "Editor" label at top */
