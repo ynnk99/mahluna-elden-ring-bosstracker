@@ -135,7 +135,7 @@ function toolboxToggleCell(cell, btnId) {
   var newVal = toolboxCellState[cell];
   toolboxWriteCell(cell, newVal ? "TRUE" : "FALSE");
   toolboxSetBtnActive(btnId, newVal);
-  toolboxApplyLocally(cell, newVal);
+  toolboxPatchAndRefresh();
 }
 
 // Immediately reflect toolbox changes in the page UI without waiting for refresh
@@ -197,36 +197,59 @@ function toolboxToggleTimer() {
   if (!isAuthorized()) return;
   var isRunning = timerStartTs > 0;
   if (isRunning) {
-    // Pause → L1=FALSE
     timerElapsed = timerElapsed + (Date.now() - timerStartTs);
     timerStartTs = 0;
     toolboxWriteCell("L1", "FALSE");
     toolboxWriteTimerCells(0, timerElapsed);
-    if (timerInterval) clearInterval(timerInterval); // stop main tick
   } else {
-    // Start/Resume → L1=TRUE
     timerStartTs = Date.now();
     toolboxWriteCell("L1", "TRUE");
     toolboxWriteTimerCells(timerStartTs, timerElapsed);
-    startTimerTick(); // start main page tick
   }
-  updateTimerDisplay(); // sync main stats bar immediately
-  toolboxSyncTimerUI();
+  toolboxPatchAndRefresh();
 }
 
 function toolboxTimerReset() {
   if (!isAuthorized()) return;
   timerStartTs = 0;
   timerElapsed = 0;
-  // L2 serverseitig pulsen (TRUE → 300ms → FALSE)
   if (TOOLBOX_SCRIPT_URL) {
     fetch(TOOLBOX_SCRIPT_URL + "?action=pulseCell&cell=L2", { method: "GET", mode: "no-cors" })
       .catch(function(e) { console.error("[Toolbox] pulseCell error:", e); });
   }
   toolboxWriteTimerCells(0, 0);
-  if (timerInterval) clearInterval(timerInterval); // stop main tick
-  updateTimerDisplay(); // reset main stats bar immediately
-  toolboxSyncTimerUI();
+  toolboxPatchAndRefresh();
+}
+
+// Patch cachedRows with current toolbox state and re-run processData so the
+// page updates instantly without waiting for the next sheet poll.
+function toolboxPatchAndRefresh() {
+  if (!cachedRows) return;
+
+  function ensureCell(rowIdx, colIdx, val) {
+    if (!cachedRows[rowIdx]) return;
+    if (!cachedRows[rowIdx].c) cachedRows[rowIdx].c = [];
+    if (!cachedRows[rowIdx].c[colIdx]) cachedRows[rowIdx].c[colIdx] = {};
+    cachedRows[rowIdx].c[colIdx].v = val;
+  }
+
+  // Timer state  (W1 = col 22 row 0, W3 = col 22 row 2)
+  ensureCell(0, 22, timerStartTs);
+  ensureCell(2, 22, timerElapsed);
+  // N1 timerVisible (col 13 row 0)
+  ensureCell(0, 13, toolboxCellState.N1);
+  // N2 overlay (col 13 row 1)
+  ensureCell(1, 13, toolboxCellState.N2);
+  // Q1 Base Game (col 16 row 0), Q2 DLC (col 16 row 1)
+  ensureCell(0, 16, toolboxCellState.Q1);
+  ensureCell(1, 16, toolboxCellState.Q2);
+  // S1 nur offen (col 18 row 0), S2 nur erledigt (col 18 row 1)
+  ensureCell(0, 18, toolboxCellState.S1);
+  ensureCell(1, 18, toolboxCellState.S2);
+  // Y1 (col 24 row 0)
+  ensureCell(0, 24, toolboxCellState.Y1);
+
+  processData(cachedRows);
 }
 
 function toolboxSyncTimerUI() {
