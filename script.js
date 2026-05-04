@@ -149,15 +149,14 @@ function toolboxToggleCell(cell, btnId) {
 // ── Timer Start/Pause ────────────────────────────────────────────────────
 function toolboxToggleTimer() {
   if (!isAuthorized()) return;
+  pendingLocalTimer = Date.now();
   if (timerStartTs > 0) {
-    // Pause
     timerElapsed += Date.now() - timerStartTs;
     timerStartTs = 0;
     toolboxWriteCell("L1", "FALSE");
     toolboxWriteTimerCells(0, timerElapsed);
     if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
   } else {
-    // Start / Resume
     timerStartTs = Date.now();
     toolboxWriteCell("L1", "TRUE");
     toolboxWriteTimerCells(timerStartTs, timerElapsed);
@@ -169,6 +168,7 @@ function toolboxToggleTimer() {
 
 function toolboxTimerReset() {
   if (!isAuthorized()) return;
+  pendingLocalTimer = Date.now();
   timerStartTs = 0;
   timerElapsed = 0;
   if (TOOLBOX_SCRIPT_URL) {
@@ -273,9 +273,12 @@ function toolboxSyncTimerUI() {
   if (!btn || !disp) return;
   var running = timerStartTs > 0;
   btn.classList.toggle("timer-running", running);
-  btn.innerHTML = running
-    ? '<span class="etb-btn-icon">⏸</span><span class="etb-btn-text">Pause</span>'
-    : '<span class="etb-btn-icon">▶</span><span class="etb-btn-text">Start</span>';
+  // Update icon and text without replacing innerHTML (replacing it destroys
+  // the click target mid-event, causing the panel to close)
+  var iconEl = btn.querySelector(".etb-btn-icon");
+  var textEl = btn.querySelector(".etb-btn-text");
+  if (iconEl) iconEl.textContent = running ? "⏸" : "▶";
+  if (textEl) textEl.textContent = running ? "Pause" : "Start";
   disp.classList.toggle("running", running);
   if (toolboxTimerTick) clearInterval(toolboxTimerTick);
   if (running) toolboxTimerTick = setInterval(toolboxUpdateTimerDisplay, 500);
@@ -326,6 +329,7 @@ var prevChartSnapshot = "";
 var clipsByBoss         = {};
 var deathsWriteTimer = null;
 var pendingLocalChanges = {};
+var pendingLocalTimer   = 0; // timestamp of last toolbox timer action
 var fieldDeaths = { base: 0, dlc: 0 };
 var fieldDeathsTimer = { base: null, dlc: null };
 var liveCheckInterval = null;
@@ -1923,9 +1927,13 @@ function processData(rows) {
     updateFieldDeathsVisibility(); // ← neu
   }
 
-  timerStartTs = Number(rows[0] && rows[0].c[22] ? rows[0].c[22].v : 0) || 0;
-  timerElapsed = Number(rows[2] && rows[2].c[22] ? rows[2].c[22].v : 0) || 0;
-  timerVisible = isTrue(rows[0] && rows[0].c[13] ? rows[0].c[13].v : false);
+  // Only overwrite local timer state if no recent toolbox action (10s grace period)
+  if (!pendingLocalTimer || Date.now() - pendingLocalTimer > 10000) {
+    pendingLocalTimer = 0;
+    timerStartTs = Number(rows[0] && rows[0].c[22] ? rows[0].c[22].v : 0) || 0;
+    timerElapsed = Number(rows[2] && rows[2].c[22] ? rows[2].c[22].v : 0) || 0;
+    timerVisible = isTrue(rows[0] && rows[0].c[13] ? rows[0].c[13].v : false);
+  }
   updateTimerDisplay();
   if (timerStartTs > 0) startTimerTick(); else if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
   toolboxSyncFromRows(rows);
