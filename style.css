@@ -1919,3 +1919,187 @@ body.filter-open #chart-section {
   border-color: var(--gold);
   box-shadow: 0 0 12px rgba(201,164,74,0.2);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   EDITOR TOOLBOX
+═══════════════════════════════════════════════════════════════════════ */
+
+.editor-toolbox {
+  position: fixed;
+  top: 50%;
+  left: max(8px, calc(50vw - 615px));
+  transform: translateY(-50%);
+  width: 188px;
+  z-index: 900;
+  font-family: 'Crimson Pro', serif;
+  user-select: none;
+}
+
+.etb-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  background: rgba(12, 10, 6, 0.97);
+  border: 1px solid var(--border-bright);
+  border-bottom: none;
+  cursor: pointer;
+  border-radius: var(--radius) var(--radius) 0 0;
+  transition: background 0.2s;
+}
+.etb-header:hover { background: rgba(201,164,74,0.08); }
+
+.etb-icon {
+  font-size: 13px;
+  opacity: 0.7;
+}
+.etb-title {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: var(--gold);
+  text-transform: uppercase;
+  flex: 1;
+}
+.etb-chevron {
+  font-size: 9px;
+  color: var(--gold-dim);
+  transition: transform 0.25s;
+}
+.etb-chevron.open { transform: rotate(180deg); }
+
+.etb-body {
+  background: rgba(10, 9, 6, 0.97);
+  border: 1px solid var(--border-bright);
+  border-radius: 0 0 var(--radius) var(--radius);
+  overflow: hidden;
+  max-height: 600px;
+  transition: max-height 0.3s ease, opacity 0.25s;
+  opacity: 1;
+}
+.etb-body.collapsed {
+  max-height: 0;
+  opacity: 0;
+}
+
+.etb-section {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(201,164,74,0.12);
+}
+.etb-section:last-child { border-bottom: none; }
+
+.etb-section-label {
+  font-family: 'Cinzel', serif;
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  color: var(--gold-dim);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  opacity: 0.8;
+}
+
+/* Checkbox rows */
+.etb-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.etb-checkbox-row:hover .etb-cb-label { color: var(--gold-light); }
+.etb-checkbox-row input[type="checkbox"] {
+  display: none;
+}
+.etb-cb-box {
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid var(--gold-dim);
+  border-radius: 2px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, border-color 0.15s;
+  position: relative;
+}
+.etb-checkbox-row input:checked + .etb-cb-box {
+  background: var(--gold-dim);
+  border-color: var(--gold);
+}
+.etb-checkbox-row input:checked + .etb-cb-box::after {
+  content: "✓";
+  font-size: 9px;
+  color: var(--bg-deep);
+  font-weight: 900;
+  line-height: 1;
+}
+.etb-cb-label {
+  font-size: 13px;
+  color: var(--parchment-dim);
+  line-height: 1;
+  transition: color 0.15s;
+}
+
+/* Timer display */
+.etb-timer-display {
+  font-family: 'Cinzel', serif;
+  font-size: 20px;
+  letter-spacing: 0.08em;
+  color: var(--gold-light);
+  text-align: center;
+  padding: 8px 0 6px;
+  text-shadow: 0 0 20px rgba(201,164,74,0.4);
+}
+
+/* Buttons */
+.etb-btn-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 2px;
+}
+.etb-btn {
+  flex: 1;
+  padding: 5px 6px;
+  border-radius: 4px;
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.etb-btn-primary {
+  background: rgba(201,164,74,0.15);
+  border-color: var(--gold-dim);
+  color: var(--gold-light);
+}
+.etb-btn-primary:hover {
+  background: rgba(201,164,74,0.28);
+  border-color: var(--gold);
+}
+.etb-btn-primary.running {
+  background: rgba(100,180,100,0.15);
+  border-color: var(--green);
+  color: var(--green-bright);
+}
+.etb-btn-danger {
+  background: rgba(196,74,58,0.12);
+  border-color: rgba(196,74,58,0.4);
+  color: var(--red-bright);
+}
+.etb-btn-danger:hover {
+  background: rgba(196,74,58,0.25);
+  border-color: var(--red);
+}
+
+/* Pulse animation for running timer */
+@keyframes etb-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+.etb-timer-display.running {
+  animation: etb-pulse 2s ease-in-out infinite;
+  color: var(--green-bright);
+  text-shadow: 0 0 20px rgba(100,200,100,0.4);
+}

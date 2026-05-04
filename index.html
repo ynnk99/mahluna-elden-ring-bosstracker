@@ -21,6 +21,90 @@
 </head>
 <body>
 
+<!-- ── EDITOR TOOLBOX ── -->
+<div class="editor-toolbox" id="editor-toolbox" style="display:none;">
+  <div class="etb-header" id="etb-toggle" onclick="toolboxToggle()">
+    <span class="etb-icon">⚙</span>
+    <span class="etb-title">Toolbox</span>
+    <span class="etb-chevron" id="etb-chevron">◀</span>
+  </div>
+  <div class="etb-body" id="etb-body">
+
+    <!-- TIMER -->
+    <div class="etb-section">
+      <div class="etb-section-label">⏳ Timer</div>
+      <label class="etb-checkbox-row" title="Sheet-Zelle L1">
+        <input type="checkbox" id="etb-L1" onchange="toolboxSetCell('L1', this.checked)">
+        <span class="etb-cb-box"></span>
+        <span class="etb-cb-label">L1</span>
+      </label>
+      <label class="etb-checkbox-row" title="Sheet-Zelle L2">
+        <input type="checkbox" id="etb-L2" onchange="toolboxSetCell('L2', this.checked)">
+        <span class="etb-cb-box"></span>
+        <span class="etb-cb-label">L2</span>
+      </label>
+      <label class="etb-checkbox-row" title="Sheet-Zelle N1 – Timer einblenden">
+        <input type="checkbox" id="etb-N1" onchange="toolboxSetCell('N1', this.checked)">
+        <span class="etb-cb-box"></span>
+        <span class="etb-cb-label">N1 – Einblenden</span>
+      </label>
+      <div class="etb-timer-display" id="etb-timer-display">00:00:00</div>
+      <div class="etb-btn-row">
+        <button class="etb-btn etb-btn-primary" id="etb-timer-playpause" onclick="toolboxTimerPlayPause()">
+          <span id="etb-pp-icon">▶</span> Start
+        </button>
+        <button class="etb-btn etb-btn-danger" onclick="toolboxTimerReset()">↺ Reset</button>
+      </div>
+    </div>
+
+    <!-- OVERLAY -->
+    <div class="etb-section">
+      <div class="etb-section-label">📺 Overlay</div>
+      <label class="etb-checkbox-row" title="Sheet-Zelle N2 – Kleines / Volles Overlay">
+        <input type="checkbox" id="etb-N2" onchange="toolboxSetCell('N2', this.checked)">
+        <span class="etb-cb-box"></span>
+        <span class="etb-cb-label">N2 – Klein / Voll</span>
+      </label>
+    </div>
+
+    <!-- FILTER -->
+    <div class="etb-section">
+      <div class="etb-section-label">🗺 Filter</div>
+      <label class="etb-checkbox-row" title="Sheet-Zelle Q1 – Base Game anzeigen">
+        <input type="checkbox" id="etb-Q1" onchange="toolboxSetCell('Q1', this.checked)">
+        <span class="etb-cb-box"></span>
+        <span class="etb-cb-label">Q1 – Base Game</span>
+      </label>
+      <label class="etb-checkbox-row" title="Sheet-Zelle Q2 – DLC anzeigen">
+        <input type="checkbox" id="etb-Q2" onchange="toolboxSetCell('Q2', this.checked)">
+        <span class="etb-cb-box"></span>
+        <span class="etb-cb-label">Q2 – DLC</span>
+      </label>
+    </div>
+
+    <!-- OBS QUELLEN -->
+    <div class="etb-section">
+      <div class="etb-section-label">🎥 OBS Quellen</div>
+      <label class="etb-checkbox-row" title="Sheet-Zelle S1">
+        <input type="checkbox" id="etb-S1" onchange="toolboxSetCell('S1', this.checked)">
+        <span class="etb-cb-box"></span>
+        <span class="etb-cb-label">S1</span>
+      </label>
+      <label class="etb-checkbox-row" title="Sheet-Zelle S2">
+        <input type="checkbox" id="etb-S2" onchange="toolboxSetCell('S2', this.checked)">
+        <span class="etb-cb-box"></span>
+        <span class="etb-cb-label">S2</span>
+      </label>
+      <label class="etb-checkbox-row" title="Sheet-Zelle Y1">
+        <input type="checkbox" id="etb-Y1" onchange="toolboxSetCell('Y1', this.checked)">
+        <span class="etb-cb-box"></span>
+        <span class="etb-cb-label">Y1</span>
+      </label>
+    </div>
+
+  </div>
+</div>
+
 <div class="page-wrapper">
 
   <header class="site-header">
