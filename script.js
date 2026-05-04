@@ -81,6 +81,7 @@ var timerInterval = null;
 // ─── EDITOR TOOLBOX ────────────────────────────────────────────────────────
 var toolboxTimerTick = null;
 var toolboxCellState = { N1: false, N2: false, Q1: true, Q2: true, S1: false, S2: false, Y1: false };
+var toolboxPendingCells = {}; // cell → timestamp, schützt Button-States vor Sheet-Überschreibung
 
 function toolboxInit() {
   var box = document.getElementById("editor-toolbox");
@@ -138,8 +139,19 @@ function toolboxToggleCell(cell, btnId) {
   if (!isAuthorized()) return;
   toolboxCellState[cell] = !toolboxCellState[cell];
   var v = toolboxCellState[cell];
-  if (cell === 'S1' && v) { toolboxCellState.S2 = false; toolboxSetBtnActive('etb-btn-S2', false); toolboxWriteCell('S2', 'FALSE'); }
-  if (cell === 'S2' && v) { toolboxCellState.S1 = false; toolboxSetBtnActive('etb-btn-S1', false); toolboxWriteCell('S1', 'FALSE'); }
+  if (cell === 'S1' && v) {
+    toolboxCellState.S2 = false;
+    toolboxPendingCells['S2'] = Date.now();
+    toolboxSetBtnActive('etb-btn-S2', false);
+    toolboxWriteCell('S2', 'FALSE');
+  }
+  if (cell === 'S2' && v) {
+    toolboxCellState.S1 = false;
+    toolboxPendingCells['S1'] = Date.now();
+    toolboxSetBtnActive('etb-btn-S1', false);
+    toolboxWriteCell('S1', 'FALSE');
+  }
+  toolboxPendingCells[cell] = Date.now();
   toolboxWriteCell(cell, v ? "TRUE" : "FALSE");
   toolboxSetBtnActive(btnId, v);
   toolboxPatchCell(cell, v);   // keep cachedRows in sync
@@ -295,23 +307,24 @@ function toolboxUpdateTimerDisplay() {
 
 function toolboxSyncFromRows(rows) {
   if (!isAuthorized()) return;
+  var now = Date.now();
+  var GRACE = 10000;
   function getCell(r, c) {
     return rows[r] && rows[r].c && rows[r].c[c] ? rows[r].c[c].v : null;
   }
-  toolboxCellState.N1 = isTrue(getCell(0, 13));
-  toolboxCellState.N2 = isTrue(getCell(1, 13));
-  toolboxCellState.Q1 = isTrue(getCell(0, 16));
-  toolboxCellState.Q2 = isTrue(getCell(1, 16));
-  toolboxCellState.S1 = isTrue(getCell(0, 18));
-  toolboxCellState.S2 = isTrue(getCell(1, 18));
-  toolboxCellState.Y1 = isTrue(getCell(0, 24));
-  toolboxSetBtnActive("etb-btn-N1", toolboxCellState.N1);
-  toolboxSetBtnActive("etb-btn-N2", toolboxCellState.N2);
-  toolboxSetBtnActive("etb-btn-Q1", toolboxCellState.Q1);
-  toolboxSetBtnActive("etb-btn-Q2", toolboxCellState.Q2);
-  toolboxSetBtnActive("etb-btn-S1", toolboxCellState.S1);
-  toolboxSetBtnActive("etb-btn-S2", toolboxCellState.S2);
-  toolboxSetBtnActive("etb-btn-Y1", toolboxCellState.Y1);
+  function syncCell(cell, r, c, btnId) {
+    if (toolboxPendingCells[cell] && (now - toolboxPendingCells[cell]) < GRACE) return;
+    delete toolboxPendingCells[cell];
+    toolboxCellState[cell] = isTrue(getCell(r, c));
+    toolboxSetBtnActive(btnId, toolboxCellState[cell]);
+  }
+  syncCell('N1', 0, 13, 'etb-btn-N1');
+  syncCell('N2', 1, 13, 'etb-btn-N2');
+  syncCell('Q1', 0, 16, 'etb-btn-Q1');
+  syncCell('Q2', 1, 16, 'etb-btn-Q2');
+  syncCell('S1', 0, 18, 'etb-btn-S1');
+  syncCell('S2', 1, 18, 'etb-btn-S2');
+  syncCell('Y1', 0, 24, 'etb-btn-Y1');
   toolboxSyncTimerUI();
   toolboxInit();
 }
