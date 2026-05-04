@@ -2073,3 +2073,54 @@ body.editor-mode { padding-left: 0; }
   color: var(--red-bright);
   box-shadow: 0 0 8px rgba(196,74,58,0.15);
 }
+
+/* ── Timer-Eingabe (H:M:S setzen) ── */
+.etb-time-set {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(201,164,74,0.18);
+  border-radius: 5px;
+  padding: 5px 7px;
+  margin-top: 2px;
+}
+.etb-time-input {
+  width: 30px;
+  background: transparent;
+  border: none;
+  color: var(--gold-light);
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  text-align: center;
+  outline: none;
+  -moz-appearance: textfield;
+  padding: 0;
+}
+.etb-time-input::-webkit-inner-spin-button,
+.etb-time-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+.etb-time-input::placeholder { color: rgba(201,164,74,0.28); }
+.etb-time-input:focus { color: var(--gold-light); }
+.etb-time-sep {
+  color: var(--gold-dim);
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  user-select: none;
+  opacity: 0.7;
+}
+.etb-time-set-btn {
+  margin-left: 5px;
+  padding: 2px 7px;
+  background: rgba(201,164,74,0.12);
+  border: 1px solid rgba(201,164,74,0.3);
+  border-radius: 4px;
+  color: var(--gold);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  transition: background 0.15s, border-color 0.15s;
+}
+.etb-time-set-btn:hover {
+  background: rgba(201,164,74,0.26);
+  border-color: var(--gold);
+}

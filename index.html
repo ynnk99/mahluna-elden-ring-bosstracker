@@ -41,6 +41,20 @@
       <button class="etb-action-btn etb-btn-toggle" id="etb-btn-N1" onclick="toolboxToggleCell('N1','etb-btn-N1')">
         <span class="etb-btn-icon">👁</span><span class="etb-btn-text">Einblenden</span>
       </button>
+      <div class="etb-time-set">
+        <input type="number" class="etb-time-input" id="etb-elapsed-h"
+               min="0" max="99" placeholder="00"
+               onkeydown="if(event.key==='Enter')toolboxSetElapsed()">
+        <span class="etb-time-sep">:</span>
+        <input type="number" class="etb-time-input" id="etb-elapsed-m"
+               min="0" max="59" placeholder="00"
+               onkeydown="if(event.key==='Enter')toolboxSetElapsed()">
+        <span class="etb-time-sep">:</span>
+        <input type="number" class="etb-time-input" id="etb-elapsed-s"
+               min="0" max="59" placeholder="00"
+               onkeydown="if(event.key==='Enter')toolboxSetElapsed()">
+        <button class="etb-time-set-btn" onclick="toolboxSetElapsed()" title="Timer auf diese Zeit setzen">↵</button>
+      </div>
     </div>
   </div>
 

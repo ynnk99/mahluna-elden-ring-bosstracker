@@ -93,12 +93,54 @@ function toolboxInit() {
 
 function toolboxOpenPanel(name) {
   var panels = ['timer', 'obs', 'filter'];
+  var wasOpen = false;
   panels.forEach(function(p) {
     var item = document.getElementById('etb-item-' + p);
     if (!item) return;
+    if (p === name && item.classList.contains('open')) wasOpen = true;
     item.classList.toggle('open', p === name && !item.classList.contains('open'));
     if (p !== name) item.classList.remove('open');
   });
+  if (name === 'timer' && !wasOpen) toolboxFillTimeInputs();
+}
+
+function toolboxFillTimeInputs() {
+  var ms  = timerStartTs > 0 ? timerElapsed + (Date.now() - timerStartTs) : timerElapsed;
+  var s   = Math.floor(ms / 1000);
+  var h   = Math.floor(s / 3600);
+  var m   = Math.floor((s % 3600) / 60);
+  var sec = s % 60;
+  var hEl = document.getElementById('etb-elapsed-h');
+  var mEl = document.getElementById('etb-elapsed-m');
+  var sEl = document.getElementById('etb-elapsed-s');
+  if (hEl) hEl.value = h > 0 ? h : '';
+  if (mEl) mEl.value = m > 0 ? m : '';
+  if (sEl) sEl.value = sec > 0 ? sec : '';
+}
+
+function toolboxSetElapsed() {
+  if (!isAuthorized()) return;
+  var h   = Math.max(0, parseInt(document.getElementById('etb-elapsed-h').value) || 0);
+  var m   = Math.max(0, Math.min(59, parseInt(document.getElementById('etb-elapsed-m').value) || 0));
+  var s   = Math.max(0, Math.min(59, parseInt(document.getElementById('etb-elapsed-s').value) || 0));
+  var ms  = (h * 3600 + m * 60 + s) * 1000;
+
+  pendingLocalTimer = Date.now();
+  timerElapsed = ms;
+  if (timerStartTs > 0) timerStartTs = Date.now(); // Timer läuft weiter ab neuer Zeit
+
+  toolboxPatchTimerCells();
+  updateTimerDisplay();
+  toolboxSyncTimerUI();
+
+  if (TOOLBOX_SCRIPT_URL) {
+    fetch(TOOLBOX_SCRIPT_URL
+      + "?action=setElapsed&elapsed=" + encodeURIComponent(ms),
+      { method: "GET", mode: "no-cors" }
+    ).catch(function(e) { console.error("[Toolbox] setElapsed:", e); });
+  }
+
+  showToast("⏱ Timer gesetzt: " + fmtTime(ms), 2000);
 }
 
 document.addEventListener('click', function(e) {
