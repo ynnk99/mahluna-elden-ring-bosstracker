@@ -175,7 +175,11 @@ function toolboxTimerReset() {
   if (!isAuthorized()) return;
   timerStartTs = 0;
   timerElapsed = 0;
-  toolboxWriteCell("L2", "TRUE");   // pulse L2=TRUE to trigger reset
+  // L2 serverseitig pulsen (TRUE → 300ms → FALSE)
+  if (TOOLBOX_SCRIPT_URL) {
+    fetch(TOOLBOX_SCRIPT_URL + "?action=pulseCell&cell=L2", { method: "GET", mode: "no-cors" })
+      .catch(function(e) { console.error("[Toolbox] pulseCell error:", e); });
+  }
   toolboxWriteTimerCells(0, 0);
   toolboxSyncTimerUI();
 }
