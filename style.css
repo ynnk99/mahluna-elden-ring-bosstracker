@@ -1236,7 +1236,7 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 
 /* Datum-Badge auf Clip-Karten */
 .clip-date {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--gold-dim);
   font-family: 'Cinzel', serif;
   letter-spacing: 0.04em;
@@ -1244,7 +1244,7 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
   margin-right: 4px;
 }
 .clip-creator {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--gold-dim);
   font-family: 'Cinzel', serif;
   letter-spacing: 0.04em;
