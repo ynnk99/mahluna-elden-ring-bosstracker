@@ -4,7 +4,7 @@
 
 const TWITCH_CLIENT_ID   = "n3oqt780bnsi3lb2gzinxdbrrazork";
 const TWITCH_REDIRECT_URI = window.location.origin + window.location.pathname;
-const APPS_SCRIPT_URL    = "https://script.google.com/macros/s/AKfycbwBW3krabNJWaNzIApY2be5dKenM5gyu03LpDggwiQOvyvA6cir2rCgE8Hxc01ZV-L8/exec";
+const APPS_SCRIPT_URL    = "https://script.google.com/macros/s/AKfycbzTt2y1Cgt7wzQpBGJC57LFa8B2o90MmkeJXuf83lDxC8aUyJPhzu6O_jJm4J65j5ri/exec";
 const TOOLBOX_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzTt2y1Cgt7wzQpBGJC57LFa8B2o90MmkeJXuf83lDxC8aUyJPhzu6O_jJm4J65j5ri/exec";
 
 const ALLOWED_USERS = [
