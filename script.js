@@ -405,6 +405,7 @@ var menuState = {
 
 var bingoCells          = [];
 var bingoChecked        = [];
+var bingoProgress       = {};  // "row,col" → aktueller Zählerstand für x/y-Felder
 var bingoPanelCollapsed = false;
 var prevBingoTextSnap   = "";
 var prevBingoStateSnap  = "";
@@ -2415,6 +2416,14 @@ function renderBingo() {
     for (var c = 0; c < 5; c++) {
       var text    = (bingoCells[r] && bingoCells[r][c]) ? bingoCells[r][c] : "";
       var checked = (bingoChecked[r] && bingoChecked[r][c]) || false;
+      // Für x/y-Felder: live Zähler im Label anzeigen
+      var progressMatch = !checked && text.match(/^(\d+)\/(\d+)$/);
+      var displayText = text;
+      if (progressMatch) {
+        var pKey = r + "," + c;
+        var pCur = (bingoProgress[pKey] !== undefined) ? bingoProgress[pKey] : 0;
+        displayText = pCur + "/" + progressMatch[2];
+      }
       var isWin   = !!winCells[r + "," + c];
       var isFree  = /^free$/i.test(text.trim());
 
@@ -2431,7 +2440,7 @@ function renderBingo() {
         + ' oncontextmenu="openBingoEdit(event,' + r + ',' + c + ')"' : '';
 
       html += '<div class="' + cls + '"' + click + '>'
-        + '<span class="bingo-cell-text">' + escHtml(text) + '</span>'
+        + '<span class="bingo-cell-text">' + escHtml(displayText) + '</span>'
         + '</div>';
     }
   }
@@ -2448,12 +2457,40 @@ function renderBingo() {
 
 function toggleBingoCell(row, col) {
   if (!isAuthorized()) return;
-  if (!bingoChecked[row]) bingoChecked[row] = Array(5).fill(false);
-  bingoChecked[row][col] = !bingoChecked[row][col];
-  prevBingoStateSnap = JSON.stringify(bingoChecked);
-  renderBingo();
-  showToast((bingoChecked[row][col] ? "✔ " : "○ ") + (bingoCells[row] ? bingoCells[row][col] : ""), 2000);
-  writeBingoCellToSheet(row, col, bingoChecked[row][col]);
+  var text = (bingoCells[row] && bingoCells[row][col]) ? bingoCells[row][col] : "";
+  var progressMatch = text.match(/^(\d+)\/(\d+)$/);
+
+  if (progressMatch) {
+    // Feld ist bereits vollständig abgehakt → nichts tun
+    if (bingoChecked[row] && bingoChecked[row][col]) return;
+
+    var max     = parseInt(progressMatch[2], 10);
+    var key     = row + "," + col;
+    var current = (bingoProgress[key] !== undefined) ? bingoProgress[key] : 0;
+
+    current = Math.min(current + 1, max);
+    bingoProgress[key] = current;
+
+    if (current >= max) {
+      // Ziel erreicht → als abgehakt markieren
+      if (!bingoChecked[row]) bingoChecked[row] = Array(5).fill(false);
+      bingoChecked[row][col] = true;
+      prevBingoStateSnap = JSON.stringify(bingoChecked);
+      writeBingoCellToSheet(row, col, true);
+      showToast("✔ " + text + " abgeschlossen!", 2000);
+    } else {
+      showToast(current + "/" + max + " — " + text, 2000);
+    }
+    renderBingo();
+  } else {
+    // Normales Toggle-Feld
+    if (!bingoChecked[row]) bingoChecked[row] = Array(5).fill(false);
+    bingoChecked[row][col] = !bingoChecked[row][col];
+    prevBingoStateSnap = JSON.stringify(bingoChecked);
+    renderBingo();
+    showToast((bingoChecked[row][col] ? "✔ " : "○ ") + (bingoCells[row] ? bingoCells[row][col] : ""), 2000);
+    writeBingoCellToSheet(row, col, bingoChecked[row][col]);
+  }
 }
 
 function writeBingoCellToSheet(row, col, value) {
