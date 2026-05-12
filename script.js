@@ -1269,7 +1269,7 @@ function renderRanking(allBosses) {
 
   var maxDeaths       = top.length > 0 ? top[0].deaths : 1;
   var totalDeaths     = allBosses.reduce(function(s, b) { return s + b.deaths; }, 0);
-  var bossesAttempted = allBosses.filter(function(b) { return b.deaths > 0; }).length;
+  var bossesAttempted = allBosses.length;
   var avgDeaths       = bossesAttempted > 0 ? (totalDeaths / bossesAttempted).toFixed(1) : "–";
 
   document.getElementById("val-avg").textContent = avgDeaths === "–" ? "–" : avgDeaths + " †";
