@@ -16,11 +16,14 @@ const ALLOWED_USERS = [
 
 const SPREADSHEET_ID = "1r9BzZJYFrk4rQLlMn4ZPBBUuc8u_peqwThTi1UTCQcE";
 
-// Shared secret – muss mit SECRET_TOKEN im Apps Script übereinstimmen
-const SECRET_TOKEN = "idX2d27BsIBqORtyjJctHZXQSIbF1uUvnpcgAKpTvIE";
-
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
   + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json";
+
+// ── Twitch-Token für serverseitige Validierung ────────────────────────────
+function getTwitchToken() {
+  return localStorage.getItem("twitch_token") || "";
+}
+
 
 const CLIPS_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
   + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&range=W9:AB1000";
@@ -139,7 +142,7 @@ function toolboxSetElapsed() {
   if (TOOLBOX_SCRIPT_URL) {
     fetch(TOOLBOX_SCRIPT_URL
       + "?action=setElapsed&elapsed=" + encodeURIComponent(ms)
-      + "&token=" + encodeURIComponent(SECRET_TOKEN),
+      + "&twitchToken=" + encodeURIComponent(getTwitchToken()),
       { method: "GET", mode: "no-cors" }
     ).catch(function(e) { console.error("[Toolbox] setElapsed:", e); });
   }
@@ -162,7 +165,7 @@ function toolboxWriteCell(cell, value) {
   fetch(TOOLBOX_SCRIPT_URL
     + "?action=setCell&cell=" + encodeURIComponent(cell)
     + "&value=" + encodeURIComponent(value)
-    + "&token=" + encodeURIComponent(SECRET_TOKEN),
+    + "&twitchToken=" + encodeURIComponent(getTwitchToken()),
     { method: "GET", mode: "no-cors" }
   ).catch(function(e) { console.error("[Toolbox] setCell:", e); });
 }
@@ -172,7 +175,7 @@ function toolboxWriteTimerCells(startTs, elapsed) {
   fetch(TOOLBOX_SCRIPT_URL
     + "?action=setTimer&startTs=" + encodeURIComponent(startTs)
     + "&elapsed=" + encodeURIComponent(elapsed)
-    + "&token=" + encodeURIComponent(SECRET_TOKEN),
+    + "&twitchToken=" + encodeURIComponent(getTwitchToken()),
     { method: "GET", mode: "no-cors" }
   ).catch(function(e) { console.error("[Toolbox] setTimer:", e); });
 }
@@ -232,7 +235,7 @@ function toolboxTimerReset() {
   timerStartTs = 0;
   timerElapsed = 0;
   if (TOOLBOX_SCRIPT_URL) {
-    fetch(TOOLBOX_SCRIPT_URL + "?action=pulseCell&cell=L2&token=" + encodeURIComponent(SECRET_TOKEN), { method: "GET", mode: "no-cors" })
+    fetch(TOOLBOX_SCRIPT_URL + "?action=pulseCell&cell=L2&twitchToken=" + encodeURIComponent(getTwitchToken()), { method: "GET", mode: "no-cors" })
       .catch(function(e) { console.error("[Toolbox] pulseCell:", e); });
   }
   toolboxWriteTimerCells(0, 0);
@@ -696,7 +699,7 @@ function writeToSheet(area, boss, action, value) {
     + "&boss="   + encodeURIComponent(boss)
     + "&action=" + encodeURIComponent(action)
     + "&value="  + encodeURIComponent(value)
-    + "&token="  + encodeURIComponent(SECRET_TOKEN);
+    + "&twitchToken=" + encodeURIComponent(getTwitchToken());
 
   fetch(url, { method: "GET", mode: "no-cors" })
     .catch(function(err) {
@@ -761,7 +764,7 @@ function writeFieldDeathsToSheet(type, value) {
     + "?action=setFieldDeaths"
     + "&type="  + encodeURIComponent(type)
     + "&value=" + encodeURIComponent(value)
-    + "&token=" + encodeURIComponent(SECRET_TOKEN),
+    + "&twitchToken=" + encodeURIComponent(getTwitchToken()),
     { method: "GET", mode: "no-cors" }
   ).catch(function(err) { console.error("[FieldDeaths]", err); });
 }
@@ -1766,7 +1769,7 @@ function writeClipToSheet(url, category, title, boss, addedAt, creatorName) {
     + "&boss="        + encodeURIComponent(boss || "")
     + "&addedAt="     + encodeURIComponent(addedAt || getNowISO())
     + "&creatorName=" + encodeURIComponent(creatorName || "")
-    + "&token="       + encodeURIComponent(SECRET_TOKEN); // Spalte AB im Sheet
+    + "&twitchToken="  + encodeURIComponent(getTwitchToken()); // Spalte AB im Sheet
   fetch(reqUrl, { method: "GET", mode: "no-cors" })
     .catch(function(err) { console.error("[Clips] Schreibfehler:", err); });
 }
@@ -1874,7 +1877,7 @@ function writeBossTagToSheet(clipUrl, boss) {
     + "?action=setBossTag"
     + "&value=" + encodeURIComponent(clipUrl)
     + "&boss="  + encodeURIComponent(boss || "")
-    + "&token=" + encodeURIComponent(SECRET_TOKEN);
+    + "&twitchToken=" + encodeURIComponent(getTwitchToken());
   fetch(reqUrl, { method: "GET", mode: "no-cors" })
     .catch(function(err) { console.error("[Clips] BossTag Schreibfehler:", err); });
 }
@@ -2473,7 +2476,7 @@ function writeBingoCellToSheet(row, col, value) {
     + "&row="   + encodeURIComponent(row)
     + "&col="   + encodeURIComponent(col)
     + "&value=" + encodeURIComponent(value ? "TRUE" : "FALSE")
-    + "&token=" + encodeURIComponent(SECRET_TOKEN),
+    + "&twitchToken=" + encodeURIComponent(getTwitchToken()),
     { method: "GET", mode: "no-cors" }
   ).catch(function(e) { console.error("[Bingo] Schreibfehler:", e); });
 }
@@ -2530,7 +2533,7 @@ function writeBingoTextToSheet(row, col, text) {
     + "&row="   + encodeURIComponent(row)
     + "&col="   + encodeURIComponent(col)
     + "&value=" + encodeURIComponent(text)
-    + "&token=" + encodeURIComponent(SECRET_TOKEN),
+    + "&twitchToken=" + encodeURIComponent(getTwitchToken()),
     { method: "GET", mode: "no-cors" }
   ).catch(function(e) { console.error("[Bingo] Text-Schreibfehler:", e); });
 }
