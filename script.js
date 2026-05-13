@@ -470,7 +470,7 @@ function loginWithTwitch() {
     showToast("⚠ Twitch Client ID nicht konfiguriert!", 4000);
     return;
   }
-  var scope = "user:read:email";
+  var scope = "";
   var url   = "https://id.twitch.tv/oauth2/authorize"
     + "?client_id="    + encodeURIComponent(TWITCH_CLIENT_ID)
     + "&redirect_uri=" + encodeURIComponent(TWITCH_REDIRECT_URI)
