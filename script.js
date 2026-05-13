@@ -12,6 +12,7 @@ const ALLOWED_USERS = [
   "mahluna",
   "der_gude_nico",
   "Deeichkind",
+  "LinkPostman",
 ];
 
 const SPREADSHEET_ID = "1r9BzZJYFrk4rQLlMn4ZPBBUuc8u_peqwThTi1UTCQcE";
