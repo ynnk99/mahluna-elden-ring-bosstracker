@@ -2079,7 +2079,10 @@ function processData(rows) {
   var kBase = rows[1]   && rows[1].c[10]   ? (Number(rows[1].c[10].v)   || 0) : 0;
   var kDlc  = rows[168] && rows[168].c[10] ? (Number(rows[168].c[10].v) || 0) : 0;
   var globalDeaths;
-  if (showBase && showDLC)       globalDeaths = kBase + kDlc;
+  if (showOnlyMain) {
+    // Nur Tode bei Main Bossen zählen (allBosses ist bereits nach Main gefiltert)
+    globalDeaths = allBosses.reduce(function(s, b) { return s + b.deaths; }, 0);
+  } else if (showBase && showDLC)       globalDeaths = kBase + kDlc;
   else if (showBase && !showDLC) globalDeaths = kBase;
   else if (!showBase && showDLC) globalDeaths = kDlc;
   else                           globalDeaths = 0;
