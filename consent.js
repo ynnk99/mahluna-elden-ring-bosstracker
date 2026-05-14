@@ -12,22 +12,6 @@
 
   /* ── Ressourcen laden ─────────────────────────────────────────── */
 
-  function loadGoogleFonts() {
-    const pc1 = document.createElement('link');
-    pc1.rel = 'preconnect'; pc1.href = 'https://fonts.googleapis.com';
-    document.head.appendChild(pc1);
-
-    const pc2 = document.createElement('link');
-    pc2.rel = 'preconnect'; pc2.href = 'https://fonts.gstatic.com';
-    pc2.crossOrigin = 'anonymous';
-    document.head.appendChild(pc2);
-
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = 'https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap';
-    document.head.appendChild(link);
-  }
-
   function loadGoogleAnalytics() {
     const script = document.createElement('script');
     script.async = true;
@@ -44,7 +28,6 @@
   /* ── Einwilligung anwenden ────────────────────────────────────── */
 
   function applyConsent(analytics) {
-    loadGoogleFonts();          // Fonts immer nach Einwilligung laden
     if (analytics) loadGoogleAnalytics();
   }
 
@@ -220,10 +203,9 @@
         <div class="ccb-content">
           <div class="ccb-title">🍪 Datenschutz-Einstellungen</div>
           <p class="ccb-text">
-            Diese Seite lädt <strong>Google Fonts</strong> (Schriftarten, Server in den USA)
-            und <strong>Google Analytics</strong> (Nutzungsstatistiken, Tracking-Cookies).
-            Beide Dienste übertragen deine IP-Adresse an Google LLC, USA.
-            Ohne deine Einwilligung werden keine externen Ressourcen geladen.<br>
+            Diese Seite verwendet <strong>Google Analytics</strong> um anonymisierte
+            Nutzungsstatistiken zu erfassen. Dabei wird deine IP-Adresse an Google LLC, USA übertragen.
+            Ohne deine Einwilligung wird kein Tracking-Cookie gesetzt.<br>
             <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google Datenschutz</a>
             &nbsp;·&nbsp;
             <span role="button" tabindex="0" onclick="window.cookieConsent && window.cookieConsent.reset()" onkeydown="if(event.key==='Enter')window.cookieConsent&&window.cookieConsent.reset()" style="cursor:pointer;text-decoration:underline;">Einwilligung widerrufen</span>
@@ -232,7 +214,6 @@
         <div class="ccb-buttons">
           <button class="ccb-btn ccb-btn-accept" id="ccb-accept">Alle akzeptieren</button>
           <button class="ccb-btn ccb-btn-reject" id="ccb-reject">Nur notwendige</button>
-          <span class="ccb-settings-link">Google Fonts werden in beiden Fällen geladen.</span>
         </div>
       </div>
     `;
