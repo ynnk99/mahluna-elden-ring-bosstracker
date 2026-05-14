@@ -83,6 +83,7 @@ var timerStartTs  = 0;
 var timerElapsed  = 0;
 var timerVisible  = false;
 var timerInterval = null;
+var timerLabel    = ""; // M3: wenn befüllt, ersetzt "Aktueller Boss:" im Timer
 
 // ─── EDITOR TOOLBOX ────────────────────────────────────────────────────────
 var toolboxTimerTick = null;
@@ -1139,6 +1140,9 @@ function updateTimerDisplay() {
     ? timerElapsed + (Date.now() - timerStartTs)
     : timerElapsed;
   document.getElementById("val-timer").textContent = fmtTime(elapsed);
+  // M3: Custom Label – wenn leer, Standard "Aktueller Boss:" verwenden
+  var labelEl = document.getElementById("val-timer-label");
+  if (labelEl) labelEl.textContent = timerLabel ? timerLabel + ":" : "Aktueller Boss:";
 }
 
 function startTimerTick() {
@@ -2003,6 +2007,10 @@ function processData(rows) {
     timerElapsed = Number(rows[2] && rows[2].c[22] ? rows[2].c[22].v : 0) || 0;
     timerVisible = isTrue(rows[0] && rows[0].c[13] ? rows[0].c[13].v : false);
   }
+  // M3 (rows[2].c[12]): Custom Timer-Label – wenn befüllt, ersetzt "Aktueller Boss:"
+  timerLabel = (rows[2] && rows[2].c[12] && rows[2].c[12].v)
+    ? String(rows[2].c[12].v).trim()
+    : "";
   updateTimerDisplay();
   if (timerStartTs > 0) startTimerTick(); else if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
   toolboxSyncFromRows(rows);
