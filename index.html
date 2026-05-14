@@ -301,7 +301,54 @@
 
 <footer class="site-footer">
   &copy; ynnk99 &bull; Daten werden alle 5 Sekunden aus Google Sheets geladen &bull; Elden Ring Boss Tracker
+  &bull; <a href="#" class="footer-privacy-link" onclick="document.getElementById('privacy-modal').style.display='flex'; return false;">Datenschutz</a>
 </footer>
+
+<!-- ── DATENSCHUTZERKLÄRUNG MODAL ── -->
+<div id="privacy-modal" style="display:none;" class="privacy-modal-backdrop" onclick="if(event.target===this)this.style.display='none'">
+  <div class="privacy-modal-box" role="dialog" aria-modal="true" aria-label="Datenschutzerklärung">
+    <button class="privacy-modal-close" onclick="document.getElementById('privacy-modal').style.display='none'" title="Schließen">✕</button>
+    <div class="privacy-modal-content">
+
+      <h2>Datenschutzerklärung</h2>
+
+      <h3>1. Verantwortliche Person</h3>
+      <p>Diese Website ist ein privates, nicht-kommerzielles Fan-Projekt des Twitch-Streamers Mahluna (ynnk99). Anfragen zum Datenschutz können über den Twitch- oder Discord-Kanal gestellt werden.</p>
+
+      <h3>2. Was diese Seite ist</h3>
+      <p>Der Elden Ring Boss Tracker ist ein öffentlich zugängliches Overlay-Tool, das den Fortschritt beim Durchspielen von Elden Ring visualisiert. Die Daten werden live aus Google Sheets geladen und alle fünf Sekunden aktualisiert. Es werden keine Nutzerdaten auf eigenen Servern gespeichert.</p>
+
+      <h3>3. Google Analytics</h3>
+      <p>Mit deiner Einwilligung verwendet diese Seite Google Analytics 4, einen Webanalysedienst der Google LLC, 1600 Amphitheatre Parkway, Mountain View, CA 94043, USA. Dabei wird deine IP-Adresse an Google-Server in den USA übertragen und dort anonymisiert verarbeitet. Google Analytics setzt Cookies um Nutzungsstatistiken zu erfassen (z. B. Seitenaufrufe, Verweildauer). Eine Datenübertragung in die USA erfolgt auf Grundlage der EU-Standardvertragsklauseln.</p>
+      <p><strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. a DSGVO (Einwilligung).<br>
+      Du kannst deine Einwilligung jederzeit widerrufen über den Link „Einwilligung widerrufen" im Cookie-Banner, der nach dem Widerruf erneut angezeigt wird.</p>
+      <p>Weitere Informationen: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google Datenschutzerklärung</a> &nbsp;·&nbsp; <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener noreferrer">Google Analytics Opt-out</a></p>
+
+      <h3>4. Google Sheets (Datenabruf)</h3>
+      <p>Die Boss-Daten (Fortschritt, Tode, Zeiten) werden alle fünf Sekunden per HTTP-Request aus einem öffentlich freigegebenen Google Spreadsheet geladen. Dabei wird deine IP-Adresse im Rahmen der normalen HTTP-Kommunikation an Google übertragen. Es werden keine personenbezogenen Daten aus diesem Abruf gespeichert oder verarbeitet.<br>
+      <strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der Funktionalität der Seite).</p>
+
+      <h3>5. Twitch-Login (optionaler Editor-Zugang)</h3>
+      <p>Bestimmte Bearbeitungsfunktionen erfordern einen Login über Twitch OAuth. Dabei wirst du auf die Seite von Twitch Interactive, Inc. (USA) weitergeleitet. Nach erfolgreicher Authentifizierung speichert die Seite deinen Twitch-Zugriffstoken und deinen Twitch-Nutzernamen ausschließlich im <code>localStorage</code> deines Browsers – es erfolgt keine Übertragung an eigene Server. Die Daten werden beim Ausloggen gelöscht oder bleiben bis du sie manuell löschst.<br>
+      <strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. a DSGVO (Einwilligung durch aktive Anmeldung).</p>
+
+      <h3>6. Lokale Speicherung (localStorage)</h3>
+      <p>Diese Seite nutzt den <code>localStorage</code> deines Browsers um deine Cookie-Einwilligung sowie ggf. deinen Twitch-Token zu speichern. Diese Daten verlassen deinen Browser nicht und sind für andere Websites nicht zugänglich.</p>
+
+      <h3>7. Hosting</h3>
+      <p>Diese Seite wird über GitHub Pages (GitHub, Inc., USA) gehostet. GitHub kann dabei technische Zugriffsdaten (IP-Adresse, Zeitpunkt) protokollieren. Weitere Informationen: <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener noreferrer">GitHub Datenschutzerklärung</a>.</p>
+
+      <h3>8. Deine Rechte</h3>
+      <p>Du hast das Recht auf Auskunft, Berichtigung, Löschung und Einschränkung der Verarbeitung deiner Daten sowie das Recht auf Datenübertragbarkeit. Beschwerden kannst du bei der zuständigen Datenschutzbehörde einreichen (in Deutschland: der jeweilige Landesbeauftragte für Datenschutz).</p>
+
+      <div class="privacy-modal-footer">
+        <button class="privacy-consent-reset-btn" onclick="window.cookieConsent && window.cookieConsent.reset()">Cookie-Einwilligung zurücksetzen</button>
+        <span class="privacy-modal-date">Stand: Mai 2025</span>
+      </div>
+
+    </div>
+  </div>
+</div>
 
 <!-- ── BOSS CONTEXT MENU ── -->
 <div class="boss-menu" id="boss-menu" role="menu">
