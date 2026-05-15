@@ -302,7 +302,34 @@
 <footer class="site-footer">
   &copy; ynnk99 &bull; Daten werden alle 5 Sekunden aus Google Sheets geladen &bull; Elden Ring Boss Tracker
   &bull; <a href="#" class="footer-privacy-link" onclick="document.getElementById('privacy-modal').style.display='flex'; return false;">Datenschutz</a>
+  &bull; <a href="#" class="footer-privacy-link" onclick="document.getElementById('impressum-modal').style.display='flex'; return false;">Impressum</a>
 </footer>
+
+<!-- ── IMPRESSUM MODAL ── -->
+<div id="impressum-modal" style="display:none;" class="privacy-modal-backdrop" onclick="if(event.target===this)this.style.display='none'">
+  <div class="privacy-modal-box" role="dialog" aria-modal="true" aria-label="Impressum">
+    <button class="privacy-modal-close" onclick="document.getElementById('impressum-modal').style.display='none'" title="Schließen">✕</button>
+    <div class="privacy-modal-content">
+      <h2>Impressum</h2>
+      <h3>Angaben gemäß § 5 TMG</h3>
+      <p>
+        ynnk99<br>
+        (Privatperson, nicht-kommerzielles Projekt)
+      </p>
+      <h3>Kontakt</h3>
+      <p>
+        E-Mail: <a href="mailto:yalolp@gmail.com">yalolp@gmail.com</a>
+      </p>
+      <h3>Hinweis</h3>
+      <p>
+        Diese Website ist ein privates, nicht-kommerzielles Fan-Projekt. Es besteht keine Verbindung zu FromSoftware, Bandai Namco oder Twitch Interactive, Inc.
+      </p>
+      <div class="privacy-modal-footer">
+        <span class="privacy-modal-date">Stand: Mai 2025</span>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ── DATENSCHUTZERKLÄRUNG MODAL ── -->
 <div id="privacy-modal" style="display:none;" class="privacy-modal-backdrop" onclick="if(event.target===this)this.style.display='none'">
