@@ -1,7 +1,8 @@
 /**
  * consent.js – DSGVO-konformes Cookie-Banner
- * Blockiert Google Fonts & Google Analytics bis zur Einwilligung.
+ * Blockiert Google Analytics bis zur Einwilligung.
  * Speichert die Entscheidung in localStorage.
+ * Alle Schriften und Bibliotheken werden lokal ausgeliefert (keine externen CDN-Requests).
  */
 (function () {
   'use strict';
@@ -63,7 +64,7 @@
 
   function rejectAll() {
     saveConsent(false);
-    applyConsent(false); // Fonts werden trotzdem geladen (kein Tracking)
+    applyConsent(false);
     hideBanner();
   }
 
