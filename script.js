@@ -398,6 +398,8 @@ var pendingLocalChanges = {};
 var pendingLocalTimer   = 0; // timestamp of last toolbox timer action
 var fieldDeaths = { base: 0, dlc: 0 };
 var fieldDeathsTimer = { base: null, dlc: null };
+var fieldDeathsPending = { base: 0, dlc: 0 }; // timestamp of last local write (grace period)
+var FIELD_DEATHS_GRACE = 10000; // 10s – same grace as pendingLocalChanges
 var liveCheckInterval = null;
 
 // Auth state
@@ -739,6 +741,7 @@ function adjustFieldDeaths(type, delta) {
   var newVal = Math.max(0, fieldDeaths[type] + delta);
   fieldDeaths[type] = newVal;
   document.getElementById("fdeath-val-" + type).textContent = newVal;
+  fieldDeathsPending[type] = Date.now(); // protect against processData overwrite
   if (fieldDeathsTimer[type]) clearTimeout(fieldDeathsTimer[type]);
   var t = type, v = newVal;
   fieldDeathsTimer[type] = setTimeout(function() {
@@ -1983,8 +1986,8 @@ function processData(rows) {
   if (isAuthorized()) {
     var fdBase = rows[1]   && rows[1].c[9]   ? (Number(rows[1].c[9].v)   || 0) : 0;
     var fdDlc  = rows[168] && rows[168].c[9] ? (Number(rows[168].c[9].v) || 0) : 0;
-    if (!fieldDeathsTimer.base) { fieldDeaths.base = fdBase; document.getElementById("fdeath-val-base").textContent = fdBase; }
-    if (!fieldDeathsTimer.dlc)  { fieldDeaths.dlc  = fdDlc;  document.getElementById("fdeath-val-dlc").textContent  = fdDlc; }
+    if (!fieldDeathsTimer.base && Date.now() - fieldDeathsPending.base > FIELD_DEATHS_GRACE) { fieldDeaths.base = fdBase; document.getElementById("fdeath-val-base").textContent = fdBase; }
+    if (!fieldDeathsTimer.dlc  && Date.now() - fieldDeathsPending.dlc  > FIELD_DEATHS_GRACE) { fieldDeaths.dlc  = fdDlc;  document.getElementById("fdeath-val-dlc").textContent  = fdDlc; }
     document.getElementById("field-deaths-bar").style.display = "flex";
   } else {
     document.getElementById("field-deaths-bar").style.display = "none";
