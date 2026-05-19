@@ -971,8 +971,9 @@ document.addEventListener("click", function(e) {
 
 var quickClipMenuOpen = false;
 var quickClipBoss     = "";
+var quickClipArea     = "";
 
-function openQuickClipMenu(e, bossName) {
+function openQuickClipMenu(e, bossName, areaName) {
   if (!isAuthorized()) return;
   e.preventDefault();
   e.stopPropagation();
@@ -981,6 +982,7 @@ function openQuickClipMenu(e, bossName) {
   if (menuOpen) closeBossMenu();
 
   quickClipBoss = bossName;
+  quickClipArea = areaName || "";
   document.getElementById("quick-clip-boss-name").textContent = bossName;
   document.getElementById("quick-clip-url").value             = "";
   document.getElementById("quick-clip-cat").value             = "Allgemein";
@@ -1025,6 +1027,7 @@ function submitQuickClip() {
   var url      = urlEl.value.trim();
   var category = catEl.value;
   var boss     = quickClipBoss;
+  var area     = quickClipArea;
 
   feedEl.className = "quick-clip-feedback";
 
@@ -1053,7 +1056,7 @@ function submitQuickClip() {
   feedEl.textContent = "⏳ Clip-Datum wird abgerufen…";
 
   fetchTwitchClipData(parsed.slug).then(function(clipData) {
-    var newClip = { url: url, category: category, title: "", boss: boss, addedAt: clipData.addedAt, creatorName: clipData.creatorName };
+    var newClip = { url: url, category: category, title: "", boss: boss, area: area, addedAt: clipData.addedAt, creatorName: clipData.creatorName };
     clipsData.push(newClip);
     rebuildClipsByBoss();
 
@@ -1067,7 +1070,7 @@ function submitQuickClip() {
     feedEl.textContent = "✔ Clip gespeichert!";
     feedEl.classList.add("success");
 
-    writeClipToSheet(url, category, "", boss, clipData.addedAt, clipData.creatorName);
+    writeClipToSheet(url, category, "", boss, clipData.addedAt, clipData.creatorName, area);
 
     setTimeout(closeQuickClipMenu, 1400);
   });
@@ -1763,17 +1766,19 @@ function submitNewClip() {
   });
 }
 
-function writeClipToSheet(url, category, title, boss, addedAt, creatorName) {
+function writeClipToSheet(url, category, title, boss, addedAt, creatorName, area) {
   if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === "DEINE_APPS_SCRIPT_URL_HIER") {
     console.warn("[Clips] Apps Script URL nicht konfiguriert – Clip nur lokal.");
     return;
   }
+  // Gebiet in Boss-Feld encodieren: "Area|Boss" — wird beim Laden wieder geparst
+  var bossEncoded = (area && area.length > 0) ? area + "|" + boss : boss;
   var reqUrl = APPS_SCRIPT_URL
     + "?action=addClip"
     + "&value="       + encodeURIComponent(url)
     + "&category="    + encodeURIComponent(category)
     + "&title="       + encodeURIComponent(title)
-    + "&boss="        + encodeURIComponent(boss || "")
+    + "&boss="        + encodeURIComponent(bossEncoded)
     + "&addedAt="     + encodeURIComponent(addedAt || getNowISO())
     + "&creatorName=" + encodeURIComponent(creatorName || "")
     + "&twitchToken="  + encodeURIComponent(getTwitchToken()); // Spalte AB im Sheet
@@ -1800,8 +1805,10 @@ function rebuildClipsByBoss() {
   clipsByBoss = {};
   clipsData.forEach(function(c) {
     if (c.boss) {
-      if (!clipsByBoss[c.boss]) clipsByBoss[c.boss] = [];
-      clipsByBoss[c.boss].push(c);
+      // Clips mit Gebiet werden unter "Area|Boss" abgelegt, ohne Gebiet unter "Boss"
+      var key = (c.area && c.area.length > 0) ? c.area + "|" + c.boss : c.boss;
+      if (!clipsByBoss[key]) clipsByBoss[key] = [];
+      clipsByBoss[key].push(c);
     }
   });
 }
@@ -1814,9 +1821,13 @@ function getBossOptions(selectedBoss) {
   return opts;
 }
 
-function openBossClipsPanel(bossName, e) {
+function openBossClipsPanel(bossName, areaName, e) {
   if (e) e.stopPropagation();
-  var clips = clipsByBoss[bossName] || [];
+  // Zuerst gebietsspezifische Clips, dann Fallback auf namensbezogene (Legacy/Modal)
+  var bossKey = (areaName && areaName.length > 0) ? areaName + "|" + bossName : bossName;
+  var clips = (clipsByBoss[bossKey] || []).concat(clipsByBoss[bossName] || []);
+  // Duplikate entfernen (falls ein Clip sowohl unter altem als auch neuem Key gespeichert ist)
+  clips = clips.filter(function(c, i, arr) { return arr.findIndex(function(x) { return x.url === c.url; }) === i; });
   if (clips.length === 0) return;
 
   document.getElementById("boss-clips-heading").textContent = bossName;
@@ -1846,7 +1857,9 @@ function updateClipBoss(clipUrl, newBoss) {
   if (!clip) return;
 
   var oldBoss = clip.boss || "";
-  clip.boss   = newBoss;
+  var oldArea = clip.area || "";
+  clip.boss = newBoss;
+  clip.area = "";  // Manuelle Zuweisung im Modal hat kein Gebiet
   rebuildClipsByBoss();
 
   var panel = document.getElementById("boss-clips-modal");
@@ -1854,7 +1867,9 @@ function updateClipBoss(clipUrl, newBoss) {
     var heading  = document.getElementById("boss-clips-heading");
     var panelBoss = heading ? heading.textContent : "";
     if (panelBoss === oldBoss || panelBoss === newBoss) {
-      var clips = clipsByBoss[panelBoss] || [];
+      var panelKey = oldArea ? oldArea + "|" + panelBoss : panelBoss;
+      var clips = (clipsByBoss[panelKey] || []).concat(clipsByBoss[panelBoss] || []);
+      clips = clips.filter(function(c, i, arr) { return arr.findIndex(function(x) { return x.url === c.url; }) === i; });
       var body  = document.getElementById("boss-clips-body");
       var badge = document.getElementById("boss-clips-badge");
       if (clips.length === 0) {
@@ -1917,10 +1932,18 @@ function loadClips() {
         var url         = row.c[0] && row.c[0].v ? String(row.c[0].v).trim() : "";
         var category    = row.c[1] && row.c[1].v ? String(row.c[1].v).trim() : "Sonstige";
         var title       = row.c[2] && row.c[2].v ? String(row.c[2].v).trim() : "";
-        var boss        = row.c[3] && row.c[3].v ? String(row.c[3].v).trim() : "";
+        var bossRaw     = row.c[3] && row.c[3].v ? String(row.c[3].v).trim() : "";
         var addedAt     = row.c[4] && row.c[4].v ? String(row.c[4].v).trim() : "";
         var creatorName = row.c[5] && row.c[5].v ? String(row.c[5].v).trim() : "";
-        if (url) newClips.push({ url: url, category: category, title: title, boss: boss, addedAt: addedAt, creatorName: creatorName });
+        // "Area|Boss"-Encoding auflösen (seit Bug-Fix)
+        var areaParsed  = "";
+        var bossParsed  = bossRaw;
+        var pipeIdx = bossRaw.indexOf("|");
+        if (pipeIdx > 0) {
+          areaParsed = bossRaw.substring(0, pipeIdx);
+          bossParsed = bossRaw.substring(pipeIdx + 1);
+        }
+        if (url) newClips.push({ url: url, category: category, title: title, boss: bossParsed, area: areaParsed, addedAt: addedAt, creatorName: creatorName });
       });
 
       var clipsChanged = JSON.stringify(newClips) !== JSON.stringify(clipsData);
@@ -2271,12 +2294,13 @@ function renderBossRow(b, areaName) {
     : '';
 
   var ctxAttr = isAuthorized()
-    ? ' oncontextmenu="openQuickClipMenu(event,\'' + escAttr(b.boss) + '\')"'
+    ? ' oncontextmenu="openQuickClipMenu(event,\'' + escAttr(b.boss) + '\',\'' + escAttr(areaName) + '\')"'
     : '';
 
-  var bossClipCount = (clipsByBoss[b.boss] || []).length;
+  var bossClipKey   = areaName + "|" + b.boss;
+  var bossClipCount = ((clipsByBoss[bossClipKey] || []).length) + ((clipsByBoss[b.boss] || []).length);
   var clipBadge = bossClipCount > 0
-    ? '<span class="boss-clip-badge" onclick="openBossClipsPanel(\'' + escAttr(b.boss) + '\',event)" title="' + bossClipCount + ' Clip' + (bossClipCount > 1 ? 's' : '') + ' ansehen">🎬 ' + bossClipCount + '</span>'
+    ? '<span class="boss-clip-badge" onclick="openBossClipsPanel(\'' + escAttr(b.boss) + '\',\'' + escAttr(areaName) + '\',event)" title="' + bossClipCount + ' Clip' + (bossClipCount > 1 ? 's' : '') + ' ansehen">🎬 ' + bossClipCount + '</span>'
     : '';
 
   return '<div class="boss-row' + (b.done ? " done" : "") + editClass + '"'
