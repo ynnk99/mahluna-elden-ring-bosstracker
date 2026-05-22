@@ -2285,3 +2285,14 @@ body.editor-mode { padding-left: 0; }
 }
 .privacy-consent-reset-btn:hover { color: #c8b078; border-color: #7a5c1e; }
 .privacy-modal-date { font-size: 12px; color: #5a4a28; }
+
+/* ── Sticky Controls ── */
+.sticky-controls-wrapper {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  background: var(--bg, #0e0b07); /* passt deine CSS-Variable an */
+  padding-bottom: 6px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.55);
+  border-bottom: 1px solid rgba(201, 164, 74, 0.12);
+}
