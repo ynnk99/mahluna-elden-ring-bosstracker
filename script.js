@@ -400,6 +400,7 @@ var fieldDeaths = { base: 0, dlc: 0 };
 var fieldDeathsTimer = { base: null, dlc: null };
 var fieldDeathsPending = { base: 0, dlc: 0 }; // timestamp of last local write (grace period)
 var FIELD_DEATHS_GRACE = 10000; // 10s – same grace as pendingLocalChanges
+var PENDING_GRACE = 35000; // 35s – Zeit bis Sheet-Wert nach lokalem Write wieder übernommen wird (GAS braucht bis zu 30s)
 var liveCheckInterval = null;
 
 // Auth state
@@ -2033,7 +2034,7 @@ function processData(rows) {
     timerElapsed = Number(rows[2] && rows[2].c[22] ? rows[2].c[22].v : 0) || 0;
     timerVisible = isTrue(rows[0] && rows[0].c[13] ? rows[0].c[13].v : false);
   }
-  // M3 (rows[2].c[12]): Custom Timer-Label – wenn befüllt, ersetzt "Aktueller Boss:"
+  // M3 (rows[2].c[12]): Custom Timer-Label – wenn leer, ersetzt "Aktueller Boss:"
   timerLabel = (rows[2] && rows[2].c[12] && rows[2].c[12].v)
     ? String(rows[2].c[12].v).trim()
     : "";
@@ -2077,7 +2078,7 @@ function processData(rows) {
     var pendingKey = area + "|" + boss;
     if (pendingLocalChanges[pendingKey]) {
       var age = Date.now() - pendingLocalChanges[pendingKey];
-      if (age < 10000) {
+      if (age < PENDING_GRACE) { // ← FIX: war 10000, jetzt PENDING_GRACE (35s)
         var localBoss = currentAreas[area] && currentAreas[area].bosses.find(function(b) { return b.boss === boss; });
         if (localBoss) {
           deaths = localBoss.deaths;
