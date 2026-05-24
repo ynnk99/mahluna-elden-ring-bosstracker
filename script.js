@@ -140,7 +140,7 @@ function renderBossLevelPanel() {
     var isMain = MAIN_BOSSES.has(b.boss);
     // DLC: "Scadubaum-Stufe X", Base Game: "Lv X"
     var displayLevel = String(b.level).split("/")[0].trim();
-    var levelLabel   = b.isDLC ? 'Stufe&nbsp;' : 'Lv&nbsp;';
+    var levelLabel   = b.isDLC ? 'Scadu-Lvl.&nbsp;' : 'Lvl&nbsp;';
     return '<div class="boss-level-entry' + (isMain ? " main" : "") + '">'
       + '<span class="boss-level-rank">' + (i + 1) + '</span>'
       + '<span class="boss-level-badge' + (b.isDLC ? ' dlc' : '') + '">' + levelLabel + escHtml(displayLevel) + '</span>'
