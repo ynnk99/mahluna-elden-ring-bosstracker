@@ -107,10 +107,26 @@ function renderBossLevelPanel() {
   var list = document.getElementById("boss-level-list");
   if (!list) return;
 
+  // Hilfsfunktion: "9/2" → { primary: 9, secondary: 2 }; "9" → { primary: 9, secondary: 0 }
+  function parseLevel(raw) {
+    if (!raw) return null;
+    var parts = String(raw).split("/");
+    var p = parseInt(parts[0], 10);
+    var s = parts.length > 1 ? parseInt(parts[1], 10) : 0;
+    return isNaN(p) ? null : { primary: p, secondary: isNaN(s) ? 0 : s };
+  }
+
+  // Nur besiegte Bosse mit gültigem Level
   var done = bossLevelData.filter(function(b) {
-    return b.done && b.level !== null && !isNaN(b.level);
+    return b.done && b.level !== null && parseLevel(b.level) !== null;
   });
-  done.sort(function(a, b) { return a.level - b.level; });
+
+  // Aufsteigend sortieren: erst nach Level (vor /), dann nach Suffix (nach /)
+  done.sort(function(a, b) {
+    var pa = parseLevel(a.level), pb = parseLevel(b.level);
+    if (pa.primary !== pb.primary) return pa.primary - pb.primary;
+    return pa.secondary - pb.secondary;
+  });
 
   var subtitle = document.getElementById("boss-level-subtitle");
   if (subtitle) subtitle.textContent = done.length + " Bosse besiegt";
@@ -122,9 +138,11 @@ function renderBossLevelPanel() {
 
   list.innerHTML = done.map(function(b, i) {
     var isMain = MAIN_BOSSES.has(b.boss);
+    // Nur den Teil vor dem Slash anzeigen
+    var displayLevel = String(b.level).split("/")[0].trim();
     return '<div class="boss-level-entry' + (isMain ? " main" : "") + '">'
       + '<span class="boss-level-rank">' + (i + 1) + '</span>'
-      + '<span class="boss-level-badge">Lv&nbsp;' + b.level + '</span>'
+      + '<span class="boss-level-badge">Lv&nbsp;' + escHtml(displayLevel) + '</span>'
       + '<div class="boss-level-info">'
       + '<span class="boss-level-name' + (isMain ? " main" : "") + '">' + escHtml(b.boss) + '</span>'
       + '<span class="boss-level-area">' + escHtml(b.area) + '</span>'
@@ -2123,8 +2141,8 @@ function processData(rows) {
     var date           = r.c[3] && r.c[3].f ? r.c[3].f.trim() : "";
     var deaths         = Number(r.c[4] ? r.c[4].v : 0) || 0;
     var pinned         = isTrue(r.c[5] ? r.c[5].v : false);
-    // Spalte G (Index 6): Level beim Boss-Kill
-    var level          = (r.c[6] && r.c[6].v !== null && r.c[6].v !== "") ? (Number(r.c[6].v) || null) : null;
+    // Spalte G (Index 6): Level beim Boss-Kill, z.B. "9" oder "9/2" (gleiche Level aufsteigend nummeriert)
+    var level          = (r.c[6] && r.c[6].v !== null && r.c[6].v !== "") ? String(r.c[6].v).trim() : null;
 
     if (showOnlyDone && !done) return;
     if (showOnlyOpen && done) return;
