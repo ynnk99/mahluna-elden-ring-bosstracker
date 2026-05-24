@@ -87,6 +87,56 @@ var timerVisible  = false;
 var timerInterval = null;
 var timerLabel    = ""; // M3: wenn befüllt, ersetzt "Aktueller Boss:" im Timer
 
+// ─── BOSS LEVEL PANEL ────────────────────────────────────────────────────────
+var bossLevelData = []; // { boss, level, area, deaths, done, isMain }
+
+function openBossLevelPanel() {
+  document.getElementById("boss-level-backdrop").classList.add("open");
+  document.getElementById("boss-level-modal").classList.add("open");
+  document.body.style.overflow = "hidden";
+  renderBossLevelPanel();
+}
+
+function closeBossLevelPanel() {
+  document.getElementById("boss-level-backdrop").classList.remove("open");
+  document.getElementById("boss-level-modal").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+function renderBossLevelPanel() {
+  var list = document.getElementById("boss-level-list");
+  if (!list) return;
+
+  var done = bossLevelData.filter(function(b) {
+    return b.done && b.level !== null && !isNaN(b.level);
+  });
+  done.sort(function(a, b) { return a.level - b.level; });
+
+  var subtitle = document.getElementById("boss-level-subtitle");
+  if (subtitle) subtitle.textContent = done.length + " Bosse besiegt";
+
+  if (done.length === 0) {
+    list.innerHTML = '<div class="boss-level-empty">Noch keine Bosse mit Level-Eintrag besiegt.</div>';
+    return;
+  }
+
+  list.innerHTML = done.map(function(b, i) {
+    var isMain = MAIN_BOSSES.has(b.boss);
+    return '<div class="boss-level-entry' + (isMain ? " main" : "") + '">'
+      + '<span class="boss-level-rank">' + (i + 1) + '</span>'
+      + '<span class="boss-level-badge">Lv&nbsp;' + b.level + '</span>'
+      + '<div class="boss-level-info">'
+      + '<span class="boss-level-name' + (isMain ? " main" : "") + '">' + escHtml(b.boss) + '</span>'
+      + '<span class="boss-level-area">' + escHtml(b.area) + '</span>'
+      + '</div>'
+      + '<span class="boss-level-deaths' + (b.deaths === 0 ? " nodeath" : "") + '">'
+      + (b.deaths > 0 ? '†' + b.deaths : '†–')
+      + '</span>'
+      + '</div>';
+  }).join("");
+}
+// ─── END BOSS LEVEL PANEL ────────────────────────────────────────────────────
+
 // ─── EDITOR TOOLBOX ────────────────────────────────────────────────────────
 var toolboxTimerTick = null;
 // GEÄNDERT: alle Zellnamen auf neue Spaltenadressen angepasst (N→O, Q→R, S→T, Y→Z)
@@ -1103,6 +1153,7 @@ document.addEventListener("touchend", function(e) {
 
 document.addEventListener("keydown", function(e) {
   if (e.key === "Escape") {
+    closeBossLevelPanel();
     closeBossClipsPanel();
     closeBingoEdit();
     closeClipModal();
@@ -2072,6 +2123,8 @@ function processData(rows) {
     var date           = r.c[3] && r.c[3].f ? r.c[3].f.trim() : "";
     var deaths         = Number(r.c[4] ? r.c[4].v : 0) || 0;
     var pinned         = isTrue(r.c[5] ? r.c[5].v : false);
+    // Spalte G (Index 6): Level beim Boss-Kill
+    var level          = (r.c[6] && r.c[6].v !== null && r.c[6].v !== "") ? (Number(r.c[6].v) || null) : null;
 
     if (showOnlyDone && !done) return;
     if (showOnlyOpen && done) return;
@@ -2108,9 +2161,9 @@ function processData(rows) {
 
     areas[area].total++;
     if (done) areas[area].done++;
-    areas[area].bosses.push({ boss: boss, done: done, deaths: deaths, pinned: pinned });
+    areas[area].bosses.push({ boss: boss, done: done, deaths: deaths, pinned: pinned, level: level });
 
-    allBosses.push({ boss: boss, deaths: deaths, done: done, area: area, date: date });
+    allBosses.push({ boss: boss, deaths: deaths, done: done, area: area, date: date, level: level });
   });
 
   // GEÄNDERT: K→L, 0-basiert: 10→11
@@ -2170,6 +2223,12 @@ function processData(rows) {
   if (chartSnapshot !== prevChartSnapshot) {
     prevChartSnapshot = chartSnapshot;
     renderChart(allBosses);
+  }
+
+  // Levelübersicht aktualisieren (alle gefilterten Bosse mit Level)
+  bossLevelData = allBosses;
+  if (document.getElementById("boss-level-modal").classList.contains("open")) {
+    renderBossLevelPanel();
   }
 
   renderAreas(areas);
