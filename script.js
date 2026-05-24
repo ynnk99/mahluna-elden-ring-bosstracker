@@ -26,12 +26,12 @@ function getTwitchToken() {
 
 
 const CLIPS_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
-  + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&range=W9:AB1000";
+  + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&range=X9:AC1000";
 
 const BINGO_TEXT_URL  = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
-  + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&range=N15:R19";
+  + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&range=O15:S19";
 const BINGO_STATE_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
-  + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&range=N20:R24";
+  + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&range=O20:S24";
 
 const RANKING_TOP_N = 10;
 const STREAMER_LOGIN = "mahluna";
