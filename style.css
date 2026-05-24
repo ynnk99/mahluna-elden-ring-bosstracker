@@ -2494,8 +2494,8 @@ body.editor-mode { padding-left: 0; }
 }
 .boss-level-area {
   font-family: 'Crimson Pro', serif;
-  font-size: 12px;
-  color: #5a4f38;
+  font-size: 15px;
+  color: #DECFCC;
   font-style: italic;
   white-space: nowrap;
   overflow: hidden;
