@@ -138,10 +138,11 @@
       <span>Tode:</span>
       <span class="value" id="val-deaths">–</span>
     </div>
-    <div class="stat-chip" id="stat-bosses">
+    <div class="stat-chip stat-chip-clickable" id="stat-bosses" onclick="openBossLevelPanel()" title="Besiegte Bosse nach Level sortiert anzeigen">
       <span class="icon">🏆</span>
       <span>Bosse:</span>
       <span class="value" id="val-bosses">–</span>
+      <span class="stat-chip-arrow">▾</span>
     </div>
     <div class="stat-chip" id="stat-percent">
       <span class="icon">📜</span>
@@ -557,6 +558,247 @@
     <button class="bingo-edit-save" onclick="saveBingoEdit()">✓ Speichern</button>
   </div>
 </div>
+
+<!-- ── BOSS LEVEL MODAL ── -->
+<div class="boss-level-backdrop" id="boss-level-backdrop" onclick="closeBossLevelPanel()"></div>
+<div class="boss-level-modal" id="boss-level-modal" role="dialog" aria-modal="true" aria-label="Besiegte Bosse nach Level">
+  <div class="boss-level-inner">
+    <div class="boss-level-header">
+      <div class="boss-level-title">
+        <span class="boss-level-title-icon">🏆</span>
+        <div>
+          <h2>Besiegte Bosse</h2>
+          <span class="boss-level-subtitle" id="boss-level-subtitle">wird geladen…</span>
+        </div>
+      </div>
+      <button class="clip-close-btn" onclick="closeBossLevelPanel()" title="Schließen">✕</button>
+    </div>
+    <div class="boss-level-table-head">
+      <span class="blh-rank">#</span>
+      <span class="blh-level">Level</span>
+      <span class="blh-name">Boss</span>
+      <span class="blh-deaths">Tode</span>
+    </div>
+    <div class="boss-level-list" id="boss-level-list"></div>
+  </div>
+</div>
+
+<style>
+/* ── BOSSES CHIP: CLICKABLE ── */
+.stat-chip-clickable {
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.18s, border-color 0.18s, transform 0.12s;
+  position: relative;
+}
+.stat-chip-clickable:hover {
+  background: rgba(201, 164, 74, 0.13) !important;
+  border-color: rgba(201, 164, 74, 0.6) !important;
+  transform: translateY(-1px);
+}
+.stat-chip-clickable:active {
+  transform: translateY(0);
+}
+.stat-chip-arrow {
+  font-size: 13px;
+  color: var(--gold-dim, #a89060);
+  margin-left: 2px;
+  line-height: 1;
+  transition: color 0.18s;
+}
+.stat-chip-clickable:hover .stat-chip-arrow {
+  color: var(--gold, #c9a44a);
+}
+
+/* ── BOSS LEVEL MODAL ── */
+.boss-level-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 3, 1, 0.72);
+  z-index: 1100;
+  backdrop-filter: blur(3px);
+}
+.boss-level-backdrop.open { display: block; }
+
+.boss-level-modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -48%) scale(0.97);
+  opacity: 0;
+  width: min(680px, 96vw);
+  max-height: 82vh;
+  background: #100d08;
+  border: 1px solid rgba(201, 164, 74, 0.35);
+  border-radius: 6px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(201,164,74,0.08);
+  z-index: 1101;
+  overflow: hidden;
+  flex-direction: column;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.boss-level-modal.open {
+  display: flex;
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.boss-level-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.boss-level-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid rgba(201,164,74,0.15);
+  flex-shrink: 0;
+}
+.boss-level-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.boss-level-title-icon {
+  font-size: 26px;
+  line-height: 1;
+  filter: drop-shadow(0 0 6px rgba(201,164,74,0.4));
+}
+.boss-level-title h2 {
+  font-family: 'Cinzel', serif;
+  font-size: 17px;
+  color: #e3b873;
+  margin: 0 0 2px 0;
+  letter-spacing: 0.06em;
+}
+.boss-level-subtitle {
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 13px;
+  color: #8a7a60;
+  font-style: italic;
+}
+
+/* ── TABLE HEADER ── */
+.boss-level-table-head {
+  display: grid;
+  grid-template-columns: 32px 72px 1fr 52px;
+  gap: 0 10px;
+  padding: 8px 22px 8px 18px;
+  background: rgba(201,164,74,0.05);
+  border-bottom: 1px solid rgba(201,164,74,0.1);
+  flex-shrink: 0;
+}
+.boss-level-table-head span {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: #6a5c40;
+  text-transform: uppercase;
+}
+.blh-deaths { text-align: right; }
+
+/* ── LIST ── */
+.boss-level-list {
+  overflow-y: auto;
+  flex: 1;
+  padding: 4px 0 10px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201,164,74,0.25) transparent;
+}
+.boss-level-list::-webkit-scrollbar { width: 5px; }
+.boss-level-list::-webkit-scrollbar-track { background: transparent; }
+.boss-level-list::-webkit-scrollbar-thumb { background: rgba(201,164,74,0.25); border-radius: 3px; }
+
+.boss-level-empty {
+  padding: 40px 22px;
+  text-align: center;
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  color: #5a4f38;
+  font-size: 15px;
+}
+
+/* ── ENTRY ROW ── */
+.boss-level-entry {
+  display: grid;
+  grid-template-columns: 32px 72px 1fr 52px;
+  gap: 0 10px;
+  align-items: center;
+  padding: 7px 22px 7px 18px;
+  border-bottom: 1px solid rgba(201,164,74,0.055);
+  transition: background 0.14s;
+}
+.boss-level-entry:hover { background: rgba(201,164,74,0.055); }
+.boss-level-entry.main {
+  background: rgba(201,164,74,0.04);
+}
+.boss-level-entry.main:hover { background: rgba(201,164,74,0.09); }
+
+.boss-level-rank {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  color: #5a4f38;
+  text-align: center;
+}
+
+.boss-level-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: #e3b873;
+  background: rgba(201,164,74,0.12);
+  border: 1px solid rgba(201,164,74,0.28);
+  border-radius: 4px;
+  padding: 2px 8px;
+  letter-spacing: 0.04em;
+  min-width: 56px;
+}
+
+.boss-level-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.boss-level-name {
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 15px;
+  color: #c8bfa8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.boss-level-name.main {
+  color: #e3b873;
+  font-weight: 600;
+}
+.boss-level-area {
+  font-family: 'Crimson Pro', serif;
+  font-size: 12px;
+  color: #5a4f38;
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.boss-level-deaths {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  color: #8a7260;
+  text-align: right;
+}
+.boss-level-deaths.nodeath { color: #3a3228; }
+</style>
 
 <script src="script.js"></script>
 </body>
