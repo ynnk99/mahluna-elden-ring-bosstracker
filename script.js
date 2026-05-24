@@ -138,11 +138,12 @@ function renderBossLevelPanel() {
 
   list.innerHTML = done.map(function(b, i) {
     var isMain = MAIN_BOSSES.has(b.boss);
-    // Nur den Teil vor dem Slash anzeigen
+    // DLC: "Scadubaum-Stufe X", Base Game: "Lv X"
     var displayLevel = String(b.level).split("/")[0].trim();
+    var levelLabel   = b.isDLC ? 'Stufe&nbsp;' : 'Lv&nbsp;';
     return '<div class="boss-level-entry' + (isMain ? " main" : "") + '">'
       + '<span class="boss-level-rank">' + (i + 1) + '</span>'
-      + '<span class="boss-level-badge">Lv&nbsp;' + escHtml(displayLevel) + '</span>'
+      + '<span class="boss-level-badge' + (b.isDLC ? ' dlc' : '') + '">' + levelLabel + escHtml(displayLevel) + '</span>'
       + '<div class="boss-level-info">'
       + '<span class="boss-level-name' + (isMain ? " main" : "") + '">' + escHtml(b.boss) + '</span>'
       + '<span class="boss-level-area">' + escHtml(b.area) + '</span>'
@@ -2181,7 +2182,7 @@ function processData(rows) {
     if (done) areas[area].done++;
     areas[area].bosses.push({ boss: boss, done: done, deaths: deaths, pinned: pinned, level: level });
 
-    allBosses.push({ boss: boss, deaths: deaths, done: done, area: area, date: date, level: level });
+    allBosses.push({ boss: boss, deaths: deaths, done: done, area: area, date: date, level: level, isDLC: isDLC });
   });
 
   // GEÄNDERT: K→L, 0-basiert: 10→11
