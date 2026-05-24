@@ -17,7 +17,7 @@
 
   <!-- Button: Timer -->
   <div class="etb-item" id="etb-item-timer">
-    <button class="etb-icon-btn" onclick="toolboxOpenPanel('timer')" title="Timer">
+    <button class="etb-icon-btn" onclick="toolboxOpenPanel('timer')" data-tip="Timer" data-tip-always="1">
       <span>⏳</span>
     </button>
     <div class="etb-panel" id="etb-panel-timer">
@@ -44,14 +44,14 @@
         <input type="number" class="etb-time-input" id="etb-elapsed-s"
                min="0" max="59" placeholder="00"
                onkeydown="if(event.key==='Enter')toolboxSetElapsed()">
-        <button class="etb-time-set-btn" onclick="toolboxSetElapsed()" title="Timer auf diese Zeit setzen">↵</button>
+        <button class="etb-time-set-btn" onclick="toolboxSetElapsed()" data-tip="Timer auf diese Zeit setzen" data-tip-always="1">↵</button>
       </div>
     </div>
   </div>
 
   <!-- Button: OBS -->
   <div class="etb-item" id="etb-item-obs">
-    <button class="etb-icon-btn" onclick="toolboxOpenPanel('obs')" title="OBS">
+    <button class="etb-icon-btn" onclick="toolboxOpenPanel('obs')" data-tip="OBS" data-tip-always="1">
       <span>📺</span>
     </button>
     <div class="etb-panel" id="etb-panel-obs">
@@ -67,7 +67,7 @@
 
   <!-- Button: Filter -->
   <div class="etb-item" id="etb-item-filter">
-    <button class="etb-icon-btn" onclick="toolboxOpenPanel('filter')" title="Filter">
+    <button class="etb-icon-btn" onclick="toolboxOpenPanel('filter')" data-tip="Filter" data-tip-always="1">
       <span>⚔</span>
     </button>
     <div class="etb-panel" id="etb-panel-filter">
@@ -262,8 +262,8 @@
       oninput="onSearchInput(this.value)"
     >
     <span class="search-result-count" id="search-result-count"></span>
-    <span class="search-clear" id="search-clear" onclick="clearSearch()" title="Suche leeren">✕</span>
-    <span class="search-shortcut-hint" title="Tastenkürzel: Strg+F = Suche, Esc = Schließen, +/− = Tode (im Boss-Menü)">⌨</span>
+    <span class="search-clear" id="search-clear" onclick="clearSearch()" data-tip="Suche leeren" data-tip-always="1">✕</span>
+    <span class="search-shortcut-hint" data-tip="Tastenkürzel: Strg+F = Suche, Esc = Schließen, +/− = Tode (im Boss-Menü)" data-tip-always="1">⌨</span>
   </div>
 
   <section id="pinned-section">
@@ -309,7 +309,7 @@
 <!-- ── IMPRESSUM MODAL ── -->
 <div id="impressum-modal" style="display:none;" class="privacy-modal-backdrop" onclick="if(event.target===this)this.style.display='none'">
   <div class="privacy-modal-box" role="dialog" aria-modal="true" aria-label="Impressum">
-    <button class="privacy-modal-close" onclick="document.getElementById('impressum-modal').style.display='none'" title="Schließen">✕</button>
+    <button class="privacy-modal-close" onclick="document.getElementById('impressum-modal').style.display='none'" data-tip="Schließen" data-tip-always="1">✕</button>
     <div class="privacy-modal-content">
       <h2>Impressum</h2>
       <h3>Angaben gemäß § 5 TMG</h3>
@@ -335,7 +335,7 @@
 <!-- ── DATENSCHUTZERKLÄRUNG MODAL ── -->
 <div id="privacy-modal" style="display:none;" class="privacy-modal-backdrop" onclick="if(event.target===this)this.style.display='none'">
   <div class="privacy-modal-box" role="dialog" aria-modal="true" aria-label="Datenschutzerklärung">
-    <button class="privacy-modal-close" onclick="document.getElementById('privacy-modal').style.display='none'" title="Schließen">✕</button>
+    <button class="privacy-modal-close" onclick="document.getElementById('privacy-modal').style.display='none'" data-tip="Schließen" data-tip-always="1">✕</button>
     <div class="privacy-modal-content">
 
       <h2>Datenschutzerklärung</h2>
@@ -387,12 +387,12 @@
   <div class="boss-menu-body">
     <span class="boss-menu-section-label">Tode</span>
     <div class="boss-menu-deaths-row">
-      <button class="boss-menu-deaths-btn danger" onclick="menuAdjustDeaths(-1)" title="−1 Tod">−</button>
+      <button class="boss-menu-deaths-btn danger" onclick="menuAdjustDeaths(-1)" data-tip="−1 Tod" data-tip-always="1">−</button>
       <div>
         <div class="boss-menu-deaths-val" id="menu-deaths-val">0</div>
         <div class="boss-menu-deaths-label">Tode</div>
       </div>
-      <button class="boss-menu-deaths-btn" onclick="menuAdjustDeaths(1)" title="+1 Tod">+</button>
+      <button class="boss-menu-deaths-btn" onclick="menuAdjustDeaths(1)" data-tip="+1 Tod" data-tip-always="1">+</button>
     </div>
     <div class="boss-menu-divider"></div>
     <span class="boss-menu-section-label">Aktionen</span>
@@ -414,7 +414,7 @@
   <div class="quick-clip-header">
     <span class="quick-clip-icon">🎬</span>
     <span class="quick-clip-title">Clip hinzufügen</span>
-    <button class="quick-clip-close" onclick="closeQuickClipMenu()" title="Schließen">✕</button>
+    <button class="quick-clip-close" onclick="closeQuickClipMenu()" data-tip="Schließen" data-tip-always="1">✕</button>
   </div>
   <div class="quick-clip-boss-label" id="quick-clip-boss-name">–</div>
   <div class="quick-clip-body">
@@ -455,7 +455,7 @@
         <button class="add-clip-btn" id="add-clip-btn" onclick="toggleAddClipPanel()">
           ➕ Clip hinzufügen
         </button>
-        <button class="clip-close-btn" onclick="closeClipModal()" title="Schließen">✕</button>
+        <button class="clip-close-btn" onclick="closeClipModal()" data-tip="Schließen" data-tip-always="1">✕</button>
       </div>
     </div>
 
@@ -532,7 +532,7 @@
         <h3 id="boss-clips-heading">Boss Clips</h3>
         <span class="boss-clips-badge" id="boss-clips-badge">0 Clips</span>
       </div>
-      <button class="clip-close-btn" onclick="closeBossClipsPanel()" title="Schließen">✕</button>
+      <button class="clip-close-btn" onclick="closeBossClipsPanel()" data-tip="Schließen" data-tip-always="1">✕</button>
     </div>
     <div class="boss-clips-body" id="boss-clips-body"></div>
   </div>
@@ -564,7 +564,7 @@
           <span class="boss-level-subtitle" id="boss-level-subtitle">wird geladen…</span>
         </div>
       </div>
-      <button class="clip-close-btn" onclick="closeBossLevelPanel()" title="Schließen">✕</button>
+      <button class="clip-close-btn" onclick="closeBossLevelPanel()" data-tip="Schließen" data-tip-always="1">✕</button>
     </div>
     <div class="boss-level-table-head">
       <span class="blh-rank">#</span>

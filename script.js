@@ -150,7 +150,7 @@ function renderBossLevelPanel() {
     });
     var bosskillClip = allClips.find(function(c) { return c.category === "Bosskill"; });
     var clipHtml = bosskillClip
-      ? '<a class="boss-level-clip-link" href="' + escAttr(bosskillClip.url) + '" target="_blank" rel="noopener" title="Bosskill-Clip ansehen">'
+      ? '<a class="boss-level-clip-link" href="' + escAttr(bosskillClip.url) + '" target="_blank" rel="noopener" data-tip="Bosskill-Clip ansehen" data-tip-always="1">'
         + '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M21 2H3C1.9 2 1 2.9 1 4v16c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 18H3V4h18v16zM10 8.5v7l6-3.5-6-3.5z"/></svg>'
         + '</a>'
       : '<span class="boss-level-clip-empty"></span>';
@@ -2314,7 +2314,7 @@ function renderAreas(areas) {
       }
       card.innerHTML = '<span class="pinned-deaths">📌 ' + (b.deaths > 0 ? b.deaths : "–") + '</span>'
         + '<span class="pinned-name' + (isMain ? " main-boss" : "") + '">' + escHtml(b.boss) + '</span>'
-        + (isAuthorized() ? '<span class="boss-edit-hint" title="Bearbeiten">✏</span>' : '');
+        + (isAuthorized() ? '<span class="boss-edit-hint" data-tip="Bearbeiten" data-tip-always="1">✏</span>' : '');
       pinnedList.appendChild(card);
     });
   } else {
@@ -2395,7 +2395,7 @@ function renderBossRow(b, areaName) {
   var bossClipKey   = areaName + "|" + b.boss;
   var bossClipCount = ((clipsByBoss[bossClipKey] || []).length) + ((clipsByBoss[b.boss] || []).length);
   var clipBadge = bossClipCount > 0
-    ? '<span class="boss-clip-badge" onclick="openBossClipsPanel(\'' + escAttr(b.boss) + '\',\'' + escAttr(areaName) + '\',event)" title="' + bossClipCount + ' Clip' + (bossClipCount > 1 ? 's' : '') + ' ansehen">🎬 ' + bossClipCount + '</span>'
+    ? '<span class="boss-clip-badge" onclick="openBossClipsPanel(\'' + escAttr(b.boss) + '\',\'' + escAttr(areaName) + '\',event)" data-tip="' + bossClipCount + ' Clip' + (bossClipCount > 1 ? 's' : '') + ' ansehen" data-tip-always="1">🎬 ' + bossClipCount + '</span>'
     : '';
 
   return '<div class="boss-row' + (b.done ? " done" : "") + editClass + '"'
@@ -2406,7 +2406,7 @@ function renderBossRow(b, areaName) {
     + '<span class="boss-name' + (isMain ? " main" : "") + '" data-tip="' + escAttr(b.boss) + '">' + escHtml(b.boss) + '</span>'
     + clipBadge
     + '<span class="boss-check">✓</span>'
-    + (isAuthorized() ? '<span class="boss-edit-hint" title="Bearbeiten">✏</span>' : '')
+    + (isAuthorized() ? '<span class="boss-edit-hint" data-tip="Bearbeiten" data-tip-always="1">✏</span>' : '')
     + '</div>';
 }
 
