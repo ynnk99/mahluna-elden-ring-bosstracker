@@ -25,9 +25,11 @@ function getTwitchToken() {
 }
 
 
+// GEÄNDERT: W→X, AB→AC (Spaltenverschiebung)
 const CLIPS_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
   + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&range=X9:AC1000";
 
+// GEÄNDERT: N→O, R→S (Spaltenverschiebung)
 const BINGO_TEXT_URL  = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
   + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&range=O15:S19";
 const BINGO_STATE_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
@@ -87,7 +89,8 @@ var timerLabel    = ""; // M3: wenn befüllt, ersetzt "Aktueller Boss:" im Timer
 
 // ─── EDITOR TOOLBOX ────────────────────────────────────────────────────────
 var toolboxTimerTick = null;
-var toolboxCellState = { N1: false, N2: false, Q1: true, Q2: true, S1: false, S2: false, Y1: false };
+// GEÄNDERT: alle Zellnamen auf neue Spaltenadressen angepasst (N→O, Q→R, S→T, Y→Z)
+var toolboxCellState = { O1: false, O2: false, R1: true, R2: true, T1: false, T2: false, Z1: false };
 var toolboxPendingCells = {}; // cell → timestamp, schützt Button-States vor Sheet-Überschreibung
 
 function toolboxInit() {
@@ -186,22 +189,25 @@ function toolboxSetBtnActive(btnId, active) {
   if (btn) btn.classList.toggle("active", active);
 }
 
-// ── Cell toggle (N1, N2, Q1, Q2, S1, S2, Y1) ────────────────────────────
+// ── Cell toggle (O1, O2, R1, R2, T1, T2, Z1) ────────────────────────────
+// HINWEIS: HTML-Button-onclick-Attribute müssen ebenfalls auf neue Zellnamen aktualisiert werden
+// z.B. toolboxToggleCell('O1','etb-btn-O1') statt ('N1','etb-btn-N1')
 function toolboxToggleCell(cell, btnId) {
   if (!isAuthorized()) return;
   toolboxCellState[cell] = !toolboxCellState[cell];
   var v = toolboxCellState[cell];
-  if (cell === 'S1' && v) {
-    toolboxCellState.S2 = false;
-    toolboxPendingCells['S2'] = Date.now();
-    toolboxSetBtnActive('etb-btn-S2', false);
-    toolboxWriteCell('S2', 'FALSE');
+  // GEÄNDERT: S1→T1, S2→T2
+  if (cell === 'T1' && v) {
+    toolboxCellState.T2 = false;
+    toolboxPendingCells['T2'] = Date.now();
+    toolboxSetBtnActive('etb-btn-T2', false);
+    toolboxWriteCell('T2', 'FALSE');
   }
-  if (cell === 'S2' && v) {
-    toolboxCellState.S1 = false;
-    toolboxPendingCells['S1'] = Date.now();
-    toolboxSetBtnActive('etb-btn-S1', false);
-    toolboxWriteCell('S1', 'FALSE');
+  if (cell === 'T2' && v) {
+    toolboxCellState.T1 = false;
+    toolboxPendingCells['T1'] = Date.now();
+    toolboxSetBtnActive('etb-btn-T1', false);
+    toolboxWriteCell('T1', 'FALSE');
   }
   toolboxPendingCells[cell] = Date.now();
   toolboxWriteCell(cell, v ? "TRUE" : "FALSE");
@@ -217,12 +223,14 @@ function toolboxToggleTimer() {
   if (timerStartTs > 0) {
     timerElapsed += Date.now() - timerStartTs;
     timerStartTs = 0;
-    toolboxWriteCell("L1", "FALSE");
+    // GEÄNDERT: L1→M1
+    toolboxWriteCell("M1", "FALSE");
     toolboxWriteTimerCells(0, timerElapsed);
     if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
   } else {
     timerStartTs = Date.now();
-    toolboxWriteCell("L1", "TRUE");
+    // GEÄNDERT: L1→M1
+    toolboxWriteCell("M1", "TRUE");
     toolboxWriteTimerCells(timerStartTs, timerElapsed);
     startTimerTick();
   }
@@ -236,7 +244,8 @@ function toolboxTimerReset() {
   timerStartTs = 0;
   timerElapsed = 0;
   if (TOOLBOX_SCRIPT_URL) {
-    fetch(TOOLBOX_SCRIPT_URL + "?action=pulseCell&cell=L2&twitchToken=" + encodeURIComponent(getTwitchToken()), { method: "GET", mode: "no-cors" })
+    // GEÄNDERT: L2→M2
+    fetch(TOOLBOX_SCRIPT_URL + "?action=pulseCell&cell=M2&twitchToken=" + encodeURIComponent(getTwitchToken()), { method: "GET", mode: "no-cors" })
       .catch(function(e) { console.error("[Toolbox] pulseCell:", e); });
   }
   toolboxWriteTimerCells(0, 0);
@@ -246,11 +255,13 @@ function toolboxTimerReset() {
 }
 
 // Patch helpers – keep cachedRows in sync so next real fetch doesn't revert
+// GEÄNDERT: alle Spaltenindizes um +1 (ab ex-Spalte G, 0-basiert: ≥6 → +1)
+// N→O: 13→14, Q→R: 16→17, S→T: 18→19, Y→Z: 24→25
 var CELL_MAP = {
-  N1: [0, 13], N2: [1, 13],
-  Q1: [0, 16], Q2: [1, 16],
-  S1: [0, 18], S2: [1, 18],
-  Y1: [0, 24]
+  O1: [0, 14], O2: [1, 14],
+  R1: [0, 17], R2: [1, 17],
+  T1: [0, 19], T2: [1, 19],
+  Z1: [0, 25]
 };
 
 function toolboxPatchCell(cell, value) {
@@ -272,46 +283,49 @@ function toolboxPatchTimerCells() {
     if (!cachedRows[r].c[c]) cachedRows[r].c[c] = {};
     cachedRows[r].c[c].v = v;
   }
-  set(0, 22, timerStartTs);
-  set(2, 22, timerElapsed);
+  // GEÄNDERT: W→X, 0-basiert: 22→23
+  set(0, 23, timerStartTs);
+  set(2, 23, timerElapsed);
 }
 
 // Direct UI update – no processData, no re-read from cachedRows
 function toolboxRefresh() {
   // Also keep cachedRows patched so the next real sheet poll doesn't revert
   toolboxPatchTimerCells();
-  toolboxPatchCell('N1', toolboxCellState.N1);
-  toolboxPatchCell('Q1', toolboxCellState.Q1);
-  toolboxPatchCell('Q2', toolboxCellState.Q2);
+  // GEÄNDERT: N1→O1, Q1→R1, Q2→R2
+  toolboxPatchCell('O1', toolboxCellState.O1);
+  toolboxPatchCell('R1', toolboxCellState.R1);
+  toolboxPatchCell('R2', toolboxCellState.R2);
 }
 
 // Apply cell change immediately to page state
+// GEÄNDERT: alle case-Bezeichner auf neue Spaltennamen
 function toolboxApplyCell(cell, val) {
   switch (cell) {
-    case 'N1':
+    case 'O1': // war N1
       pendingLocalTimer = Date.now();
       timerVisible = val;
       updateTimerDisplay();
       if (val && timerStartTs > 0) startTimerTick();
       else if (!val && timerInterval) { clearInterval(timerInterval); timerInterval = null; }
       break;
-    case 'Q1':
+    case 'R1': // war Q1
       showBase = val;
       var b = document.getElementById('btn-basegame');
       if (b) b.classList.toggle('active', val);
       updateFieldDeathsVisibility();
       renderAreas(currentAreas);
       break;
-    case 'Q2':
+    case 'R2': // war Q2
       showDLC = val;
       var b = document.getElementById('btn-dlc');
       if (b) b.classList.toggle('active', val);
       updateFieldDeathsVisibility();
       renderAreas(currentAreas);
       break;
-    case 'S1':
+    case 'T1': // war S1
       showOnlyOpen = val;
-      if (val) { showOnlyDone = false; toolboxCellState.S2 = false; toolboxSetBtnActive('etb-btn-S2', false); }
+      if (val) { showOnlyDone = false; toolboxCellState.T2 = false; toolboxSetBtnActive('etb-btn-T2', false); }
       var bo = document.getElementById('btn-open');
       var bd = document.getElementById('btn-done');
       if (bo) bo.classList.toggle('active', showOnlyOpen);
@@ -319,9 +333,9 @@ function toolboxApplyCell(cell, val) {
       document.body.classList.toggle('filter-open', showOnlyOpen);
       renderAreas(currentAreas);
       break;
-    case 'S2':
+    case 'T2': // war S2
       showOnlyDone = val;
-      if (val) { showOnlyOpen = false; toolboxCellState.S1 = false; toolboxSetBtnActive('etb-btn-S1', false); }
+      if (val) { showOnlyOpen = false; toolboxCellState.T1 = false; toolboxSetBtnActive('etb-btn-T1', false); }
       var bo = document.getElementById('btn-open');
       var bd = document.getElementById('btn-done');
       if (bd) bd.classList.toggle('active', showOnlyDone);
@@ -370,13 +384,14 @@ function toolboxSyncFromRows(rows) {
     toolboxCellState[cell] = isTrue(getCell(r, c));
     toolboxSetBtnActive(btnId, toolboxCellState[cell]);
   }
-  syncCell('N1', 0, 13, 'etb-btn-N1');
-  syncCell('N2', 1, 13, 'etb-btn-N2');
-  syncCell('Q1', 0, 16, 'etb-btn-Q1');
-  syncCell('Q2', 1, 16, 'etb-btn-Q2');
-  syncCell('S1', 0, 18, 'etb-btn-S1');
-  syncCell('S2', 1, 18, 'etb-btn-S2');
-  syncCell('Y1', 0, 24, 'etb-btn-Y1');
+  // GEÄNDERT: alle Zellnamen (N→O, Q→R, S→T, Y→Z) und 0-basierten Indizes (+1 ab ex-Spalte G)
+  syncCell('O1', 0, 14, 'etb-btn-O1');  // war: N1, 0, 13
+  syncCell('O2', 1, 14, 'etb-btn-O2');  // war: N2, 1, 13
+  syncCell('R1', 0, 17, 'etb-btn-R1');  // war: Q1, 0, 16
+  syncCell('R2', 1, 17, 'etb-btn-R2');  // war: Q2, 1, 16
+  syncCell('T1', 0, 19, 'etb-btn-T1');  // war: S1, 0, 18
+  syncCell('T2', 1, 19, 'etb-btn-T2');  // war: S2, 1, 18
+  syncCell('Z1', 0, 25, 'etb-btn-Z1');  // war: Y1, 0, 24
   toolboxSyncTimerUI();
   toolboxInit();
 }
@@ -553,9 +568,6 @@ function fetchTwitchUser(token) {
 }
 
 // ── Twitch Clip-Erstelldatum abrufen ─────────────────────────────────────────
-// Nutzt den bereits vorhandenen OAuth-Token aus dem localStorage.
-// Gibt ein Promise<string> zurück: ISO-Timestamp (UTC) oder Fallback = jetzt.
-// Gibt { addedAt: string, creatorName: string } zurück – beides aus einem einzigen API-Call.
 function fetchTwitchClipData(slug) {
   return new Promise(function(resolve) {
     var fallback = { addedAt: new Date().toISOString(), creatorName: "" };
@@ -586,7 +598,6 @@ function fetchTwitchClipData(slug) {
   });
 }
 
-// Rückwärtskompatibilität – wird intern nicht mehr direkt benötigt
 function fetchTwitchClipDate(slug) {
   return fetchTwitchClipData(slug).then(function(d) { return d.addedAt; });
 }
@@ -866,7 +877,6 @@ function positionMenu(e) {
   var mh     = 280;
   var vw     = window.innerWidth;
   var vh     = window.innerHeight;
-  // Touch-Koordinaten bevorzugen falls vorhanden
   var touch  = e.changedTouches && e.changedTouches[0];
   var cx     = touch ? touch.clientX : e.clientX;
   var cy     = touch ? touch.clientY : e.clientY;
@@ -979,7 +989,6 @@ function openQuickClipMenu(e, bossName, areaName) {
   e.preventDefault();
   e.stopPropagation();
 
-  // Close regular boss menu if open
   if (menuOpen) closeBossMenu();
 
   quickClipBoss = bossName;
@@ -1083,19 +1092,16 @@ document.addEventListener("click", function(e) {
   if (!menu.contains(e.target)) closeQuickClipMenu();
 });
 
-// Touch-Support für Boss-Rows (Event Delegation auf dem Grid)
 document.addEventListener("touchend", function(e) {
   if (!isAuthorized()) return;
   var row = e.target.closest(".boss-row[data-boss]");
   if (!row) return;
-  // Clip-Badge nicht triggern
   if (e.target.closest(".boss-clip-badge")) return;
   e.preventDefault();
   openBossMenu(e, row.dataset.area, row.dataset.boss);
 }, { passive: false });
 
 document.addEventListener("keydown", function(e) {
-  // ── Esc: alle Modals schließen, Suche leeren ──
   if (e.key === "Escape") {
     closeBossClipsPanel();
     closeBingoEdit();
@@ -1106,7 +1112,6 @@ document.addEventListener("keydown", function(e) {
     return;
   }
 
-  // ── Strg+F / Cmd+F: Suche fokussieren ──
   if ((e.ctrlKey || e.metaKey) && e.key === "f") {
     var searchInput = document.getElementById("search-input");
     if (searchInput) {
@@ -1117,7 +1122,6 @@ document.addEventListener("keydown", function(e) {
     return;
   }
 
-  // ── +/− : Tode im offenen Boss-Menü anpassen ──
   if (menuOpen) {
     var tag = (e.target && e.target.tagName) ? e.target.tagName.toUpperCase() : "";
     if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
@@ -1147,7 +1151,6 @@ function updateTimerDisplay() {
     ? timerElapsed + (Date.now() - timerStartTs)
     : timerElapsed;
   document.getElementById("val-timer").textContent = fmtTime(elapsed);
-  // M3: Custom Label – wenn leer, Standard "Aktueller Boss:" verwenden
   var labelEl = document.getElementById("val-timer-label");
   if (labelEl) labelEl.textContent = timerLabel ? timerLabel + ":" : "Aktueller Boss:";
 }
@@ -1469,7 +1472,6 @@ function buildEmbedUrl(parsed) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// ═══════════════════════════════════════════════════════════════════════════
 // CLIP DATUM-FILTER
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -1515,7 +1517,7 @@ function getFilteredClips() {
     to   = clipDateTo;
   }
   return clipsData.filter(function(c) {
-    if (!c.addedAt) return false; // Clips ohne Datum nur in "Alle Clips"
+    if (!c.addedAt) return false;
     var d = new Date(c.addedAt);
     if (isNaN(d)) return false;
     if (from && d < from) return false;
@@ -1536,6 +1538,7 @@ function formatClipDate(iso) {
   });
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
 // CLIP MODAL
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -1772,7 +1775,6 @@ function writeClipToSheet(url, category, title, boss, addedAt, creatorName, area
     console.warn("[Clips] Apps Script URL nicht konfiguriert – Clip nur lokal.");
     return;
   }
-  // Gebiet in Boss-Feld encodieren: "Area|Boss" — wird beim Laden wieder geparst
   var bossEncoded = (area && area.length > 0) ? area + "|" + boss : boss;
   var reqUrl = APPS_SCRIPT_URL
     + "?action=addClip"
@@ -1782,12 +1784,11 @@ function writeClipToSheet(url, category, title, boss, addedAt, creatorName, area
     + "&boss="        + encodeURIComponent(bossEncoded)
     + "&addedAt="     + encodeURIComponent(addedAt || getNowISO())
     + "&creatorName=" + encodeURIComponent(creatorName || "")
-    + "&twitchToken="  + encodeURIComponent(getTwitchToken()); // Spalte AB im Sheet
+    + "&twitchToken="  + encodeURIComponent(getTwitchToken());
   fetch(reqUrl, { method: "GET", mode: "no-cors" })
     .catch(function(err) { console.error("[Clips] Schreibfehler:", err); });
 }
 
-// Gibt aktuellen Zeitstempel mit lokalem UTC-Offset zurück (z.B. 2026-05-02T00:27:40.440+02:00)
 function getNowISO() {
   var d   = new Date();
   var off = -d.getTimezoneOffset();
@@ -1806,7 +1807,6 @@ function rebuildClipsByBoss() {
   clipsByBoss = {};
   clipsData.forEach(function(c) {
     if (c.boss) {
-      // Clips mit Gebiet werden unter "Area|Boss" abgelegt, ohne Gebiet unter "Boss"
       var key = (c.area && c.area.length > 0) ? c.area + "|" + c.boss : c.boss;
       if (!clipsByBoss[key]) clipsByBoss[key] = [];
       clipsByBoss[key].push(c);
@@ -1824,10 +1824,8 @@ function getBossOptions(selectedBoss) {
 
 function openBossClipsPanel(bossName, areaName, e) {
   if (e) e.stopPropagation();
-  // Zuerst gebietsspezifische Clips, dann Fallback auf namensbezogene (Legacy/Modal)
   var bossKey = (areaName && areaName.length > 0) ? areaName + "|" + bossName : bossName;
   var clips = (clipsByBoss[bossKey] || []).concat(clipsByBoss[bossName] || []);
-  // Duplikate entfernen (falls ein Clip sowohl unter altem als auch neuem Key gespeichert ist)
   clips = clips.filter(function(c, i, arr) { return arr.findIndex(function(x) { return x.url === c.url; }) === i; });
   if (clips.length === 0) return;
 
@@ -1860,7 +1858,7 @@ function updateClipBoss(clipUrl, newBoss) {
   var oldBoss = clip.boss || "";
   var oldArea = clip.area || "";
   clip.boss = newBoss;
-  clip.area = "";  // Manuelle Zuweisung im Modal hat kein Gebiet
+  clip.area = "";
   rebuildClipsByBoss();
 
   var panel = document.getElementById("boss-clips-modal");
@@ -1936,7 +1934,6 @@ function loadClips() {
         var bossRaw     = row.c[3] && row.c[3].v ? String(row.c[3].v).trim() : "";
         var addedAt     = row.c[4] && row.c[4].v ? String(row.c[4].v).trim() : "";
         var creatorName = row.c[5] && row.c[5].v ? String(row.c[5].v).trim() : "";
-        // "Area|Boss"-Encoding auflösen (seit Bug-Fix)
         var areaParsed  = "";
         var bossParsed  = bossRaw;
         var pipeIdx = bossRaw.indexOf("|");
@@ -2008,35 +2005,39 @@ function loadData() {
 function processData(rows) {
   cachedRows = rows;
   if (isAuthorized()) {
-    var fdBase = rows[1]   && rows[1].c[9]   ? (Number(rows[1].c[9].v)   || 0) : 0;
-    var fdDlc  = rows[168] && rows[168].c[9] ? (Number(rows[168].c[9].v) || 0) : 0;
+    // GEÄNDERT: J→K, 0-basiert: 9→10
+    var fdBase = rows[1]   && rows[1].c[10]   ? (Number(rows[1].c[10].v)   || 0) : 0;
+    var fdDlc  = rows[168] && rows[168].c[10] ? (Number(rows[168].c[10].v) || 0) : 0;
     if (!fieldDeathsTimer.base && Date.now() - fieldDeathsPending.base > FIELD_DEATHS_GRACE) { fieldDeaths.base = fdBase; document.getElementById("fdeath-val-base").textContent = fdBase; }
     if (!fieldDeathsTimer.dlc  && Date.now() - fieldDeathsPending.dlc  > FIELD_DEATHS_GRACE) { fieldDeaths.dlc  = fdDlc;  document.getElementById("fdeath-val-dlc").textContent  = fdDlc; }
     document.getElementById("field-deaths-bar").style.display = "flex";
   } else {
     document.getElementById("field-deaths-bar").style.display = "none";
   }
-  var baseGameFlag = isTrue(rows[0] && rows[0].c[16] ? rows[0].c[16].v : false);
-  var dlcFlag      = isTrue(rows[1] && rows[1].c[16] ? rows[1].c[16].v : false);
+  // GEÄNDERT: Q→R, 0-basiert: 16→17
+  var baseGameFlag = isTrue(rows[0] && rows[0].c[17] ? rows[0].c[17].v : false);
+  var dlcFlag      = isTrue(rows[1] && rows[1].c[17] ? rows[1].c[17].v : false);
 
   if (prevDeaths === null) {
     showBase = baseGameFlag;
     showDLC  = dlcFlag;
     document.getElementById("btn-basegame").classList.toggle("active", showBase);
     document.getElementById("btn-dlc").classList.toggle("active", showDLC);
-    updateFieldDeathsVisibility(); // ← neu
+    updateFieldDeathsVisibility();
   }
 
   // Only overwrite local timer state if no recent toolbox action (10s grace period)
   if (!pendingLocalTimer || Date.now() - pendingLocalTimer > 10000) {
     pendingLocalTimer = 0;
-    timerStartTs = Number(rows[0] && rows[0].c[22] ? rows[0].c[22].v : 0) || 0;
-    timerElapsed = Number(rows[2] && rows[2].c[22] ? rows[2].c[22].v : 0) || 0;
-    timerVisible = isTrue(rows[0] && rows[0].c[13] ? rows[0].c[13].v : false);
+    // GEÄNDERT: W→X, 0-basiert: 22→23
+    timerStartTs = Number(rows[0] && rows[0].c[23] ? rows[0].c[23].v : 0) || 0;
+    timerElapsed = Number(rows[2] && rows[2].c[23] ? rows[2].c[23].v : 0) || 0;
+    // GEÄNDERT: N→O, 0-basiert: 13→14
+    timerVisible = isTrue(rows[0] && rows[0].c[14] ? rows[0].c[14].v : false);
   }
-  // M3 (rows[2].c[12]): Custom Timer-Label – wenn leer, ersetzt "Aktueller Boss:"
-  timerLabel = (rows[2] && rows[2].c[12] && rows[2].c[12].v)
-    ? String(rows[2].c[12].v).trim()
+  // GEÄNDERT: M→N, 0-basiert: 12→13
+  timerLabel = (rows[2] && rows[2].c[13] && rows[2].c[13].v)
+    ? String(rows[2].c[13].v).trim()
     : "";
   updateTimerDisplay();
   if (timerStartTs > 0) startTimerTick(); else if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
@@ -2078,7 +2079,7 @@ function processData(rows) {
     var pendingKey = area + "|" + boss;
     if (pendingLocalChanges[pendingKey]) {
       var age = Date.now() - pendingLocalChanges[pendingKey];
-      if (age < PENDING_GRACE) { // ← FIX: war 10000, jetzt PENDING_GRACE (35s)
+      if (age < PENDING_GRACE) {
         var localBoss = currentAreas[area] && currentAreas[area].bosses.find(function(b) { return b.boss === boss; });
         if (localBoss) {
           deaths = localBoss.deaths;
@@ -2089,7 +2090,8 @@ function processData(rows) {
         delete pendingLocalChanges[pendingKey];
       }
     }
-    var sheetCollapsed = isTrue(r.c[6] ? r.c[6].v : false);
+    // GEÄNDERT: G→H, 0-basiert: 6→7
+    var sheetCollapsed = isTrue(r.c[7] ? r.c[7].v : false);
     var key            = area + "|" + boss;
 
     if (!(key in previousBossStates)) {
@@ -2111,11 +2113,11 @@ function processData(rows) {
     allBosses.push({ boss: boss, deaths: deaths, done: done, area: area, date: date });
   });
 
-  var kBase = rows[1]   && rows[1].c[10]   ? (Number(rows[1].c[10].v)   || 0) : 0;
-  var kDlc  = rows[168] && rows[168].c[10] ? (Number(rows[168].c[10].v) || 0) : 0;
+  // GEÄNDERT: K→L, 0-basiert: 10→11
+  var kBase = rows[1]   && rows[1].c[11]   ? (Number(rows[1].c[11].v)   || 0) : 0;
+  var kDlc  = rows[168] && rows[168].c[11] ? (Number(rows[168].c[11].v) || 0) : 0;
   var globalDeaths;
   if (showOnlyMain) {
-    // Nur Tode bei Main Bossen zählen (allBosses ist bereits nach Main gefiltert)
     globalDeaths = allBosses.reduce(function(s, b) { return s + b.deaths; }, 0);
   } else if (showBase && showDLC)       globalDeaths = kBase + kDlc;
   else if (showBase && !showDLC) globalDeaths = kBase;
@@ -2212,9 +2214,8 @@ function renderAreas(areas) {
         card.addEventListener("click", function(e) {
           openBossMenu(e, b.area, b.boss);
         });
-        // Touch-Support: touchend statt click, damit Koordinaten stimmen
         card.addEventListener("touchend", function(e) {
-          e.preventDefault(); // verhindert nachfolgenden Mausklick
+          e.preventDefault();
           openBossMenu(e, b.area, b.boss);
         });
       }
@@ -2444,7 +2445,6 @@ function renderBingo() {
   var subtitle = document.getElementById("bingo-subtitle");
   if (!section || !grid) return;
 
-  // Sichtbar machen – auch wenn noch keine Texte geladen sind
   section.style.display = "block";
 
   if (!bingoCells.length) {
@@ -2520,7 +2520,7 @@ function writeBingoCellToSheet(row, col, value) {
   ).catch(function(e) { console.error("[Bingo] Schreibfehler:", e); });
 }
 
-// ──────────── NEU: BINGO EDIT ────────────
+// ──────────── BINGO EDIT ────────────
 var bingoEditState = { row: -1, col: -1 };
 
 function openBingoEdit(e, row, col) {
