@@ -159,7 +159,7 @@ function renderBossLevelPanel() {
       + '<span class="boss-level-rank">' + (i + 1) + '</span>'
       + '<span class="boss-level-badge' + (b.isDLC ? ' dlc' : '') + '">' + levelLabel + escHtml(displayLevel) + '</span>'
       + '<div class="boss-level-info">'
-      + '<span class="boss-level-name' + (isMain ? " main" : "") + '">' + escHtml(b.boss) + '</span>'
+      + '<span class="boss-level-name' + (isMain ? " main" : "") + '" data-tip="' + escAttr(b.boss) + '" data-tip-always="1">' + escHtml(b.boss) + '</span>'
       + '<span class="boss-level-area">' + escHtml(b.area) + '</span>'
       + '</div>'
       + '<span class="boss-level-deaths' + (b.deaths === 0 ? " nodeath" : "") + '">'
@@ -2434,7 +2434,7 @@ document.addEventListener("keydown", function(e) {
   document.addEventListener("mouseover", function(e) {
     var el = e.target.closest("[data-tip]");
     if (!el) return;
-    if (el.scrollWidth <= el.offsetWidth) return;
+    if (!el.dataset.tipAlways && el.scrollWidth <= el.offsetWidth) return;
     tip.textContent = el.dataset.tip;
     tip.classList.add("visible");
   });
