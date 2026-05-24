@@ -141,7 +141,21 @@ function renderBossLevelPanel() {
     // DLC: "Scadubaum-Stufe X", Base Game: "Lv X"
     var displayLevel = String(b.level).split("/")[0].trim();
     var levelLabel   = b.isDLC ? 'Scadu-Lvl.&nbsp;' : 'Lvl&nbsp;';
-    return '<div class="boss-level-entry' + (isMain ? " main" : "") + '">'
+
+    // Bosskill-Clip suchen
+    var bossKey  = (b.area && b.area.length > 0) ? b.area + "|" + b.boss : b.boss;
+    var allClips = (clipsByBoss[bossKey] || []).concat(clipsByBoss[b.boss] || []);
+    allClips = allClips.filter(function(c, idx, arr) {
+      return arr.findIndex(function(x) { return x.url === c.url; }) === idx;
+    });
+    var bosskillClip = allClips.find(function(c) { return c.category === "Bosskill"; });
+    var clipHtml = bosskillClip
+      ? '<a class="boss-level-clip-link" href="' + escAttr(bosskillClip.url) + '" target="_blank" rel="noopener" title="Bosskill-Clip ansehen">'
+        + '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M21 2H3C1.9 2 1 2.9 1 4v16c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 18H3V4h18v16zM10 8.5v7l6-3.5-6-3.5z"/></svg>'
+        + '</a>'
+      : '<span class="boss-level-clip-empty"></span>';
+
+    return '<div class="boss-level-entry' + (isMain ? " main" : "") + ' has-clip-col">'
       + '<span class="boss-level-rank">' + (i + 1) + '</span>'
       + '<span class="boss-level-badge' + (b.isDLC ? ' dlc' : '') + '">' + levelLabel + escHtml(displayLevel) + '</span>'
       + '<div class="boss-level-info">'
@@ -151,6 +165,7 @@ function renderBossLevelPanel() {
       + '<span class="boss-level-deaths' + (b.deaths === 0 ? " nodeath" : "") + '">'
       + (b.deaths > 0 ? '†' + b.deaths : '†–')
       + '</span>'
+      + clipHtml
       + '</div>';
   }).join("");
 }

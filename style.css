@@ -2509,3 +2509,26 @@ body.editor-mode { padding-left: 0; }
   text-align: right;
 }
 .boss-level-deaths.nodeath { color: #4a3f2c; }
+
+/* ── Bosskill-Clip-Spalte im Boss-Level-Panel ─────────────────────── */
+.boss-level-entry.has-clip-col {
+  grid-template-columns: 36px 80px 1fr 58px 32px;
+}
+
+.boss-level-clip-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9146ff;
+  opacity: 0.75;
+  transition: opacity 0.15s, color 0.15s;
+  text-decoration: none;
+}
+.boss-level-clip-link:hover {
+  opacity: 1;
+  color: #b06bff;
+}
+.boss-level-clip-empty {
+  display: block;
+  width: 32px;
+}
