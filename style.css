@@ -1656,7 +1656,7 @@ body.filter-open #chart-section {
 
 /* ── FELDTODE BAR ── */
 .field-deaths-bar {
-  display: none; /* via JS eingeblendet */
+  display: none;
   align-items: center;
   gap: 14px;
   flex-wrap: wrap;
@@ -1786,7 +1786,6 @@ body.filter-open #chart-section {
   cursor: default;
 }
 
-/* Editor: Hover-Feedback */
 .bingo-cell.editable { cursor: pointer; }
 .bingo-cell.editable:hover {
   border-color: rgba(201,164,74,0.4);
@@ -1794,7 +1793,6 @@ body.filter-open #chart-section {
   color: var(--parchment);
 }
 
-/* Abgehakt */
 .bingo-cell.checked {
   background: rgba(201,164,74,0.13);
   border-color: rgba(201,164,74,0.55);
@@ -1819,7 +1817,6 @@ body.filter-open #chart-section {
   opacity: 0.7;
 }
 
-/* Gewinn-Linie */
 .bingo-cell.bingo-line {
   background: rgba(201,164,74,0.2);
   border-color: var(--gold);
@@ -1837,7 +1834,6 @@ body.filter-open #chart-section {
   50%       { box-shadow: 0 0 22px rgba(201,164,74,0.55); }
 }
 
-/* FREE-Feld */
 .bingo-cell.free-cell {
   background: rgba(201,164,74,0.1);
   border-color: rgba(201,164,74,0.45);
@@ -1847,11 +1843,9 @@ body.filter-open #chart-section {
   letter-spacing: 0.08em;
 }
 
-/* Mittelpunkt-Ornament */
 .bingo-cell.free-cell .bingo-cell-text::before { content: "⚔ "; }
 .bingo-cell.free-cell .bingo-cell-text::after  { content: " ⚔"; }
 
-/* ── Gewinn-Banner ── */
 .bingo-win-banner {
   text-align: center;
   margin-top: 18px;
@@ -1971,7 +1965,6 @@ body.filter-open #chart-section {
   box-shadow: 0 0 12px rgba(201,164,74,0.2);
 }
 
-
 /* ═══════════════════════════════════════════════════════════════════════
    EDITOR TOOLBOX – Icon strip + flyout panels
 ═══════════════════════════════════════════════════════════════════════ */
@@ -2017,7 +2010,6 @@ body.editor-mode { padding-left: 0; }
   border-color: rgba(201,164,74,0.55);
 }
 
-/* Flyout panel */
 .etb-panel {
   position: absolute;
   left: 50px;
@@ -2125,7 +2117,6 @@ body.editor-mode { padding-left: 0; }
   box-shadow: 0 0 8px rgba(196,74,58,0.15);
 }
 
-/* ── Timer-Eingabe (H:M:S setzen) ── */
 .etb-time-set {
   display: flex;
   align-items: center;
@@ -2291,8 +2282,230 @@ body.editor-mode { padding-left: 0; }
   position: sticky;
   top: 0;
   z-index: 200;
-  background: var(--bg, #0e0b07); /* passt deine CSS-Variable an */
+  background: var(--bg, #0e0b07);
   padding-bottom: 6px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.55);
   border-bottom: 1px solid rgba(201, 164, 74, 0.12);
 }
+
+/* ══════════════════════════════════════════════════════════════
+   BOSSES CHIP: CLICKABLE
+══════════════════════════════════════════════════════════════ */
+.stat-chip-clickable {
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.18s, border-color 0.18s, transform 0.12s;
+  position: relative;
+}
+.stat-chip-clickable:hover {
+  background: rgba(201, 164, 74, 0.13) !important;
+  border-color: rgba(201, 164, 74, 0.6) !important;
+  transform: translateY(-1px);
+}
+.stat-chip-clickable:active {
+  transform: translateY(0);
+}
+.stat-chip-arrow {
+  font-size: 13px;
+  color: var(--gold-dim, #a89060);
+  margin-left: 2px;
+  line-height: 1;
+  transition: color 0.18s;
+}
+.stat-chip-clickable:hover .stat-chip-arrow {
+  color: var(--gold, #c9a44a);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BOSS LEVEL MODAL
+══════════════════════════════════════════════════════════════ */
+.boss-level-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 3, 1, 0.72);
+  z-index: 1100;
+  backdrop-filter: blur(3px);
+}
+.boss-level-backdrop.open { display: block; }
+
+.boss-level-modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -48%) scale(0.97);
+  opacity: 0;
+  width: min(960px, 98vw);
+  max-height: 92vh;
+  background: #100d08;
+  border: 1px solid rgba(201, 164, 74, 0.35);
+  border-radius: 6px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(201,164,74,0.08);
+  z-index: 1101;
+  overflow: hidden;
+  flex-direction: column;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.boss-level-modal.open {
+  display: flex;
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.boss-level-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.boss-level-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid rgba(201,164,74,0.15);
+  flex-shrink: 0;
+}
+.boss-level-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.boss-level-title-icon {
+  font-size: 26px;
+  line-height: 1;
+  filter: drop-shadow(0 0 6px rgba(201,164,74,0.4));
+}
+.boss-level-title h2 {
+  font-family: 'Cinzel', serif;
+  font-size: 17px;
+  color: #e3b873;
+  margin: 0 0 2px 0;
+  letter-spacing: 0.06em;
+}
+.boss-level-subtitle {
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 13px;
+  color: #8a7a60;
+  font-style: italic;
+}
+
+.boss-level-table-head {
+  display: grid;
+  grid-template-columns: 36px 80px 1fr 58px;
+  gap: 0 12px;
+  padding: 9px 24px 9px 20px;
+  background: rgba(201,164,74,0.05);
+  border-bottom: 1px solid rgba(201,164,74,0.1);
+  flex-shrink: 0;
+}
+.boss-level-table-head span {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: #9a8660;
+  text-transform: uppercase;
+}
+.blh-deaths { text-align: right; }
+
+.boss-level-list {
+  overflow-y: auto;
+  flex: 1;
+  padding: 4px 0 10px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201,164,74,0.25) transparent;
+}
+.boss-level-list::-webkit-scrollbar { width: 5px; }
+.boss-level-list::-webkit-scrollbar-track { background: transparent; }
+.boss-level-list::-webkit-scrollbar-thumb { background: rgba(201,164,74,0.25); border-radius: 3px; }
+
+.boss-level-empty {
+  padding: 40px 22px;
+  text-align: center;
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  color: #5a4f38;
+  font-size: 15px;
+}
+
+.boss-level-entry {
+  display: grid;
+  grid-template-columns: 36px 80px 1fr 58px;
+  gap: 0 12px;
+  align-items: center;
+  padding: 10px 24px 10px 20px;
+  border-bottom: 1px solid rgba(201,164,74,0.055);
+  transition: background 0.14s;
+}
+.boss-level-entry:hover { background: rgba(201,164,74,0.055); }
+.boss-level-entry.main {
+  background: rgba(201,164,74,0.04);
+}
+.boss-level-entry.main:hover { background: rgba(201,164,74,0.09); }
+
+.boss-level-rank {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  color: #7a6a4a;
+  text-align: center;
+}
+
+.boss-level-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: #e3b873;
+  background: rgba(201,164,74,0.12);
+  border: 1px solid rgba(201,164,74,0.28);
+  border-radius: 4px;
+  padding: 2px 8px;
+  letter-spacing: 0.04em;
+  min-width: 56px;
+}
+.boss-level-badge.dlc {
+  color: #c8a8d8;
+  background: rgba(160,100,200,0.10);
+  border-color: rgba(160,100,200,0.28);
+  min-width: 68px;
+}
+
+.boss-level-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.boss-level-name {
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 16px;
+  color: #c8bfa8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.boss-level-name.main {
+  color: #e3b873;
+  font-weight: 600;
+}
+.boss-level-area {
+  font-family: 'Crimson Pro', serif;
+  font-size: 12px;
+  color: #5a4f38;
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.boss-level-deaths {
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  color: #b89070;
+  text-align: right;
+}
+.boss-level-deaths.nodeath { color: #4a3f2c; }
