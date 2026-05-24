@@ -2387,7 +2387,7 @@ body.editor-mode { padding-left: 0; }
 }
 .boss-level-subtitle {
   font-family: 'Crimson Pro', Georgia, serif;
-  font-size: 13px;
+  font-size: 15px;
   color: #8a7a60;
   font-style: italic;
 }
@@ -2505,7 +2505,7 @@ body.editor-mode { padding-left: 0; }
 .boss-level-deaths {
   font-family: 'Cinzel', serif;
   font-size: 14px;
-  color: #b89070;
+  color: #DECFCC;
   text-align: right;
 }
 .boss-level-deaths.nodeath { color: #4a3f2c; }
