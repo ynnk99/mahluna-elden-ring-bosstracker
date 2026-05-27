@@ -6,7 +6,7 @@
 <title>Elden Ring – Mahluna Boss Tracker</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="stylesheet" href="style.css">
-<!-- Google Analytics wird erst nach Einwilligung geladen (consent.js). Schriften und Chart.js sind lokal gehostet. -->
+<!-- DSGVO: consent.js blockiert ALLE externen Requests bis zur Nutzerentscheidung (Google Sheets + Google Analytics). Schriften und Chart.js sind lokal gehostet und benötigen keine Einwilligung. -->
 <script src="consent.js"></script>
 <script src="chart.umd.min.js"></script>
 </head>
@@ -326,7 +326,7 @@
         Diese Website ist ein privates, nicht-kommerzielles Fan-Projekt. Es besteht keine Verbindung zu FromSoftware, Bandai Namco oder Twitch Interactive, Inc.
       </p>
       <div class="privacy-modal-footer">
-        <span class="privacy-modal-date">Stand: Mai 2025</span>
+        <span class="privacy-modal-date">Stand: Mai 2026</span>
       </div>
     </div>
   </div>
@@ -353,8 +353,8 @@
       <p>Weitere Informationen: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google Datenschutzerklärung</a> &nbsp;·&nbsp; <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener noreferrer">Google Analytics Opt-out</a></p>
 
       <h3>4. Google Sheets (Datenabruf)</h3>
-      <p>Die Boss-Daten (Fortschritt, Tode, Zeiten) werden alle fünf Sekunden per HTTP-Request aus einem öffentlich freigegebenen Google Spreadsheet geladen. Dabei wird deine IP-Adresse im Rahmen der normalen HTTP-Kommunikation an Google übertragen. Es werden keine personenbezogenen Daten aus diesem Abruf gespeichert oder verarbeitet.<br>
-      <strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der Funktionalität der Seite).</p>
+      <p>Die Boss-Daten (Fortschritt, Tode, Zeiten) werden nach deiner Einwilligung im Cookie-Banner regelmäßig per HTTP-Request aus einem öffentlich freigegebenen Google Spreadsheet geladen. Dabei wird deine IP-Adresse im Rahmen der normalen HTTP-Kommunikation an Google LLC, USA übertragen. Es werden keine weiteren personenbezogenen Daten aus diesem Abruf gespeichert oder verarbeitet. Vor deiner Entscheidung im Cookie-Banner werden keinerlei externe Requests ausgeführt.<br>
+      <strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. a DSGVO (Einwilligung). Du kannst deine Einwilligung jederzeit über den Button &bdquo;Cookie-Einwilligung zurücksetzen&ldquo; am Ende dieser Datenschutzerklärung widerrufen.</p>
 
       <h3>5. Twitch-Login (optionaler Editor-Zugang)</h3>
       <p>Bestimmte Bearbeitungsfunktionen erfordern einen Login über Twitch OAuth. Dabei wirst du auf die Seite von Twitch Interactive, Inc. (USA) weitergeleitet. Nach erfolgreicher Authentifizierung speichert die Seite deinen Twitch-Zugriffstoken und deinen Twitch-Nutzernamen ausschließlich im <code>localStorage</code> deines Browsers – es erfolgt keine Übertragung an eigene Server. Die Daten werden beim Ausloggen gelöscht oder bleiben bis du sie manuell löschst.<br>
@@ -371,7 +371,7 @@
 
       <div class="privacy-modal-footer">
         <button class="privacy-consent-reset-btn" onclick="window.cookieConsent && window.cookieConsent.reset()">Cookie-Einwilligung zurücksetzen</button>
-        <span class="privacy-modal-date">Stand: Mai 2025</span>
+        <span class="privacy-modal-date">Stand: Mai 2026</span>
       </div>
 
     </div>

@@ -2672,15 +2672,29 @@ function writeBingoTextToSheet(row, col, text) {
 
 // ═══════════════════════════════════════════════════════════════════════════
 // INIT
+// Alle externen Requests (Google Sheets, Twitch API) werden erst gestartet,
+// nachdem der Nutzer im Cookie-Banner eine Entscheidung getroffen hat.
+// window.cookieConsent.onReady() ist in consent.js definiert und ruft den
+// Callback sofort auf, wenn bereits eine gespeicherte Entscheidung vorliegt.
 // ═══════════════════════════════════════════════════════════════════════════
 
-checkAuthOnLoad();
-loadData();
-loadClips();
-setInterval(loadData,  3000);
-setInterval(loadClips, 15000);
-startTimerTick();
-checkLiveStatus();
-liveCheckInterval = setInterval(checkLiveStatus, 60000);
-loadBingo();
-setInterval(loadBingo, 10000);
+function initApp() {
+  checkAuthOnLoad();
+  loadData();
+  loadClips();
+  setInterval(loadData,  3000);
+  setInterval(loadClips, 15000);
+  startTimerTick();
+  checkLiveStatus();
+  liveCheckInterval = setInterval(checkLiveStatus, 60000);
+  loadBingo();
+  setInterval(loadBingo, 10000);
+}
+
+// consent.js muss vor script.js geladen sein (siehe index.html)
+if (window.cookieConsent && typeof window.cookieConsent.onReady === 'function') {
+  window.cookieConsent.onReady(initApp);
+} else {
+  // Fallback, falls consent.js nicht geladen wurde
+  initApp();
+}
