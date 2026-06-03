@@ -571,62 +571,18 @@ function escAttr(str) {
 // AUTH / TWITCH OAUTH
 // ═══════════════════════════════════════════════════════════════════════════
 
-// Message-Handler für Popup-basiertes OAuth (Desktop) sowie
-// localStorage-Polling nach Redirect (Mobile-Fallback).
-var _oauthPopup = null;
-var _oauthPollTimer = null;
-
-window.addEventListener("message", function(evt) {
-  if (!evt.data || evt.data.type !== "twitch_token") return;
-  var token = evt.data.token;
-  if (!token) return;
-  if (_oauthPopup) { try { _oauthPopup.close(); } catch(e) {} _oauthPopup = null; }
-  if (_oauthPollTimer) { clearInterval(_oauthPollTimer); _oauthPollTimer = null; }
-  fetchTwitchUser(token);
-}, false);
-
 function loginWithTwitch() {
   if (!TWITCH_CLIENT_ID || TWITCH_CLIENT_ID === "DEINE_CLIENT_ID_HIER") {
     showToast("\u26a0 Twitch Client ID nicht konfiguriert!", 4000);
     return;
   }
-  var scope = "";
-  var authUrl = "https://id.twitch.tv/oauth2/authorize"
+  var url = "https://id.twitch.tv/oauth2/authorize"
     + "?client_id="    + encodeURIComponent(TWITCH_CLIENT_ID)
     + "&redirect_uri=" + encodeURIComponent(TWITCH_REDIRECT_URI)
     + "&response_type=token"
-    + "&scope="        + encodeURIComponent(scope)
+    + "&scope="
     + "&force_verify=false";
-
-  // ── Desktop: Popup öffnen ─────────────────────────────────────────────
-  // Das Popup schließt sich nach dem Login selbst und sendet den Token
-  // per postMessage zurück. Funktioniert zuverlässig ohne Hash-Verlust.
-  var isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  if (!isMobile) {
-    var w = 520, h = 680;
-    var left = Math.max(0, Math.round(screen.width  / 2 - w / 2));
-    var top  = Math.max(0, Math.round(screen.height / 2 - h / 2));
-    _oauthPopup = window.open(authUrl, "twitch_oauth",
-      "width=" + w + ",height=" + h + ",left=" + left + ",top=" + top +
-      ",toolbar=0,scrollbars=0,status=0,resizable=1");
-    if (_oauthPopup) {
-      // Polling: Popup schließt sich selbst nach Token-Übertragung
-      _oauthPollTimer = setInterval(function() {
-        try {
-          if (_oauthPopup && _oauthPopup.closed) {
-            clearInterval(_oauthPollTimer); _oauthPollTimer = null;
-            _oauthPopup = null;
-          }
-        } catch(e) {}
-      }, 500);
-      return;
-    }
-    // Popup geblockt → Fallback auf Redirect
-  }
-
-  // ── Mobile / Popup geblockt: Redirect-Flow mit sessionStorage-Flag ────
-  try { sessionStorage.setItem("twitch_oauth_pending", "1"); } catch(e) {}
-  window.location.href = authUrl;
+  window.location.href = url;
 }
 
 function logout() {
@@ -640,13 +596,12 @@ function logout() {
 }
 
 function checkAuthOnLoad() {
-  // ── Token aus URL-Hash lesen (Standard-Weg) ──────────────────────────────
+  // ── Token aus URL-Hash lesen (nach OAuth-Redirect) ───────────────────────
   var hash = window.location.hash;
   if (hash && hash.includes("access_token=")) {
     var params = new URLSearchParams(hash.substring(1));
     var token  = params.get("access_token");
     if (token) {
-      try { sessionStorage.removeItem("twitch_oauth_pending"); } catch(e) {}
       history.replaceState(null, "", window.location.pathname + window.location.search);
       fetchTwitchUser(token);
       return;
@@ -658,30 +613,17 @@ function checkAuthOnLoad() {
   var savedUser  = localStorage.getItem("twitch_user");
   if (savedToken && savedUser) {
     try {
-      // Sofort UI zeigen mit gecachten Daten (kein Flackern)
       currentUser  = JSON.parse(savedUser);
       userIsEditor = ALLOWED_USERS.indexOf(currentUser.login.toLowerCase()) !== -1;
       updateLoginUI();
-      try { sessionStorage.removeItem("twitch_oauth_pending"); } catch(e) {}
-      // Token im Hintergrund gegen Twitch verifizieren und ggf. erneuern.
-      // Twitch Implicit Tokens laufen ab – ein abgelaufener Token würde
-      // im Apps Script zu ERROR:unauthorized führen, ohne dass der User
-      // es merkt (fetch mode:no-cors zeigt keinen Fehler im UI).
+      // Token still valid? Validate silently in background.
       fetch("https://id.twitch.tv/oauth2/validate", {
         headers: { "Authorization": "OAuth " + savedToken }
       })
       .then(function(r) {
-        if (r.ok) return r.json();
-        // Token abgelaufen oder ungültig → ausloggen und neu einloggen lassen
-        throw new Error("token_invalid_" + r.status);
+        if (!r.ok) throw new Error("expired");
       })
-      .then(function(data) {
-        // Token ist gültig – nichts zu tun
-        console.log("[Auth] Token gültig, läuft ab in:", data.expires_in, "Sek.");
-      })
-      .catch(function(err) {
-        console.warn("[Auth] Token-Validierung fehlgeschlagen:", err.message);
-        // Lokalen State und Storage leeren
+      .catch(function() {
         localStorage.removeItem("twitch_token");
         localStorage.removeItem("twitch_user");
         currentUser  = null;
@@ -689,25 +631,10 @@ function checkAuthOnLoad() {
         updateLoginUI();
         showToast("\u26a0 Twitch-Sitzung abgelaufen – bitte neu einloggen.", 6000);
       });
-      return;
     } catch (e) {
       localStorage.removeItem("twitch_token");
       localStorage.removeItem("twitch_user");
     }
-  }
-
-  // ── Fallback: OAuth-Pending-Flag gesetzt, aber kein Token angekommen ─────
-  // Das passiert auf iOS Safari/Chrome wenn der URL-Hash beim Redirect
-  // verloren geht (In-App-Browser oder Privacy-Einstellungen).
-  var pending = false;
-  try { pending = sessionStorage.getItem("twitch_oauth_pending") === "1"; } catch(e) {}
-  if (pending) {
-    try { sessionStorage.removeItem("twitch_oauth_pending"); } catch(e) {}
-    // Zeige Hinweis und öffne Twitch-Login erneut im selben Tab
-    console.warn("[Auth] OAuth-Redirect hat keinen Token geliefert (iOS-Bug). Erneuter Versuch...");
-    setTimeout(function() {
-      showToast("\u26a0 Login fehlgeschlagen (iOS-Browser). Bitte erneut anmelden.", 5000);
-    }, 500);
   }
 }
 
