@@ -658,11 +658,37 @@ function checkAuthOnLoad() {
   var savedUser  = localStorage.getItem("twitch_user");
   if (savedToken && savedUser) {
     try {
+      // Sofort UI zeigen mit gecachten Daten (kein Flackern)
       currentUser  = JSON.parse(savedUser);
       userIsEditor = ALLOWED_USERS.indexOf(currentUser.login.toLowerCase()) !== -1;
       updateLoginUI();
-      // sessionStorage-Flag räumen falls vorhanden
       try { sessionStorage.removeItem("twitch_oauth_pending"); } catch(e) {}
+      // Token im Hintergrund gegen Twitch verifizieren und ggf. erneuern.
+      // Twitch Implicit Tokens laufen ab – ein abgelaufener Token würde
+      // im Apps Script zu ERROR:unauthorized führen, ohne dass der User
+      // es merkt (fetch mode:no-cors zeigt keinen Fehler im UI).
+      fetch("https://id.twitch.tv/oauth2/validate", {
+        headers: { "Authorization": "OAuth " + savedToken }
+      })
+      .then(function(r) {
+        if (r.ok) return r.json();
+        // Token abgelaufen oder ungültig → ausloggen und neu einloggen lassen
+        throw new Error("token_invalid_" + r.status);
+      })
+      .then(function(data) {
+        // Token ist gültig – nichts zu tun
+        console.log("[Auth] Token gültig, läuft ab in:", data.expires_in, "Sek.");
+      })
+      .catch(function(err) {
+        console.warn("[Auth] Token-Validierung fehlgeschlagen:", err.message);
+        // Lokalen State und Storage leeren
+        localStorage.removeItem("twitch_token");
+        localStorage.removeItem("twitch_user");
+        currentUser  = null;
+        userIsEditor = false;
+        updateLoginUI();
+        showToast("\u26a0 Twitch-Sitzung abgelaufen – bitte neu einloggen.", 6000);
+      });
       return;
     } catch (e) {
       localStorage.removeItem("twitch_token");
@@ -867,9 +893,27 @@ function writeToSheet(area, boss, action, value) {
     + "&value="  + encodeURIComponent(value)
     + "&twitchToken=" + encodeURIComponent(getTwitchToken());
 
-  fetch(url, { method: "GET", mode: "no-cors" })
-    .catch(function(err) {
-      console.error("[Sheet] Schreibfehler:", err);
+  // cors statt no-cors: Antwort lesbar machen um Fehler (z.B. abgelaufener
+  // Token) sichtbar zu machen. Google Apps Script sendet keinen
+  // Access-Control-Allow-Origin-Header → wir fangen den CORS-Fehler ab
+  // und machen einen zweiten Versuch mit no-cors als Fallback.
+  fetch(url, { method: "GET", mode: "cors" })
+    .then(function(r) { return r.text(); })
+    .then(function(text) {
+      if (text && text.indexOf("unauthorized") !== -1) {
+        console.warn("[Sheet] Unauthorized – Token abgelaufen?");
+        showToast("\u26a0 Sheet-Schreibfehler: Bitte neu einloggen.", 5000);
+        localStorage.removeItem("twitch_token");
+        localStorage.removeItem("twitch_user");
+        currentUser  = null;
+        userIsEditor = false;
+        updateLoginUI();
+      }
+    })
+    .catch(function() {
+      // CORS-Fehler erwartet (Apps Script hat kein CORS-Header) → no-cors Fallback
+      fetch(url, { method: "GET", mode: "no-cors" })
+        .catch(function(err) { console.error("[Sheet] Schreibfehler:", err); });
     });
 }
 
@@ -927,13 +971,15 @@ function updateFieldDeathsVisibility() {
 
 function writeFieldDeathsToSheet(type, value) {
   if (!APPS_SCRIPT_URL) return;
-  fetch(APPS_SCRIPT_URL
+  var url = APPS_SCRIPT_URL
     + "?action=setFieldDeaths"
     + "&type="  + encodeURIComponent(type)
     + "&value=" + encodeURIComponent(value)
-    + "&twitchToken=" + encodeURIComponent(getTwitchToken()),
-    { method: "GET", mode: "no-cors" }
-  ).catch(function(err) { console.error("[FieldDeaths]", err); });
+    + "&twitchToken=" + encodeURIComponent(getTwitchToken());
+  fetch(url, { method: "GET", mode: "cors" })
+    .then(function(r) { return r.text(); })
+    .then(function(t) { if (t && t.indexOf("unauthorized") !== -1) { showToast("\u26a0 Sheet-Schreibfehler: Bitte neu einloggen.", 5000); } })
+    .catch(function() { fetch(url, { method: "GET", mode: "no-cors" }).catch(function(e) { console.error("[FieldDeaths]", e); }); });
 }
 
 function updateBossRow(areaName, bossName, bossData) {
