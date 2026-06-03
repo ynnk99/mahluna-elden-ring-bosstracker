@@ -5,7 +5,7 @@
 const TWITCH_CLIENT_ID   = "n3oqt780bnsi3lb2gzinxdbrrazork";
 // Stabiler Redirect-URI: kein trailing slash, damit er exakt mit der
 // in der Twitch-Dev-Console registrierten URL übereinstimmt.
-const TWITCH_REDIRECT_URI = (window.location.origin + window.location.pathname).replace(/\/$/, "");
+const TWITCH_REDIRECT_URI = window.location.origin + window.location.pathname;
 const APPS_SCRIPT_URL    = "https://script.google.com/macros/s/AKfycbzTt2y1Cgt7wzQpBGJC57LFa8B2o90MmkeJXuf83lDxC8aUyJPhzu6O_jJm4J65j5ri/exec";
 const TOOLBOX_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzTt2y1Cgt7wzQpBGJC57LFa8B2o90MmkeJXuf83lDxC8aUyJPhzu6O_jJm4J65j5ri/exec";
 
@@ -580,7 +580,7 @@ function loginWithTwitch() {
     + "?client_id="    + encodeURIComponent(TWITCH_CLIENT_ID)
     + "&redirect_uri=" + encodeURIComponent(TWITCH_REDIRECT_URI)
     + "&response_type=token"
-    + "&scope="
+    + "&scope=" + encodeURIComponent("")
     + "&force_verify=false";
   window.location.href = url;
 }
