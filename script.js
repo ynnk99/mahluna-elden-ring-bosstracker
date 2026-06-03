@@ -3,8 +3,6 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 const TWITCH_CLIENT_ID   = "n3oqt780bnsi3lb2gzinxdbrrazork";
-// Stabiler Redirect-URI: kein trailing slash, damit er exakt mit der
-// in der Twitch-Dev-Console registrierten URL übereinstimmt.
 const TWITCH_REDIRECT_URI = window.location.origin + window.location.pathname;
 const APPS_SCRIPT_URL    = "https://script.google.com/macros/s/AKfycbzTt2y1Cgt7wzQpBGJC57LFa8B2o90MmkeJXuf83lDxC8aUyJPhzu6O_jJm4J65j5ri/exec";
 const TOOLBOX_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzTt2y1Cgt7wzQpBGJC57LFa8B2o90MmkeJXuf83lDxC8aUyJPhzu6O_jJm4J65j5ri/exec";
@@ -14,7 +12,6 @@ const ALLOWED_USERS = [
   "mahluna",
   "der_gude_nico",
   "Deeichkind",
-  "Bombaster_3k",
 ];
 
 const SPREADSHEET_ID = "1r9BzZJYFrk4rQLlMn4ZPBBUuc8u_peqwThTi1UTCQcE";
@@ -573,14 +570,15 @@ function escAttr(str) {
 
 function loginWithTwitch() {
   if (!TWITCH_CLIENT_ID || TWITCH_CLIENT_ID === "DEINE_CLIENT_ID_HIER") {
-    showToast("\u26a0 Twitch Client ID nicht konfiguriert!", 4000);
+    showToast("⚠ Twitch Client ID nicht konfiguriert!", 4000);
     return;
   }
-  var url = "https://id.twitch.tv/oauth2/authorize"
+  var scope = "";
+  var url   = "https://id.twitch.tv/oauth2/authorize"
     + "?client_id="    + encodeURIComponent(TWITCH_CLIENT_ID)
     + "&redirect_uri=" + encodeURIComponent(TWITCH_REDIRECT_URI)
     + "&response_type=token"
-    + "&scope=" + encodeURIComponent("")
+    + "&scope="        + encodeURIComponent(scope)
     + "&force_verify=false";
   window.location.href = url;
 }
@@ -596,7 +594,6 @@ function logout() {
 }
 
 function checkAuthOnLoad() {
-  // ── Token aus URL-Hash lesen (nach OAuth-Redirect) ───────────────────────
   var hash = window.location.hash;
   if (hash && hash.includes("access_token=")) {
     var params = new URLSearchParams(hash.substring(1));
@@ -608,7 +605,6 @@ function checkAuthOnLoad() {
     }
   }
 
-  // ── Gespeicherten Token aus localStorage wiederherstellen ────────────────
   var savedToken = localStorage.getItem("twitch_token");
   var savedUser  = localStorage.getItem("twitch_user");
   if (savedToken && savedUser) {
@@ -616,13 +612,12 @@ function checkAuthOnLoad() {
       currentUser  = JSON.parse(savedUser);
       userIsEditor = ALLOWED_USERS.indexOf(currentUser.login.toLowerCase()) !== -1;
       updateLoginUI();
-      // Token still valid? Validate silently in background.
+      // Token im Hintergrund validieren – abgelaufene Tokens führen sonst
+      // zu stillem Scheitern beim Sheet-Schreiben (mode:no-cors zeigt keinen Fehler)
       fetch("https://id.twitch.tv/oauth2/validate", {
         headers: { "Authorization": "OAuth " + savedToken }
       })
-      .then(function(r) {
-        if (!r.ok) throw new Error("expired");
-      })
+      .then(function(r) { if (!r.ok) throw new Error("expired"); })
       .catch(function() {
         localStorage.removeItem("twitch_token");
         localStorage.removeItem("twitch_user");
@@ -659,7 +654,6 @@ function fetchTwitchUser(token) {
     localStorage.setItem("twitch_user", JSON.stringify(currentUser));
     updateLoginUI();
     renderFromCache();
-    console.log("[Auth] Login OK:", user.login, "| Editor:", userIsEditor);
     showToast(userIsEditor
       ? "✔ Willkommen " + currentUser.display_name + " — Bearbeitungsrechte aktiv"
       : "👁 Eingeloggt als " + currentUser.display_name + " (nur lesen)", 4000);
@@ -820,25 +814,21 @@ function writeToSheet(area, boss, action, value) {
     + "&value="  + encodeURIComponent(value)
     + "&twitchToken=" + encodeURIComponent(getTwitchToken());
 
-  // cors statt no-cors: Antwort lesbar machen um Fehler (z.B. abgelaufener
-  // Token) sichtbar zu machen. Google Apps Script sendet keinen
-  // Access-Control-Allow-Origin-Header → wir fangen den CORS-Fehler ab
-  // und machen einen zweiten Versuch mit no-cors als Fallback.
+  // cors zuerst um Fehlerantwort lesen zu können (z.B. abgelaufener Token).
+  // Schlägt CORS fehl (Apps Script hat kein CORS-Header) → no-cors Fallback.
   fetch(url, { method: "GET", mode: "cors" })
     .then(function(r) { return r.text(); })
-    .then(function(text) {
-      if (text && text.indexOf("unauthorized") !== -1) {
-        console.warn("[Sheet] Unauthorized – Token abgelaufen?");
-        showToast("\u26a0 Sheet-Schreibfehler: Bitte neu einloggen.", 5000);
+    .then(function(t) {
+      if (t && t.indexOf("unauthorized") !== -1) {
         localStorage.removeItem("twitch_token");
         localStorage.removeItem("twitch_user");
         currentUser  = null;
         userIsEditor = false;
         updateLoginUI();
+        showToast("\u26a0 Sitzung abgelaufen – bitte neu einloggen.", 5000);
       }
     })
     .catch(function() {
-      // CORS-Fehler erwartet (Apps Script hat kein CORS-Header) → no-cors Fallback
       fetch(url, { method: "GET", mode: "no-cors" })
         .catch(function(err) { console.error("[Sheet] Schreibfehler:", err); });
     });
@@ -905,8 +895,11 @@ function writeFieldDeathsToSheet(type, value) {
     + "&twitchToken=" + encodeURIComponent(getTwitchToken());
   fetch(url, { method: "GET", mode: "cors" })
     .then(function(r) { return r.text(); })
-    .then(function(t) { if (t && t.indexOf("unauthorized") !== -1) { showToast("\u26a0 Sheet-Schreibfehler: Bitte neu einloggen.", 5000); } })
-    .catch(function() { fetch(url, { method: "GET", mode: "no-cors" }).catch(function(e) { console.error("[FieldDeaths]", e); }); });
+    .then(function(t) { if (t && t.indexOf("unauthorized") !== -1) { showToast("\u26a0 Sitzung abgelaufen – bitte neu einloggen.", 5000); } })
+    .catch(function() {
+      fetch(url, { method: "GET", mode: "no-cors" })
+        .catch(function(e) { console.error("[FieldDeaths]", e); });
+    });
 }
 
 function updateBossRow(areaName, bossName, bossData) {
@@ -2712,29 +2705,15 @@ function writeBingoTextToSheet(row, col, text) {
 
 // ═══════════════════════════════════════════════════════════════════════════
 // INIT
-// Alle externen Requests (Google Sheets, Twitch API) werden erst gestartet,
-// nachdem der Nutzer im Cookie-Banner eine Entscheidung getroffen hat.
-// window.cookieConsent.onReady() ist in consent.js definiert und ruft den
-// Callback sofort auf, wenn bereits eine gespeicherte Entscheidung vorliegt.
 // ═══════════════════════════════════════════════════════════════════════════
 
-function initApp() {
-  checkAuthOnLoad();
-  loadData();
-  loadClips();
-  setInterval(loadData,  3000);
-  setInterval(loadClips, 15000);
-  startTimerTick();
-  checkLiveStatus();
-  liveCheckInterval = setInterval(checkLiveStatus, 60000);
-  loadBingo();
-  setInterval(loadBingo, 10000);
-}
-
-// consent.js muss vor script.js geladen sein (siehe index.html)
-if (window.cookieConsent && typeof window.cookieConsent.onReady === 'function') {
-  window.cookieConsent.onReady(initApp);
-} else {
-  // Fallback, falls consent.js nicht geladen wurde
-  initApp();
-}
+checkAuthOnLoad();
+loadData();
+loadClips();
+setInterval(loadData,  3000);
+setInterval(loadClips, 15000);
+startTimerTick();
+checkLiveStatus();
+liveCheckInterval = setInterval(checkLiveStatus, 60000);
+loadBingo();
+setInterval(loadBingo, 10000);
