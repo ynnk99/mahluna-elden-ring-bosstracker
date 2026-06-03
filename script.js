@@ -3,7 +3,9 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 const TWITCH_CLIENT_ID   = "n3oqt780bnsi3lb2gzinxdbrrazork";
-const TWITCH_REDIRECT_URI = window.location.origin + window.location.pathname;
+// Stabiler Redirect-URI: kein trailing slash, damit er exakt mit der
+// in der Twitch-Dev-Console registrierten URL übereinstimmt.
+const TWITCH_REDIRECT_URI = (window.location.origin + window.location.pathname).replace(/\/$/, "");
 const APPS_SCRIPT_URL    = "https://script.google.com/macros/s/AKfycbzTt2y1Cgt7wzQpBGJC57LFa8B2o90MmkeJXuf83lDxC8aUyJPhzu6O_jJm4J65j5ri/exec";
 const TOOLBOX_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzTt2y1Cgt7wzQpBGJC57LFa8B2o90MmkeJXuf83lDxC8aUyJPhzu6O_jJm4J65j5ri/exec";
 
@@ -569,19 +571,62 @@ function escAttr(str) {
 // AUTH / TWITCH OAUTH
 // ═══════════════════════════════════════════════════════════════════════════
 
+// Message-Handler für Popup-basiertes OAuth (Desktop) sowie
+// localStorage-Polling nach Redirect (Mobile-Fallback).
+var _oauthPopup = null;
+var _oauthPollTimer = null;
+
+window.addEventListener("message", function(evt) {
+  if (!evt.data || evt.data.type !== "twitch_token") return;
+  var token = evt.data.token;
+  if (!token) return;
+  if (_oauthPopup) { try { _oauthPopup.close(); } catch(e) {} _oauthPopup = null; }
+  if (_oauthPollTimer) { clearInterval(_oauthPollTimer); _oauthPollTimer = null; }
+  fetchTwitchUser(token);
+}, false);
+
 function loginWithTwitch() {
   if (!TWITCH_CLIENT_ID || TWITCH_CLIENT_ID === "DEINE_CLIENT_ID_HIER") {
-    showToast("⚠ Twitch Client ID nicht konfiguriert!", 4000);
+    showToast("\u26a0 Twitch Client ID nicht konfiguriert!", 4000);
     return;
   }
   var scope = "";
-  var url   = "https://id.twitch.tv/oauth2/authorize"
+  var authUrl = "https://id.twitch.tv/oauth2/authorize"
     + "?client_id="    + encodeURIComponent(TWITCH_CLIENT_ID)
     + "&redirect_uri=" + encodeURIComponent(TWITCH_REDIRECT_URI)
     + "&response_type=token"
     + "&scope="        + encodeURIComponent(scope)
     + "&force_verify=false";
-  window.location.href = url;
+
+  // ── Desktop: Popup öffnen ─────────────────────────────────────────────
+  // Das Popup schließt sich nach dem Login selbst und sendet den Token
+  // per postMessage zurück. Funktioniert zuverlässig ohne Hash-Verlust.
+  var isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  if (!isMobile) {
+    var w = 520, h = 680;
+    var left = Math.max(0, Math.round(screen.width  / 2 - w / 2));
+    var top  = Math.max(0, Math.round(screen.height / 2 - h / 2));
+    _oauthPopup = window.open(authUrl, "twitch_oauth",
+      "width=" + w + ",height=" + h + ",left=" + left + ",top=" + top +
+      ",toolbar=0,scrollbars=0,status=0,resizable=1");
+    if (_oauthPopup) {
+      // Polling: Popup schließt sich selbst nach Token-Übertragung
+      _oauthPollTimer = setInterval(function() {
+        try {
+          if (_oauthPopup && _oauthPopup.closed) {
+            clearInterval(_oauthPollTimer); _oauthPollTimer = null;
+            _oauthPopup = null;
+          }
+        } catch(e) {}
+      }, 500);
+      return;
+    }
+    // Popup geblockt → Fallback auf Redirect
+  }
+
+  // ── Mobile / Popup geblockt: Redirect-Flow mit sessionStorage-Flag ────
+  try { sessionStorage.setItem("twitch_oauth_pending", "1"); } catch(e) {}
+  window.location.href = authUrl;
 }
 
 function logout() {
@@ -595,17 +640,20 @@ function logout() {
 }
 
 function checkAuthOnLoad() {
+  // ── Token aus URL-Hash lesen (Standard-Weg) ──────────────────────────────
   var hash = window.location.hash;
   if (hash && hash.includes("access_token=")) {
     var params = new URLSearchParams(hash.substring(1));
     var token  = params.get("access_token");
     if (token) {
+      try { sessionStorage.removeItem("twitch_oauth_pending"); } catch(e) {}
       history.replaceState(null, "", window.location.pathname + window.location.search);
       fetchTwitchUser(token);
       return;
     }
   }
 
+  // ── Gespeicherten Token aus localStorage wiederherstellen ────────────────
   var savedToken = localStorage.getItem("twitch_token");
   var savedUser  = localStorage.getItem("twitch_user");
   if (savedToken && savedUser) {
@@ -613,10 +661,27 @@ function checkAuthOnLoad() {
       currentUser  = JSON.parse(savedUser);
       userIsEditor = ALLOWED_USERS.indexOf(currentUser.login.toLowerCase()) !== -1;
       updateLoginUI();
+      // sessionStorage-Flag räumen falls vorhanden
+      try { sessionStorage.removeItem("twitch_oauth_pending"); } catch(e) {}
+      return;
     } catch (e) {
       localStorage.removeItem("twitch_token");
       localStorage.removeItem("twitch_user");
     }
+  }
+
+  // ── Fallback: OAuth-Pending-Flag gesetzt, aber kein Token angekommen ─────
+  // Das passiert auf iOS Safari/Chrome wenn der URL-Hash beim Redirect
+  // verloren geht (In-App-Browser oder Privacy-Einstellungen).
+  var pending = false;
+  try { pending = sessionStorage.getItem("twitch_oauth_pending") === "1"; } catch(e) {}
+  if (pending) {
+    try { sessionStorage.removeItem("twitch_oauth_pending"); } catch(e) {}
+    // Zeige Hinweis und öffne Twitch-Login erneut im selben Tab
+    console.warn("[Auth] OAuth-Redirect hat keinen Token geliefert (iOS-Bug). Erneuter Versuch...");
+    setTimeout(function() {
+      showToast("\u26a0 Login fehlgeschlagen (iOS-Browser). Bitte erneut anmelden.", 5000);
+    }, 500);
   }
 }
 
@@ -641,6 +706,7 @@ function fetchTwitchUser(token) {
     localStorage.setItem("twitch_user", JSON.stringify(currentUser));
     updateLoginUI();
     renderFromCache();
+    console.log("[Auth] Login OK:", user.login, "| Editor:", userIsEditor);
     showToast(userIsEditor
       ? "✔ Willkommen " + currentUser.display_name + " — Bearbeitungsrechte aktiv"
       : "👁 Eingeloggt als " + currentUser.display_name + " (nur lesen)", 4000);
