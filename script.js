@@ -210,6 +210,8 @@ function toolboxFillTimeInputs() {
   if (hEl) hEl.value = h > 0 ? h : '';
   if (mEl) mEl.value = m > 0 ? m : '';
   if (sEl) sEl.value = sec > 0 ? sec : '';
+  var labelInput = document.getElementById('etb-timer-label-input');
+  if (labelInput) labelInput.value = timerLabel || '';
 }
 
 function toolboxSetElapsed() {
@@ -236,6 +238,28 @@ function toolboxSetElapsed() {
   }
 
   showToast("⏱ Timer gesetzt: " + fmtTime(ms), 2000);
+}
+
+function toolboxSetTimerLabel() {
+  if (!isAuthorized()) return;
+  var input = document.getElementById('etb-timer-label-input');
+  var label = input ? input.value.trim() : "";
+
+  // Lokal sofort anwenden
+  timerLabel = label;
+  var labelEl = document.getElementById("val-timer-label");
+  if (labelEl) labelEl.textContent = timerLabel ? timerLabel + ":" : "Aktueller Boss:";
+
+  // Sheet: N3 setzen (leer = Inhalt löschen)
+  if (TOOLBOX_SCRIPT_URL) {
+    fetch(TOOLBOX_SCRIPT_URL
+      + "?action=setCell&cell=N3&value=" + encodeURIComponent(label)
+      + "&twitchToken=" + encodeURIComponent(getTwitchToken()),
+      { method: "GET", mode: "no-cors" }
+    ).catch(function(e) { console.error("[Toolbox] setTimerLabel:", e); });
+  }
+
+  showToast(label ? "\uD83C\uDFF7 Label gesetzt: " + label : "\uD83C\uDFF7 Label geleert", 2000);
 }
 
 document.addEventListener('click', function(e) {

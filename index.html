@@ -47,6 +47,12 @@
                onkeydown="if(event.key==='Enter')toolboxSetElapsed()">
         <button class="etb-time-set-btn" onclick="toolboxSetElapsed()" data-tip="Timer auf diese Zeit setzen" data-tip-always="1">↵</button>
       </div>
+      <div class="etb-label-set">
+        <input type="text" class="etb-label-input" id="etb-timer-label-input"
+               placeholder="Timer Label (leer = Standard)"
+               onkeydown="if(event.key==='Enter')toolboxSetTimerLabel()">
+        <button class="etb-time-set-btn" onclick="toolboxSetTimerLabel()" data-tip="Timer Label setzen" data-tip-always="1">↵</button>
+      </div>
     </div>
   </div>
 
