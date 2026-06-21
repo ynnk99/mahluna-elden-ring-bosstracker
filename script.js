@@ -1613,6 +1613,25 @@ function buildEmbedUrl(parsed) {
   return null;
 }
 
+// Lazy Loading: ersetzt den Platzhalter durch den echten Twitch-iframe (erst bei Klick).
+function loadClipEmbed(wrapperEl) {
+  var embedUrl = wrapperEl.getAttribute("data-embed-url");
+  var index    = wrapperEl.getAttribute("data-clip-index");
+  if (!embedUrl) return;
+
+  var iframe = document.createElement("iframe");
+  iframe.src = embedUrl + "&autoplay=true";
+  iframe.allowFullscreen = true;
+  iframe.setAttribute("scrolling", "no");
+  iframe.setAttribute("allow", "autoplay; fullscreen");
+  iframe.title = "Clip " + (parseInt(index, 10) + 1);
+
+  wrapperEl.removeAttribute("onclick");
+  wrapperEl.classList.remove("clip-lazy");
+  wrapperEl.innerHTML = "";
+  wrapperEl.appendChild(iframe);
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // CLIP DATUM-FILTER
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1767,9 +1786,11 @@ function renderClipCard(clip, index) {
   var embedHtml;
 
   if (embedUrl) {
-    embedHtml = '<div class="clip-embed-wrapper">'
-      + '<iframe src="' + escAttr(embedUrl) + '" allowfullscreen scrolling="no" allow="autoplay; fullscreen" title="Clip ' + (index + 1) + '"></iframe>'
-      + '</div>';
+    // Lazy Loading: iframe wird erst bei Klick eingesetzt, nicht beim Rendern der Liste.
+    embedHtml = '<div class="clip-embed-wrapper clip-lazy" data-embed-url="' + escAttr(embedUrl) + '" data-clip-index="' + index + '" onclick="loadClipEmbed(this)">'
+      + '<div class="clip-lazy-thumb">'
+      + '<span class="clip-lazy-play">▶</span>'
+      + '</div></div>';
   } else {
     embedHtml = '<div class="clip-embed-wrapper">'
       + '<div class="clip-placeholder" onclick="window.open(\'' + escAttr(linkUrl) + '\',\'_blank\')">'
