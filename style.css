@@ -1239,6 +1239,15 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 }
 .clip-close-btn:hover { border-color: var(--gold-dim); color: var(--gold); background: rgba(201,164,74,0.08); }
 
+.clip-view-toggle {
+  display: flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; background: transparent; border: 1px solid var(--border);
+  border-radius: var(--radius); color: var(--parchment-dim); font-size: 16px;
+  cursor: pointer; transition: all 0.2s ease; flex-shrink: 0;
+}
+.clip-view-toggle:hover { border-color: rgba(145,70,255,0.45); color: #d8c4ff; background: rgba(145,70,255,0.08); }
+.clip-view-toggle.active { border-color: var(--twitch); color: #d8c4ff; background: rgba(145,70,255,0.18); }
+
 /* ── CLIP DATUM-FILTER ── */
 .clip-date-filter {
   display: flex;
@@ -1412,6 +1421,63 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
 .clip-loading-spinner {
   width: 32px; height: 32px; border: 2px solid rgba(145,70,255,0.12);
   border-top-color: var(--twitch); border-radius: 50%; animation: spin 1s linear infinite;
+}
+
+/* ── REEL-MODUS: vertikales Durchscrollen wie TikTok/Reels ── */
+.clip-reels {
+  display: none;
+  flex: 1; overflow-y: auto; scroll-snap-type: y mandatory;
+  background: #000; scrollbar-width: none;
+}
+.clip-reels::-webkit-scrollbar { display: none; }
+
+.clip-reel-slide {
+  position: relative; height: 100%; width: 100%;
+  scroll-snap-align: start; scroll-snap-stop: always;
+  display: flex; align-items: center; justify-content: center;
+  background: #000; overflow: hidden;
+}
+
+.clip-reel-media {
+  position: relative; width: 100%; height: 100%;
+  max-width: calc((100% - 0px) * 0.5625); /* hochformatige Begrenzung, damit 16:9-Embeds nicht riesig wirken */
+  margin: 0 auto; background: #050505;
+}
+.clip-reel-media iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; display: block; }
+.clip-reel-media .clip-placeholder { position: absolute; inset: 0; }
+
+.clip-reel-info {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 2;
+  padding: 20px 70px 22px 22px;
+  background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.85) 100%);
+  pointer-events: none;
+}
+.clip-reel-title {
+  font-family: 'Crimson Pro', serif; font-size: 16px; color: var(--parchment);
+  margin-bottom: 8px; font-weight: 500;
+}
+.clip-reel-meta { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.clip-reel-meta span {
+  font-family: 'Crimson Pro', serif; font-size: 13px; color: var(--parchment-dim);
+  letter-spacing: 0.02em;
+}
+.clip-reel-category {
+  padding: 3px 10px; border-radius: 20px; background: rgba(145,70,255,0.22);
+  border: 1px solid rgba(145,70,255,0.4); color: #d8c4ff !important; font-size: 12px !important;
+}
+
+.clip-reel-open {
+  position: absolute; right: 16px; bottom: 24px; z-index: 3;
+  width: 44px; height: 44px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(145,70,255,0.85); color: #fff;
+  box-shadow: 0 4px 18px rgba(145,70,255,0.4);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+.clip-reel-open:hover { transform: scale(1.08); background: rgba(165,95,255,0.95); }
+
+@media (max-width: 600px) {
+  .clip-reel-media { max-width: 100%; }
 }
 
 @media (max-width: 600px) {

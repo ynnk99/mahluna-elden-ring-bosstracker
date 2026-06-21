@@ -511,6 +511,8 @@ var clipDateFilter = 'all';
 var clipDateFrom   = null;
 var clipDateTo     = null;
 var activeCategory = null;
+var clipViewMode   = 'grid'; // 'grid' oder 'reels'
+var clipReelsObserver = null;
 var currentAreas   = {};
 var searchQuery    = "";
 var prevRankingSnapshot = "";
@@ -1707,6 +1709,20 @@ function openClipModal() {
   document.getElementById("clip-backdrop").classList.add("open");
   document.getElementById("clip-modal").classList.add("open");
   document.body.style.overflow = "hidden";
+
+  // Immer im Grid-Modus starten, damit UI-Zustand (Tabs/Filter/Toggle) konsistent bleibt.
+  clipViewMode = 'grid';
+  var toggleBtn = document.getElementById("clip-view-toggle");
+  var tabsEl    = document.getElementById("clip-tabs");
+  var filterEl  = document.getElementById("clip-date-filter");
+  var bodyEl    = document.getElementById("clip-body");
+  var reelsEl   = document.getElementById("clip-reels");
+  if (toggleBtn) toggleBtn.classList.remove("active");
+  if (tabsEl)   tabsEl.style.display   = "";
+  if (filterEl) filterEl.style.display = "";
+  if (bodyEl)   bodyEl.style.display   = "";
+  if (reelsEl) { reelsEl.style.display = "none"; reelsEl.innerHTML = ""; }
+
   renderClipModal();
 }
 
@@ -1714,6 +1730,37 @@ function closeClipModal() {
   document.getElementById("clip-backdrop").classList.remove("open");
   document.getElementById("clip-modal").classList.remove("open");
   document.body.style.overflow = "";
+  teardownClipReelsObserver();
+}
+
+function toggleClipViewMode() {
+  clipViewMode = (clipViewMode === 'grid') ? 'reels' : 'grid';
+  var toggleBtn = document.getElementById("clip-view-toggle");
+  var tabsEl    = document.getElementById("clip-tabs");
+  var filterEl  = document.getElementById("clip-date-filter");
+  var bodyEl    = document.getElementById("clip-body");
+  var reelsEl   = document.getElementById("clip-reels");
+
+  if (clipViewMode === 'reels') {
+    toggleBtn.classList.add("active");
+    toggleBtn.querySelector(".clip-view-toggle-icon").textContent = "▤";
+    toggleBtn.setAttribute("data-tip", "Raster-Ansicht");
+    tabsEl.style.display   = "none";
+    filterEl.style.display = "none";
+    bodyEl.style.display   = "none";
+    reelsEl.style.display  = "flex";
+    renderClipReels();
+  } else {
+    toggleBtn.classList.remove("active");
+    toggleBtn.querySelector(".clip-view-toggle-icon").textContent = "▤";
+    toggleBtn.setAttribute("data-tip", "Reel-Modus");
+    tabsEl.style.display   = "";
+    filterEl.style.display = "";
+    bodyEl.style.display   = "";
+    reelsEl.style.display  = "none";
+    teardownClipReelsObserver();
+    reelsEl.innerHTML = "";
+  }
 }
 
 function renderClipModal() {
@@ -1765,6 +1812,93 @@ function renderClipModal() {
       + categories[cat].map(function(c, i) { return renderClipCard(c, i); }).join("")
       + '</div></div>';
   }).join("");
+
+  if (clipViewMode === 'reels') {
+    renderClipReels();
+  }
+}
+
+// ── REEL-MODUS: vertikales Durchscrollen, ein Clip pro Bildschirm ──────────
+
+function renderClipReels() {
+  var reelsEl = document.getElementById("clip-reels");
+  var filtered = getFilteredClips();
+
+  teardownClipReelsObserver();
+
+  reelsEl.innerHTML = filtered.map(function(c, i) {
+    return renderClipReelSlide(c, i);
+  }).join("");
+
+  setupClipReelsObserver();
+}
+
+function renderClipReelSlide(clip, index) {
+  var parsed   = parseTwitchClip(clip.url);
+  var embedUrl = buildEmbedUrl(parsed);
+  var linkUrl  = clip.url;
+
+  var mediaHtml = embedUrl
+    ? '<div class="clip-reel-media" data-embed-url="' + escAttr(embedUrl) + '" data-clip-index="' + index + '"></div>'
+    : '<div class="clip-reel-media">'
+      + '<div class="clip-placeholder" onclick="window.open(\'' + escAttr(linkUrl) + '\',\'_blank\')">'
+      + '<span class="clip-placeholder-icon">▶️</span>'
+      + '<span class="clip-placeholder-text">Clip öffnen</span>'
+      + '</div></div>';
+
+  return '<div class="clip-reel-slide" data-reel-index="' + index + '">'
+    + mediaHtml
+    + '<div class="clip-reel-info">'
+    + (clip.title ? '<p class="clip-reel-title">' + escHtml(clip.title) + '</p>' : '')
+    + '<div class="clip-reel-meta">'
+    + '<span class="clip-reel-category">' + escHtml(clip.category || "Sonstige") + '</span>'
+    + (clip.boss ? '<span class="clip-reel-boss">🎮 ' + escHtml(clip.boss) + '</span>' : '')
+    + (clip.creatorName ? '<span class="clip-reel-creator">✂ ' + escHtml(clip.creatorName) + '</span>' : '')
+    + (clip.addedAt ? '<span class="clip-reel-date">📅 ' + formatClipDate(clip.addedAt) + '</span>' : '')
+    + '</div></div>'
+    + '<a href="' + escAttr(linkUrl) + '" target="_blank" rel="noopener" class="clip-reel-open" data-tip="Auf Twitch öffnen" data-tip-always="1">'
+    + '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42L17.59 5H14V3zM5 5h6v2H7v10h10v-4h2v6H5V5z"/></svg>'
+    + '</a></div>';
+}
+
+function setupClipReelsObserver() {
+  var reelsEl = document.getElementById("clip-reels");
+  if (!reelsEl || !("IntersectionObserver" in window)) return;
+
+  clipReelsObserver = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      var media = entry.target.querySelector(".clip-reel-media[data-embed-url]");
+      if (!media) return;
+
+      if (entry.isIntersecting && entry.intersectionRatio > 0.6) {
+        if (!media.querySelector("iframe")) {
+          var embedUrl = media.getAttribute("data-embed-url");
+          var index    = media.getAttribute("data-clip-index");
+          var iframe = document.createElement("iframe");
+          iframe.src = embedUrl + "&autoplay=true&muted=false";
+          iframe.allowFullscreen = true;
+          iframe.setAttribute("scrolling", "no");
+          iframe.setAttribute("allow", "autoplay; fullscreen");
+          iframe.title = "Clip " + (parseInt(index, 10) + 1);
+          media.appendChild(iframe);
+        }
+      } else {
+        // Nicht mehr sichtbar: Player entfernen, damit nicht mehrere gleichzeitig laufen/laden.
+        media.innerHTML = "";
+      }
+    });
+  }, { root: reelsEl, threshold: [0, 0.6] });
+
+  reelsEl.querySelectorAll(".clip-reel-slide").forEach(function(slide) {
+    clipReelsObserver.observe(slide);
+  });
+}
+
+function teardownClipReelsObserver() {
+  if (clipReelsObserver) {
+    clipReelsObserver.disconnect();
+    clipReelsObserver = null;
+  }
 }
 
 function switchClipTab(cat) {

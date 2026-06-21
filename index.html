@@ -459,6 +459,9 @@
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
+        <button class="clip-view-toggle" id="clip-view-toggle" onclick="toggleClipViewMode()" data-tip="Reel-Modus" data-tip-always="1">
+          <span class="clip-view-toggle-icon">▤</span>
+        </button>
         <button class="add-clip-btn" id="add-clip-btn" onclick="toggleAddClipPanel()">
           ➕ Clip hinzufügen
         </button>
@@ -527,6 +530,7 @@
         <span>Clips werden geladen…</span>
       </div>
     </div>
+    <div class="clip-reels" id="clip-reels"></div>
   </div>
 </div>
 
