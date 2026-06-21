@@ -692,7 +692,7 @@ function fetchTwitchUser(token) {
 // ── Twitch Clip-Erstelldatum abrufen ─────────────────────────────────────────
 function fetchTwitchClipData(slug) {
   return new Promise(function(resolve) {
-    var fallback = { addedAt: new Date().toISOString(), creatorName: "" };
+    var fallback = { addedAt: new Date().toISOString(), creatorName: "", twitchTitle: "" };
     var token = localStorage.getItem("twitch_token");
     if (!token || !slug || slug === "") { resolve(fallback); return; }
     fetch("https://api.twitch.tv/helix/clips?id=" + encodeURIComponent(slug), {
@@ -706,7 +706,8 @@ function fetchTwitchClipData(slug) {
       if (data.data && data.data[0]) {
         resolve({
           addedAt:     data.data[0].created_at  || fallback.addedAt,
-          creatorName: data.data[0].creator_name || ""
+          creatorName: data.data[0].creator_name || "",
+          twitchTitle: data.data[0].title || ""
         });
       } else {
         console.warn("[Clips] Keine Clip-Daten in Twitch-Antwort:", data);
@@ -1207,7 +1208,8 @@ function submitQuickClip() {
   feedEl.textContent = "⏳ Clip-Datum wird abgerufen…";
 
   fetchTwitchClipData(parsed.slug).then(function(clipData) {
-    var newClip = { url: url, category: category, title: "", boss: boss, area: area, addedAt: clipData.addedAt, creatorName: clipData.creatorName };
+    var title = clipData.twitchTitle || "";
+    var newClip = { url: url, category: category, title: title, boss: boss, area: area, addedAt: clipData.addedAt, creatorName: clipData.creatorName };
     clipsData.push(newClip);
     rebuildClipsByBoss();
 
@@ -1221,7 +1223,7 @@ function submitQuickClip() {
     feedEl.textContent = "✔ Clip gespeichert!";
     feedEl.classList.add("success");
 
-    writeClipToSheet(url, category, "", boss, clipData.addedAt, clipData.creatorName, area);
+    writeClipToSheet(url, category, title, boss, clipData.addedAt, clipData.creatorName, area);
 
     setTimeout(closeQuickClipMenu, 1400);
   });
@@ -1778,9 +1780,22 @@ function renderClipCard(clip, index) {
       + '</div></div>';
   }
 
-  var titleHtml = clip.title
-    ? '<p class="clip-title">' + escHtml(clip.title) + '</p>'
-    : '';
+  var hasTitle  = !!clip.title;
+  var titleText = hasTitle ? clip.title : "Clip " + String(index + 1).padStart(2, "0");
+
+  // Fehlt der Titel, im Hintergrund von Twitch nachladen und dauerhaft speichern.
+  if (!hasTitle && parsed.type === "clip" && !clip._titleFetchTried) {
+    clip._titleFetchTried = true;
+    fetchTwitchClipData(parsed.slug).then(function(clipData) {
+      if (clipData.twitchTitle) {
+        clip.title = clipData.twitchTitle;
+        renderFromCache();
+        if (isAuthorized()) {
+          writeClipToSheet(clip.url, clip.category, clip.title, clip.boss, clip.addedAt, clip.creatorName, clip.area);
+        }
+      }
+    });
+  }
 
   var bossEditHtml = '';
   if (isAuthorized()) {
@@ -1797,9 +1812,8 @@ function renderClipCard(clip, index) {
   return '<div class="clip-card">'
     + embedHtml
     + '<div class="clip-card-footer">'
-    + titleHtml
     + '<div class="clip-card-footer-row">'
-    + '<span class="clip-number">Clip ' + String(index + 1).padStart(2, "0") + '</span>'
+    + '<span class="clip-number" title="' + escAttr(titleText) + '">' + escHtml(titleText) + '</span>'
     + (clip.addedAt ? '<span class="clip-date">📅 ' + formatClipDate(clip.addedAt) + '</span>' : '')
     + (clip.creatorName ? '<span class="clip-creator">✂ ' + escHtml(clip.creatorName) + '</span>' : '')
     + '<a href="' + escAttr(linkUrl) + '" target="_blank" rel="noopener" class="clip-open-link">'
@@ -1880,7 +1894,8 @@ function submitNewClip() {
   feedEl.textContent = "⏳ Clip-Datum wird abgerufen…";
 
   fetchTwitchClipData(parsed.slug).then(function(clipData) {
-    var newClip = { url: url, category: category, title: title, boss: boss, addedAt: clipData.addedAt, creatorName: clipData.creatorName };
+    var finalTitle = title || clipData.twitchTitle || "";
+    var newClip = { url: url, category: category, title: finalTitle, boss: boss, addedAt: clipData.addedAt, creatorName: clipData.creatorName };
     clipsData.push(newClip);
     rebuildClipsByBoss();
 
@@ -1908,7 +1923,7 @@ function submitNewClip() {
       if (fb) fb.textContent = "";
     }, 2200);
 
-    writeClipToSheet(url, category, title, boss, clipData.addedAt, clipData.creatorName);
+    writeClipToSheet(url, category, finalTitle, boss, clipData.addedAt, clipData.creatorName);
   });
 }
 
