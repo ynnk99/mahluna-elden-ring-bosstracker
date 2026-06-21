@@ -1364,10 +1364,12 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
 }
 
-.clip-number {
-  font-family: 'Crimson Pro', serif; font-size: 13px; letter-spacing: 0.02em; color: var(--parchment);
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 1 1 auto;
+.clip-title {
+  font-family: 'Crimson Pro', serif; font-size: 14px; color: var(--parchment); line-height: 1.35; word-break: break-word;
 }
+.clip-title:empty { display: none; }
+
+.clip-number { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 0.08em; color: var(--gold-dim); }
 
 .clip-open-link {
   display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px;
