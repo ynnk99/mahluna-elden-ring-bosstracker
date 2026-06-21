@@ -1607,10 +1607,10 @@ function buildEmbedUrl(parsed) {
   var parent = window.location.hostname || "localhost";
   if (!parsed) return null;
   if (parsed.type === "clip") {
-    return "https://clips.twitch.tv/embed?clip=" + parsed.slug + "&parent=" + parent + "&autoplay=false";
+    return "https://clips.twitch.tv/embed?clip=" + parsed.slug + "&parent=" + parent;
   }
   if (parsed.type === "vod") {
-    return "https://player.twitch.tv/?video=" + parsed.id + "&parent=" + parent + "&autoplay=false";
+    return "https://player.twitch.tv/?video=" + parsed.id + "&parent=" + parent;
   }
   return null;
 }
@@ -1622,7 +1622,7 @@ function loadClipEmbed(wrapperEl) {
   if (!embedUrl) return;
 
   var iframe = document.createElement("iframe");
-  iframe.src = embedUrl + "&autoplay=true";
+  iframe.src = embedUrl + "&autoplay=true&muted=false";
   iframe.allowFullscreen = true;
   iframe.setAttribute("scrolling", "no");
   iframe.setAttribute("allow", "autoplay; fullscreen");
@@ -1839,7 +1839,11 @@ function renderClipReelSlide(clip, index) {
   var linkUrl  = clip.url;
 
   var mediaHtml = embedUrl
-    ? '<div class="clip-reel-media" data-embed-url="' + escAttr(embedUrl) + '" data-clip-index="' + index + '"></div>'
+    ? '<div class="clip-reel-media" data-embed-url="' + escAttr(embedUrl) + '" data-clip-index="' + index + '" data-muted="1">'
+      + '<div class="clip-reel-media-inner"></div>'
+      + '<button class="clip-reel-mute" onclick="toggleReelMute(this)" data-tip="Ton ein/aus" data-tip-always="1">'
+      + '<span class="clip-reel-mute-icon">🔇</span></button>'
+      + '</div>'
     : '<div class="clip-reel-media">'
       + '<div class="clip-placeholder" onclick="window.open(\'' + escAttr(linkUrl) + '\',\'_blank\')">'
       + '<span class="clip-placeholder-icon">▶️</span>'
@@ -1861,6 +1865,31 @@ function renderClipReelSlide(clip, index) {
     + '</a></div>';
 }
 
+// Schaltet Ton eines Reels per Klick um (lädt den Player mit neuer "muted"-Einstellung neu).
+function toggleReelMute(btnEl) {
+  var media = btnEl.closest(".clip-reel-media[data-embed-url]");
+  var inner = media && media.querySelector(".clip-reel-media-inner");
+  if (!media || !inner) return;
+
+  var isMuted = media.getAttribute("data-muted") !== "0";
+  var newMuted = !isMuted;
+  media.setAttribute("data-muted", newMuted ? "1" : "0");
+
+  var icon = btnEl.querySelector(".clip-reel-mute-icon");
+  if (icon) icon.textContent = newMuted ? "🔇" : "🔊";
+
+  var embedUrl = media.getAttribute("data-embed-url");
+  var index    = media.getAttribute("data-clip-index");
+  var iframe = document.createElement("iframe");
+  iframe.src = embedUrl + "&autoplay=true&muted=" + (newMuted ? "true" : "false");
+  iframe.allowFullscreen = true;
+  iframe.setAttribute("scrolling", "no");
+  iframe.setAttribute("allow", "autoplay; fullscreen");
+  iframe.title = "Clip " + (parseInt(index, 10) + 1);
+  inner.innerHTML = "";
+  inner.appendChild(iframe);
+}
+
 function setupClipReelsObserver() {
   var reelsEl = document.getElementById("clip-reels");
   if (!reelsEl || !("IntersectionObserver" in window)) return;
@@ -1869,22 +1898,25 @@ function setupClipReelsObserver() {
     entries.forEach(function(entry) {
       var media = entry.target.querySelector(".clip-reel-media[data-embed-url]");
       if (!media) return;
+      var inner = media.querySelector(".clip-reel-media-inner");
+      if (!inner) return;
 
       if (entry.isIntersecting && entry.intersectionRatio > 0.6) {
-        if (!media.querySelector("iframe")) {
+        if (!inner.querySelector("iframe")) {
           var embedUrl = media.getAttribute("data-embed-url");
           var index    = media.getAttribute("data-clip-index");
+          var muted    = media.getAttribute("data-muted") !== "0";
           var iframe = document.createElement("iframe");
-          iframe.src = embedUrl + "&autoplay=true&muted=false";
+          iframe.src = embedUrl + "&autoplay=true&muted=" + (muted ? "true" : "false");
           iframe.allowFullscreen = true;
           iframe.setAttribute("scrolling", "no");
           iframe.setAttribute("allow", "autoplay; fullscreen");
           iframe.title = "Clip " + (parseInt(index, 10) + 1);
-          media.appendChild(iframe);
+          inner.appendChild(iframe);
         }
       } else {
         // Nicht mehr sichtbar: Player entfernen, damit nicht mehrere gleichzeitig laufen/laden.
-        media.innerHTML = "";
+        inner.innerHTML = "";
       }
     });
   }, { root: reelsEl, threshold: [0, 0.6] });
