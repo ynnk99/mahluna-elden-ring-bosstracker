@@ -513,6 +513,7 @@ var clipDateTo     = null;
 var activeCategory = null;
 var clipViewMode   = 'grid'; // 'grid' oder 'reels'
 var clipReelsObserver = null;
+var clipReelsTimers = null;
 var reelSoundPreferred = false; // wird true, sobald der Nutzer einmal manuell den Ton einschaltet
 var currentAreas   = {};
 var searchQuery    = "";
@@ -1896,29 +1897,51 @@ function setupClipReelsObserver() {
   var reelsEl = document.getElementById("clip-reels");
   if (!reelsEl || !("IntersectionObserver" in window)) return;
 
+  clipReelsTimers = new Map();
+
+  function activateSlide(slide) {
+    var media = slide.querySelector(".clip-reel-media[data-embed-url]");
+    var inner = media && media.querySelector(".clip-reel-media-inner");
+    if (!media || !inner || inner.querySelector("iframe")) return;
+
+    // Immer die aktuell gültige, globale Ton-Präferenz verwenden (nicht den Stand von beim Rendern).
+    var muted = !reelSoundPreferred;
+    media.setAttribute("data-muted", muted ? "1" : "0");
+    var iconEl = slide.querySelector(".clip-reel-mute-icon");
+    if (iconEl) iconEl.textContent = muted ? "🔇" : "🔊";
+
+    var embedUrl = media.getAttribute("data-embed-url");
+    var index    = media.getAttribute("data-clip-index");
+    var iframe = document.createElement("iframe");
+    iframe.src = embedUrl + "&autoplay=true&muted=" + (muted ? "true" : "false");
+    iframe.allowFullscreen = true;
+    iframe.setAttribute("scrolling", "no");
+    iframe.setAttribute("allow", "autoplay; fullscreen");
+    iframe.title = "Clip " + (parseInt(index, 10) + 1);
+    inner.appendChild(iframe);
+  }
+
+  function deactivateSlide(slide) {
+    var media = slide.querySelector(".clip-reel-media[data-embed-url]");
+    var inner = media && media.querySelector(".clip-reel-media-inner");
+    if (inner) inner.innerHTML = "";
+  }
+
   clipReelsObserver = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {
-      var media = entry.target.querySelector(".clip-reel-media[data-embed-url]");
-      if (!media) return;
-      var inner = media.querySelector(".clip-reel-media-inner");
-      if (!inner) return;
+      var slide = entry.target;
+
+      // Laufenden Timer für diese Slide abbrechen (verhindert Flackern bei schnellem Scrollen).
+      if (clipReelsTimers.has(slide)) {
+        clearTimeout(clipReelsTimers.get(slide));
+        clipReelsTimers.delete(slide);
+      }
 
       if (entry.isIntersecting && entry.intersectionRatio > 0.6) {
-        if (!inner.querySelector("iframe")) {
-          var embedUrl = media.getAttribute("data-embed-url");
-          var index    = media.getAttribute("data-clip-index");
-          var muted    = media.getAttribute("data-muted") !== "0";
-          var iframe = document.createElement("iframe");
-          iframe.src = embedUrl + "&autoplay=true&muted=" + (muted ? "true" : "false");
-          iframe.allowFullscreen = true;
-          iframe.setAttribute("scrolling", "no");
-          iframe.setAttribute("allow", "autoplay; fullscreen");
-          iframe.title = "Clip " + (parseInt(index, 10) + 1);
-          inner.appendChild(iframe);
-        }
+        // Kurze Verzögerung, damit Scroll-Snap sich setzt, bevor der Player geladen/gestartet wird.
+        clipReelsTimers.set(slide, setTimeout(function() { activateSlide(slide); }, 180));
       } else {
-        // Nicht mehr sichtbar: Player entfernen, damit nicht mehrere gleichzeitig laufen/laden.
-        inner.innerHTML = "";
+        clipReelsTimers.set(slide, setTimeout(function() { deactivateSlide(slide); }, 180));
       }
     });
   }, { root: reelsEl, threshold: [0, 0.6] });
@@ -1929,6 +1952,10 @@ function setupClipReelsObserver() {
 }
 
 function teardownClipReelsObserver() {
+  if (clipReelsTimers) {
+    clipReelsTimers.forEach(function(t) { clearTimeout(t); });
+    clipReelsTimers = null;
+  }
   if (clipReelsObserver) {
     clipReelsObserver.disconnect();
     clipReelsObserver = null;
