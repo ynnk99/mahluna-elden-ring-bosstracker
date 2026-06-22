@@ -513,6 +513,7 @@ var clipDateTo     = null;
 var activeCategory = null;
 var clipViewMode   = 'grid'; // 'grid' oder 'reels'
 var clipReelsObserver = null;
+var reelSoundPreferred = false; // wird true, sobald der Nutzer einmal manuell den Ton einschaltet
 var currentAreas   = {};
 var searchQuery    = "";
 var prevRankingSnapshot = "";
@@ -1839,10 +1840,10 @@ function renderClipReelSlide(clip, index) {
   var linkUrl  = clip.url;
 
   var mediaHtml = embedUrl
-    ? '<div class="clip-reel-media" data-embed-url="' + escAttr(embedUrl) + '" data-clip-index="' + index + '" data-muted="1">'
+    ? '<div class="clip-reel-media" data-embed-url="' + escAttr(embedUrl) + '" data-clip-index="' + index + '" data-muted="' + (reelSoundPreferred ? "0" : "1") + '">'
       + '<div class="clip-reel-media-inner"></div>'
       + '<button class="clip-reel-mute" onclick="toggleReelMute(this)" data-tip="Ton ein/aus" data-tip-always="1">'
-      + '<span class="clip-reel-mute-icon">🔇</span></button>'
+      + '<span class="clip-reel-mute-icon">' + (reelSoundPreferred ? "🔊" : "🔇") + '</span></button>'
       + '</div>'
     : '<div class="clip-reel-media">'
       + '<div class="clip-placeholder" onclick="window.open(\'' + escAttr(linkUrl) + '\',\'_blank\')">'
@@ -1874,6 +1875,7 @@ function toggleReelMute(btnEl) {
   var isMuted = media.getAttribute("data-muted") !== "0";
   var newMuted = !isMuted;
   media.setAttribute("data-muted", newMuted ? "1" : "0");
+  reelSoundPreferred = !newMuted; // merken für alle danach automatisch ladenden Reel-Clips
 
   var icon = btnEl.querySelector(".clip-reel-mute-icon");
   if (icon) icon.textContent = newMuted ? "🔇" : "🔊";
