@@ -129,7 +129,11 @@ function renderBossLevelPanel() {
   });
 
   var subtitle = document.getElementById("boss-level-subtitle");
-  if (subtitle) subtitle.textContent = done.length + " Bosse besiegt";
+  if (subtitle) {
+    var firstTry = done.filter(function(b) { return b.deaths === 0; }).length;
+    var firstTryPct = done.length > 0 ? Math.round((firstTry / done.length) * 100) : 0;
+    subtitle.textContent = done.length + " Bosse besiegt · " + firstTry + " First Try (" + firstTryPct + "%)";
+  }
 
   if (done.length === 0) {
     list.innerHTML = '<div class="boss-level-empty">Noch keine Bosse mit Level-Eintrag besiegt.</div>';
