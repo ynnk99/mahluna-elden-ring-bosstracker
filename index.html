@@ -402,6 +402,18 @@
       <button class="boss-menu-deaths-btn" onclick="menuAdjustDeaths(1)" data-tip="+1 Tod" data-tip-always="1">+</button>
     </div>
     <div class="boss-menu-divider"></div>
+    <span class="boss-menu-section-label">Level beim Kill</span>
+    <div class="boss-menu-level-row">
+      <input
+        type="number"
+        id="menu-level-input"
+        class="boss-menu-level-input"
+        placeholder="z.B. 120"
+        min="1" max="713"
+        oninput="menuSetLevel(this.value)"
+      />
+    </div>
+    <div class="boss-menu-divider"></div>
     <span class="boss-menu-section-label">Aktionen</span>
     <div class="boss-menu-actions">
       <button class="boss-menu-action-btn" id="menu-done-btn" onclick="menuToggleDone()">

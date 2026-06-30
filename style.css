@@ -995,6 +995,34 @@ body.searching .area-card .area-toggle-icon { opacity: 0.3; pointer-events: none
   margin: 2px 0;
 }
 
+.boss-menu-level-row {
+  padding: 4px 0 6px;
+}
+.boss-menu-level-input {
+  width: 100%;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(201,164,74,0.25);
+  border-radius: 6px;
+  color: var(--gold, #c9a84c);
+  font-size: 1.05rem;
+  padding: 6px 10px;
+  text-align: center;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s, background 0.15s;
+}
+.boss-menu-level-input::placeholder {
+  color: rgba(201,164,74,0.35);
+  font-size: 0.9rem;
+}
+.boss-menu-level-input:focus {
+  border-color: rgba(201,164,74,0.6);
+  background: rgba(255,255,255,0.1);
+}
+.boss-menu-level-input::-webkit-inner-spin-button,
+.boss-menu-level-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+.boss-menu-level-input { -moz-appearance: textfield; }
+
 /* ─── QUICK CLIP MENU (Rechtsklick) ─── */
 .quick-clip-menu {
   position: fixed;

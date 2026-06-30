@@ -536,11 +536,12 @@ var userIsEditor = false;
 
 // Boss menu state
 var menuState = {
-  area: null,
-  boss: null,
+  area:   null,
+  boss:   null,
   deaths: 0,
-  done: false,
-  pinned: false
+  done:   false,
+  pinned: false,
+  level:  null
 };
 
 var bingoCells          = [];
@@ -996,7 +997,8 @@ function openBossMenu(e, areaName, bossName) {
     boss:   bossName,
     deaths: bossData.deaths,
     done:   bossData.done,
-    pinned: bossData.pinned
+    pinned: bossData.pinned,
+    level:  bossData.level || null
   };
 
   document.getElementById("menu-boss-name").textContent = bossName;
@@ -1055,6 +1057,7 @@ function closeBossMenu() {
 
 function updateMenuDisplay() {
   document.getElementById("menu-deaths-val").textContent = menuState.deaths;
+  document.getElementById("menu-level-input").value = menuState.level !== null ? menuState.level : "";
 
   var doneBtn   = document.getElementById("menu-done-btn");
   var doneIcon  = document.getElementById("menu-done-icon");
@@ -1113,6 +1116,23 @@ function menuTogglePin() {
   updateMenuDisplay();
   applyLocalBossChange(menuState.area, menuState.boss, "pinned", newPinned);
   writeToSheet(menuState.area, menuState.boss, "setPinned", newPinned ? "TRUE" : "FALSE");
+}
+
+var levelWriteTimer = null;
+
+function menuSetLevel(val) {
+  var v = String(val).trim();
+  menuState.level = v === "" ? null : v;
+  applyLocalBossChange(menuState.area, menuState.boss, "level", menuState.level);
+
+  if (levelWriteTimer) clearTimeout(levelWriteTimer);
+  var capturedArea  = menuState.area;
+  var capturedBoss  = menuState.boss;
+  var capturedLevel = v;
+  levelWriteTimer = setTimeout(function() {
+    writeToSheet(capturedArea, capturedBoss, "setLevel", capturedLevel);
+    levelWriteTimer = null;
+  }, 800);
 }
 
 document.addEventListener("click", function(e) {
