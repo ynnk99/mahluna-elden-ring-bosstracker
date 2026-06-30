@@ -405,12 +405,13 @@
     <span class="boss-menu-section-label">Level beim Kill</span>
     <div class="boss-menu-level-row">
       <input
-        type="number"
+        type="text"
+        inputmode="numeric"
         id="menu-level-input"
         class="boss-menu-level-input"
-        placeholder="z.B. 120"
-        min="1" max="713"
-        oninput="menuSetLevel(this.value)"
+        placeholder="z.B. 120 oder 129/1"
+        onkeydown="menuLevelKeydown(event)"
+        onblur="menuSetLevel(this.value)"
       />
     </div>
     <div class="boss-menu-divider"></div>

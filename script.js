@@ -129,11 +129,7 @@ function renderBossLevelPanel() {
   });
 
   var subtitle = document.getElementById("boss-level-subtitle");
-  if (subtitle) {
-    var firstTry = done.filter(function(b) { return b.deaths === 0; }).length;
-    var firstTryPct = done.length > 0 ? Math.round((firstTry / done.length) * 100) : 0;
-    subtitle.textContent = done.length + " Bosse besiegt · " + firstTry + " First Try (" + firstTryPct + "%)";
-  }
+  if (subtitle) subtitle.textContent = done.length + " Bosse besiegt";
 
   if (done.length === 0) {
     list.innerHTML = '<div class="boss-level-empty">Noch keine Bosse mit Level-Eintrag besiegt.</div>';
@@ -1122,21 +1118,22 @@ function menuTogglePin() {
   writeToSheet(menuState.area, menuState.boss, "setPinned", newPinned ? "TRUE" : "FALSE");
 }
 
-var levelWriteTimer = null;
+function menuLevelKeydown(e) {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    menuSetLevel(e.target.value);
+    e.target.blur();
+  }
+}
 
 function menuSetLevel(val) {
   var v = String(val).trim();
-  menuState.level = v === "" ? null : v;
-  applyLocalBossChange(menuState.area, menuState.boss, "level", menuState.level);
+  var newLevel = v === "" ? null : v;
+  if (newLevel === menuState.level) return; // keine Änderung → kein unnötiger Write
 
-  if (levelWriteTimer) clearTimeout(levelWriteTimer);
-  var capturedArea  = menuState.area;
-  var capturedBoss  = menuState.boss;
-  var capturedLevel = v;
-  levelWriteTimer = setTimeout(function() {
-    writeToSheet(capturedArea, capturedBoss, "setLevel", capturedLevel);
-    levelWriteTimer = null;
-  }, 800);
+  menuState.level = newLevel;
+  applyLocalBossChange(menuState.area, menuState.boss, "level", newLevel);
+  writeToSheet(menuState.area, menuState.boss, "setLevel", v);
 }
 
 document.addEventListener("click", function(e) {
