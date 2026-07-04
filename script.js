@@ -3149,6 +3149,217 @@ document.addEventListener('click', function(e) {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
+// RUN-VERGLEICH (NG / NG+1 / NG+2 … im direkten Vergleich)
+// ═══════════════════════════════════════════════════════════════════════════
+
+var runCompareData    = null;  // { runs: [{label, sheetName, isLive, data}], canonicalBosses: [...] }
+var runCompareLoading = false;
+
+function openRunCompare() {
+  document.getElementById("run-compare-backdrop").classList.add("open");
+  document.getElementById("run-compare-modal").classList.add("open");
+  document.body.style.overflow = "hidden";
+  loadRunCompareData();
+}
+
+function closeRunCompare() {
+  document.getElementById("run-compare-backdrop").classList.remove("open");
+  document.getElementById("run-compare-modal").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+// Parst die Rohzeilen eines Run-Tabs (gleiche Spaltenbelegung wie processData)
+// in eine kompakte, für den Vergleich nutzbare Struktur.
+function parseSheetRowsForCompare(rows) {
+  // K/L-Spalten (0-basiert 10/11): Feldtode (K) & Gesamt-Tode-Zähler (L), je einmal
+  // für Base Game (Zeile 1) und einmal für DLC (Zeile 168) hinterlegt.
+  var fdBase = rows[1]   && rows[1].c[10] ? (Number(rows[1].c[10].v)   || 0) : 0;
+  var fdDlc  = rows[168] && rows[168].c[10] ? (Number(rows[168].c[10].v) || 0) : 0;
+  var kBase  = rows[1]   && rows[1].c[11] ? (Number(rows[1].c[11].v)   || 0) : 0;
+  var kDlc   = rows[168] && rows[168].c[11] ? (Number(rows[168].c[11].v) || 0) : 0;
+
+  var separatorIndex = -1;
+  for (var si = 0; si < rows.length; si++) {
+    if (rows[si] && rows[si].c[1] && rows[si].c[1].v && String(rows[si].c[1].v).trim() === "SHADOW OF THE ERDTREE DLC") {
+      separatorIndex = si;
+      break;
+    }
+  }
+
+  var bosses  = [];
+  var bossMap = {};
+  var doneCount = 0;
+
+  rows.forEach(function(r, index) {
+    if (!r || !r.c) return;
+    var area = r.c[0] && r.c[0].v ? String(r.c[0].v).trim() : "";
+    var boss = r.c[1] && r.c[1].v ? String(r.c[1].v).trim() : "";
+    if (!area || !boss) return;
+    if (area === "Gebiet" && boss === "Boss") return;
+    if (boss === "SHADOW OF THE ERDTREE DLC") return;
+
+    var isDLC  = separatorIndex !== -1 && index > separatorIndex;
+    var done   = isTrue(r.c[2] ? r.c[2].v : false);
+    var deaths = Number(r.c[4] ? r.c[4].v : 0) || 0;
+
+    var entry = { area: area, boss: boss, done: done, deaths: deaths, isDLC: isDLC };
+    bossMap[area + "|" + boss] = entry;
+    bosses.push(entry);
+    if (done) doneCount++;
+  });
+
+  var bossDeathsSum   = bosses.reduce(function(s, b) { return s + b.deaths; }, 0);
+  var fieldDeathsTotal = fdBase + fdDlc;
+  var totalDeaths      = (kBase + kDlc) || (bossDeathsSum + fieldDeathsTotal);
+
+  return {
+    bosses: bosses,
+    bossMap: bossMap,
+    doneCount: doneCount,
+    totalCount: bosses.length,
+    bossDeathsSum: bossDeathsSum,
+    fieldDeathsTotal: fieldDeathsTotal,
+    totalDeaths: totalDeaths
+  };
+}
+
+function loadRunCompareData() {
+  if (runCompareLoading) return;
+  runCompareLoading = true;
+
+  var subtitle = document.getElementById("run-compare-subtitle");
+  if (subtitle) subtitle.textContent = "wird geladen…";
+  var body = document.getElementById("run-compare-body");
+  if (body) body.innerHTML = '<div class="run-compare-loading">⏳ Lade Durchgänge…</div>';
+
+  var runsList = ngRuns.map(function(r) {
+    return { label: r.label, sheetName: r.sheetName, isLive: false };
+  });
+  runsList.push({ label: currentLiveLabel, sheetName: LIVE_SHEET_NAME, isLive: true });
+
+  var fetches = runsList.map(function(run) {
+    return fetch(gvizUrl(run.sheetName) + "&nocache=" + Date.now())
+      .then(function(r) { return r.text(); })
+      .then(function(text) {
+        var json = JSON.parse(text.substring(47).slice(0, -2));
+        var rows = (json.table && json.table.rows) ? json.table.rows : [];
+        run.data = parseSheetRowsForCompare(rows);
+        return run;
+      })
+      .catch(function(e) {
+        console.error("[RunCompare] Fehler beim Laden von " + run.sheetName + ":", e);
+        run.data = null;
+        return run;
+      });
+  });
+
+  Promise.all(fetches).then(function(runs) {
+    runCompareLoading = false;
+
+    // Kanonische Boss-Liste (Reihenfolge + Gebiete) bevorzugt vom aktuellen
+    // Live-Durchgang übernehmen, da dieser der aktuellen Tracker-Struktur entspricht.
+    var canonical = null;
+    var liveRun = runs.find(function(r) { return r.isLive; });
+    if (liveRun && liveRun.data && liveRun.data.bosses.length > 0) {
+      canonical = liveRun.data.bosses.slice();
+    } else {
+      for (var i = 0; i < runs.length; i++) {
+        if (runs[i].data && runs[i].data.bosses.length > 0) { canonical = runs[i].data.bosses.slice(); break; }
+      }
+    }
+    canonical = canonical || [];
+
+    // Bosse, die nur in einem Archiv-Durchgang vorkommen (z.B. weil die
+    // Tracker-Liste sich zwischenzeitlich geändert hat), hinten anhängen.
+    var seen = {};
+    canonical.forEach(function(b) { seen[b.area + "|" + b.boss] = true; });
+    runs.forEach(function(run) {
+      if (!run.data) return;
+      run.data.bosses.forEach(function(b) {
+        var key = b.area + "|" + b.boss;
+        if (!seen[key]) { seen[key] = true; canonical.push(b); }
+      });
+    });
+
+    runCompareData = { runs: runs, canonicalBosses: canonical };
+
+    var subtitleEl = document.getElementById("run-compare-subtitle");
+    if (subtitleEl) subtitleEl.textContent = runs.length + " Durchgänge · " + canonical.length + " Bosse";
+
+    renderRunCompareTable();
+  });
+}
+
+function renderRunCompareTable() {
+  var body = document.getElementById("run-compare-body");
+  if (!body || !runCompareData) return;
+
+  var runs   = runCompareData.runs;
+  var bosses = runCompareData.canonicalBosses;
+
+  if (runs.length === 0) {
+    body.innerHTML = '<div class="run-compare-loading">Keine Durchgänge gefunden.</div>';
+    return;
+  }
+  if (bosses.length === 0) {
+    body.innerHTML = '<div class="run-compare-loading">Keine Boss-Daten gefunden.</div>';
+    return;
+  }
+
+  var colCount = runs.length + 1;
+  var html = '<table class="run-compare-table">';
+
+  html += '<thead><tr><th class="rc-sticky rc-head-boss">Boss</th>';
+  runs.forEach(function(run) {
+    html += '<th class="rc-run-head' + (run.isLive ? ' rc-live' : '') + '">'
+      + (run.isLive ? '🔴 ' : '📜 ') + escHtml(run.label) + '</th>';
+  });
+  html += '</tr></thead><tbody>';
+
+  var lastArea = null;
+  bosses.forEach(function(b) {
+    if (b.area !== lastArea) {
+      html += '<tr class="rc-area-row"><td class="rc-sticky rc-area-cell" colspan="' + colCount + '">' + escHtml(b.area) + '</td></tr>';
+      lastArea = b.area;
+    }
+    var key = b.area + "|" + b.boss;
+    html += '<tr><td class="rc-sticky rc-boss-cell' + (b.isDLC ? ' rc-dlc' : '') + '" data-tip="' + escAttr(b.boss) + '" data-tip-always="1">' + escHtml(b.boss) + '</td>';
+    runs.forEach(function(run) {
+      var entry = run.data ? run.data.bossMap[key] : null;
+      if (!entry) {
+        html += '<td class="rc-cell rc-na">–</td>';
+      } else if (entry.done) {
+        html += '<td class="rc-cell rc-done">✔ <span class="rc-cell-deaths">' + entry.deaths + '</span></td>';
+      } else if (entry.deaths > 0) {
+        html += '<td class="rc-cell rc-open">✗ <span class="rc-cell-deaths">' + entry.deaths + '</span></td>';
+      } else {
+        html += '<td class="rc-cell rc-open">–</td>';
+      }
+    });
+    html += '</tr>';
+  });
+
+  html += '</tbody><tfoot>';
+
+  function summaryRow(labelText, extraClass, getVal) {
+    var row = '<tr class="rc-summary-row' + (extraClass ? ' ' + extraClass : '') + '"><td class="rc-sticky rc-summary-label">' + labelText + '</td>';
+    runs.forEach(function(run) {
+      row += '<td class="rc-cell rc-summary-val' + (extraClass === "rc-total-row" ? ' rc-total-val' : '') + '">' + getVal(run.data) + '</td>';
+    });
+    return row + '</tr>';
+  }
+
+  html += summaryRow("Bosse besiegt", "", function(d) { return d ? (d.doneCount + ' / ' + d.totalCount) : '–'; });
+  html += summaryRow("Boss-Tode",     "", function(d) { return d ? d.bossDeathsSum.toLocaleString("de-DE") : '–'; });
+  html += summaryRow("Sonstige Tode", "", function(d) { return d ? d.fieldDeathsTotal.toLocaleString("de-DE") : '–'; });
+  html += summaryRow("Tode gesamt",   "rc-total-row", function(d) { return d ? d.totalDeaths.toLocaleString("de-DE") : '–'; });
+
+  html += '</tfoot></table>';
+
+  body.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════════════════
 

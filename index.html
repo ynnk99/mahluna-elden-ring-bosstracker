@@ -142,6 +142,7 @@
         <span id="run-selector-label">🔴 NG</span>
         <span class="run-selector-arrow">▾</span>
       </button>
+      <button class="run-compare-btn" onclick="openRunCompare()" data-tip="Durchgänge vergleichen" data-tip-always="1">📊</button>
       <div class="run-selector-list" id="run-selector-list"></div>
     </div>
 
@@ -626,6 +627,26 @@
       <span class="blh-clip">Clip</span>
     </div>
     <div class="boss-level-list" id="boss-level-list"></div>
+  </div>
+</div>
+
+<!-- ── RUN-VERGLEICH MODAL ── -->
+<div class="run-compare-backdrop" id="run-compare-backdrop" onclick="closeRunCompare()"></div>
+<div class="run-compare-modal" id="run-compare-modal" role="dialog" aria-modal="true" aria-label="Durchgänge vergleichen">
+  <div class="run-compare-inner">
+    <div class="run-compare-header">
+      <div class="run-compare-title">
+        <span class="run-compare-title-icon">📊</span>
+        <div>
+          <h2>Durchgänge im Vergleich</h2>
+          <span class="run-compare-subtitle" id="run-compare-subtitle">wird geladen…</span>
+        </div>
+      </div>
+      <button class="clip-close-btn" onclick="closeRunCompare()" data-tip="Schließen" data-tip-always="1">✕</button>
+    </div>
+    <div class="run-compare-body" id="run-compare-body">
+      <div class="run-compare-loading">⏳ Lade Durchgänge…</div>
+    </div>
   </div>
 </div>
 
