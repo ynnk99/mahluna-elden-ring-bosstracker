@@ -3284,7 +3284,7 @@ function loadRunCompareData() {
     runCompareData = { runs: runs, canonicalBosses: canonical };
 
     var subtitleEl = document.getElementById("run-compare-subtitle");
-    if (subtitleEl) subtitleEl.textContent = runs.length + " Durchgänge · " + canonical.length + " Bosse";
+    if (subtitleEl) subtitleEl.textContent = runs.length + (runs.length === 1 ? " Durchgang · " : " Durchgänge · ") + canonical.length + " Bosse";
 
     renderRunCompareTable();
   });
@@ -3314,7 +3314,24 @@ function renderRunCompareTable() {
     html += '<th class="rc-run-head' + (run.isLive ? ' rc-live' : '') + '">'
       + (run.isLive ? '🔴 ' : '📜 ') + escHtml(run.label) + '</th>';
   });
-  html += '</tr></thead><tbody>';
+  html += '</tr></thead>';
+
+  function summaryRow(labelText, extraClass, getVal) {
+    var row = '<tr class="rc-summary-row' + (extraClass ? ' ' + extraClass : '') + '"><td class="rc-sticky rc-summary-label">' + labelText + '</td>';
+    runs.forEach(function(run) {
+      row += '<td class="rc-cell rc-summary-val' + (extraClass === "rc-total-row" ? ' rc-total-val' : '') + '">' + getVal(run.data) + '</td>';
+    });
+    return row + '</tr>';
+  }
+
+  html += '<tbody class="rc-summary-tbody">';
+  html += summaryRow("Bosse besiegt", "", function(d) { return d ? (d.doneCount + ' / ' + d.totalCount) : '–'; });
+  html += summaryRow("Boss-Tode",     "", function(d) { return d ? d.bossDeathsSum.toLocaleString("de-DE") : '–'; });
+  html += summaryRow("Sonstige Tode", "", function(d) { return d ? d.fieldDeathsTotal.toLocaleString("de-DE") : '–'; });
+  html += summaryRow("Tode gesamt",   "rc-total-row", function(d) { return d ? d.totalDeaths.toLocaleString("de-DE") : '–'; });
+  html += '</tbody>';
+
+  html += '<tbody>';
 
   var lastArea = null;
   bosses.forEach(function(b) {
@@ -3339,24 +3356,25 @@ function renderRunCompareTable() {
     html += '</tr>';
   });
 
-  html += '</tbody><tfoot>';
-
-  function summaryRow(labelText, extraClass, getVal) {
-    var row = '<tr class="rc-summary-row' + (extraClass ? ' ' + extraClass : '') + '"><td class="rc-sticky rc-summary-label">' + labelText + '</td>';
-    runs.forEach(function(run) {
-      row += '<td class="rc-cell rc-summary-val' + (extraClass === "rc-total-row" ? ' rc-total-val' : '') + '">' + getVal(run.data) + '</td>';
-    });
-    return row + '</tr>';
-  }
-
-  html += summaryRow("Bosse besiegt", "", function(d) { return d ? (d.doneCount + ' / ' + d.totalCount) : '–'; });
-  html += summaryRow("Boss-Tode",     "", function(d) { return d ? d.bossDeathsSum.toLocaleString("de-DE") : '–'; });
-  html += summaryRow("Sonstige Tode", "", function(d) { return d ? d.fieldDeathsTotal.toLocaleString("de-DE") : '–'; });
-  html += summaryRow("Tode gesamt",   "rc-total-row", function(d) { return d ? d.totalDeaths.toLocaleString("de-DE") : '–'; });
-
-  html += '</tfoot></table>';
+  html += '</tbody></table>';
 
   body.innerHTML = html;
+
+  // Sticky-Offsets berechnen: die Zusammenfassungs-Zeilen sollen direkt unter
+  // dem Tabellenkopf angepinnt bleiben (statt am unteren Rand zu "schweben").
+  // Dafür wird für jede Zeile die kumulierte Höhe der darüberliegenden
+  // Zeilen (Kopf + vorherige Summary-Zeilen) als "top" gesetzt.
+  requestAnimationFrame(function() {
+    var theadEl = body.querySelector(".run-compare-table thead");
+    var summaryRows = body.querySelectorAll(".rc-summary-tbody tr");
+    if (!theadEl || !summaryRows.length) return;
+    var offset = theadEl.getBoundingClientRect().height;
+    summaryRows.forEach(function(tr) {
+      var cells = tr.querySelectorAll("td");
+      cells.forEach(function(td) { td.style.top = offset + "px"; });
+      offset += tr.getBoundingClientRect().height;
+    });
+  });
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
