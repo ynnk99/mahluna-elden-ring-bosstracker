@@ -16,24 +16,36 @@ const ALLOWED_USERS = [
 
 const SPREADSHEET_ID = "1r9BzZJYFrk4rQLlMn4ZPBBUuc8u_peqwThTi1UTCQcE";
 
-const SHEET_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
-  + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json";
+// ── NG+ ─────────────────────────────────────────────────────────────────
+// Der "lebende" Tab, in dem aktuell gespielt/bearbeitet wird.
+const LIVE_SHEET_NAME = "OBS_Overlay";
+// Meta-Tab, der Liste + Zähler der archivierten NG-Durchgänge enthält.
+const NGPLUS_META_SHEET = "_NGPLUS_META";
+
+// Baut eine gviz-URL für einen beliebigen Tab (Standard = lebender Tab).
+function gvizUrl(sheetName, range) {
+  return "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
+    + "/gviz/tq?sheet=" + encodeURIComponent(sheetName)
+    + (range ? "&range=" + range : "")
+    + "&tqx=out:json";
+}
 
 // ── Twitch-Token für serverseitige Validierung ────────────────────────────
 function getTwitchToken() {
   return localStorage.getItem("twitch_token") || "";
 }
 
+// Welcher Tab wird gerade angezeigt? Standard = lebender Run.
+var currentRunSheet  = LIVE_SHEET_NAME;
+var viewingArchive   = false;   // true = archivierter (nur lesbarer) NG-Durchgang
+var ngRuns           = [];      // [{ label, sheetName, archivedAt }] älteste zuerst
+var currentLiveLabel = "NG";    // Label des aktuell laufenden Durchgangs, z.B. "NG+2"
 
 // GEÄNDERT: W→X, AB→AC (Spaltenverschiebung)
-const CLIPS_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
-  + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&range=X9:AC1000";
-
+function getClipsUrl()      { return gvizUrl(currentRunSheet, "X9:AC1000"); }
 // GEÄNDERT: N→O, R→S (Spaltenverschiebung)
-const BINGO_TEXT_URL  = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
-  + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&range=O15:S19";
-const BINGO_STATE_URL = "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
-  + "/gviz/tq?sheet=OBS_OVERLAY&tqx=out:json&range=O20:S24";
+function getBingoTextUrl()  { return gvizUrl(currentRunSheet, "O15:S19"); }
+function getBingoStateUrl() { return gvizUrl(currentRunSheet, "O20:S24"); }
 
 const RANKING_TOP_N = 10;
 const STREAMER_LOGIN = "mahluna";
@@ -189,7 +201,7 @@ function toolboxInit() {
 }
 
 function toolboxOpenPanel(name) {
-  var panels = ['timer', 'obs', 'filter'];
+  var panels = ['timer', 'obs', 'filter', 'ngplus'];
   var wasOpen = false;
   panels.forEach(function(p) {
     var item = document.getElementById('etb-item-' + p);
@@ -268,7 +280,7 @@ function toolboxSetTimerLabel() {
 document.addEventListener('click', function(e) {
   var toolbox = document.getElementById('editor-toolbox');
   if (toolbox && !toolbox.contains(e.target)) {
-    ['timer','obs','filter'].forEach(function(p) {
+    ['timer','obs','filter','ngplus'].forEach(function(p) {
       var item = document.getElementById('etb-item-' + p);
       if (item) item.classList.remove('open');
     });
@@ -777,7 +789,9 @@ function updateLoginUI() {
 }
 
 function isAuthorized() {
-  return userIsEditor && currentUser !== null;
+  // Im Archiv-Modus (alter NG-Durchgang wird betrachtet) ist alles read-only,
+  // unabhängig vom Login-Status – so bleiben abgeschlossene Runs unveränderbar.
+  return userIsEditor && currentUser !== null && !viewingArchive;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1474,14 +1488,14 @@ function renderRanking(allBosses) {
     var doneBossCount = allBosses.filter(function(b) { return b.done; }).length;
     subtitle.textContent = top.length > 0
       ? "— Top " + top.length + " von " + doneBossCount + " erledigten Bossen"
-      : "— Mahluna ist noch nicht gestorben - noch.";
+      : "— Du bist noch nicht gestorben - noch.";
   }
 
   var listEl = document.getElementById("ranking-list");
   if (!listEl) return;
 
   if (top.length === 0) {
-    listEl.innerHTML = '<div class="ranking-empty">Mahluna ist noch nicht gestorben - noch.</div>';
+    listEl.innerHTML = '<div class="ranking-empty">Du bist noch nicht gestorben - noch.</div>';
     return;
   }
 
@@ -2301,7 +2315,7 @@ function updateAddClipButton() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 function loadClips() {
-  fetch(CLIPS_URL + "&nocache=" + Date.now())
+  fetch(getClipsUrl() + "&nocache=" + Date.now())
     .then(function(res) { return res.text(); })
     .then(function(text) {
       var json = JSON.parse(text.substring(47).slice(0, -2));
@@ -2368,7 +2382,7 @@ function setRefreshState(state) {
 
 function loadData() {
   setRefreshState("loading");
-  fetch(SHEET_URL + "&nocache=" + Date.now())
+  fetch(gvizUrl(currentRunSheet) + "&nocache=" + Date.now())
     .then(function(res) { return res.text(); })
     .then(function(text) {
       var json = JSON.parse(text.substring(47).slice(0, -2));
@@ -2764,7 +2778,7 @@ function toggleBingoPanel() {
 }
 
 function loadBingo() {
-  fetch(BINGO_TEXT_URL + "&nocache=" + Date.now())
+  fetch(getBingoTextUrl() + "&nocache=" + Date.now())
     .then(function(r) { return r.text(); })
     .then(function(text) {
       var json  = JSON.parse(text.substring(47).slice(0, -2));
@@ -2787,7 +2801,7 @@ function loadBingo() {
     })
     .catch(function(e) { console.error("[Bingo] Text-Fehler:", e); });
 
-  fetch(BINGO_STATE_URL + "&nocache=" + Date.now())
+  fetch(getBingoStateUrl() + "&nocache=" + Date.now())
     .then(function(r) { return r.text(); })
     .then(function(text) {
       var json    = JSON.parse(text.substring(47).slice(0, -2));
@@ -2968,14 +2982,183 @@ function writeBingoTextToSheet(row, col, text) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// NG+ / RUN-VERWALTUNG
+// ═══════════════════════════════════════════════════════════════════════════
+
+function loadNGRuns() {
+  fetch(gvizUrl(NGPLUS_META_SHEET) + "&nocache=" + Date.now())
+    .then(function(r) { return r.text(); })
+    .then(function(text) {
+      var json = JSON.parse(text.substring(47).slice(0, -2));
+      var rows = (json.table && json.table.rows) ? json.table.rows : [];
+
+      var runs = [];
+      rows.forEach(function(row) {
+        if (!row || !row.c) return;
+        var label      = row.c[0] && row.c[0].v ? String(row.c[0].v).trim() : "";
+        var sheetName  = row.c[1] && row.c[1].v ? String(row.c[1].v).trim() : "";
+        var archivedAt = row.c[2] && row.c[2].v ? String(row.c[2].v).trim() : "";
+        // Nur echte NG-Run-Einträge zulassen: Label muss exakt "NG" oder
+        // "NG+<Zahl>" sein, SheetName muss exakt unserem Namensschema
+        // entsprechen. Das schützt zuverlässig gegen den Fall, dass gviz
+        // mangels vorhandenem "_NGPLUS_META"-Tab still auf einen anderen Tab
+        // (z.B. OBS_Overlay) zurückfällt und dessen Gebiets-/Bossnamen
+        // fälschlich als Run-Label interpretiert würden – egal wie viele
+        // Spalten oder welche Kopfzeile dieser Fallback-Tab hat.
+        if (!/^NG(\+\d+)?$/.test(label)) return;
+        if (!/^ARCHIV_NG\d*$/.test(sheetName)) return;
+        runs.push({ label: label, sheetName: sheetName, archivedAt: archivedAt });
+      });
+
+      // Nach Reihenfolge sortieren (NG, NG+1, NG+2, …), falls die Zeilen
+      // aus irgendeinem Grund nicht in Erstellungsreihenfolge zurückkommen.
+      runs.sort(function(a, b) {
+        var na = a.label === "NG" ? 0 : parseInt(a.label.replace("NG+", ""), 10);
+        var nb = b.label === "NG" ? 0 : parseInt(b.label.replace("NG+", ""), 10);
+        return na - nb;
+      });
+
+      ngRuns = runs;
+      currentLiveLabel = runs.length === 0 ? "NG" : "NG+" + runs.length;
+      renderRunSelector();
+    })
+    .catch(function(e) {
+      // Meta-Tab existiert evtl. noch nicht (vor dem allerersten NG+) – kein Fehler, einfach "NG" anzeigen.
+      ngRuns = [];
+      currentLiveLabel = "NG";
+      renderRunSelector();
+    });
+}
+
+function renderRunSelector() {
+  var label = document.getElementById("run-selector-label");
+  var list  = document.getElementById("run-selector-list");
+  if (!label || !list) return;
+
+  var activeLabel = viewingArchive
+    ? (ngRuns.find(function(r) { return r.sheetName === currentRunSheet; }) || {}).label
+    : currentLiveLabel;
+
+  label.textContent = (viewingArchive ? "📜 " : "🔴 ") + (activeLabel || currentLiveLabel);
+  document.getElementById("run-selector").classList.toggle("archive-active", viewingArchive);
+
+  var html = '<div class="run-option' + (!viewingArchive ? ' active' : '') + '" onclick="switchRun(\'' + LIVE_SHEET_NAME + '\', \'' + escAttr(currentLiveLabel) + '\', true)">'
+    + '<span class="run-dot live"></span> ' + escHtml(currentLiveLabel) + ' <span class="run-tag">aktuell</span></div>';
+
+  ngRuns.slice().reverse().forEach(function(run) {
+    var isActive = viewingArchive && run.sheetName === currentRunSheet;
+    html += '<div class="run-option' + (isActive ? ' active' : '') + '" onclick="switchRun(\'' + escAttr(run.sheetName) + '\', \'' + escAttr(run.label) + '\', false)">'
+      + '<span class="run-dot archive"></span> ' + escHtml(run.label) + ' <span class="run-tag">Archiv</span></div>';
+  });
+  list.innerHTML = html;
+
+  // "NG+ starten"-Button nur für Editoren und nur im lebenden Run sichtbar
+  var startBtn = document.getElementById("etb-btn-ngplus-start");
+  if (startBtn) startBtn.style.display = (isAuthorized() && !viewingArchive) ? "" : "none";
+}
+
+function toggleRunSelector() {
+  var el = document.getElementById("run-selector");
+  if (el) el.classList.toggle("open");
+}
+
+function switchRun(sheetName, label, isLive) {
+  document.getElementById("run-selector").classList.remove("open");
+  if (sheetName === currentRunSheet) return;
+
+  currentRunSheet  = sheetName;
+  viewingArchive   = !isLive;
+
+  // Caches leeren, damit Ranking/Chart/Bingo/Boss-Level beim Run-Wechsel neu gerendert werden
+  prevRankingSnapshot = null;
+  prevChartSnapshot   = null;
+  prevBingoTextSnap   = null;
+  prevBingoStateSnap  = null;
+  previousBossStates  = {};
+  prevDeaths          = null;
+  prevDoneBosses      = null;
+  cachedRows          = null;
+
+  var banner = document.getElementById("archive-banner");
+  if (banner) {
+    banner.classList.toggle("visible", viewingArchive);
+    document.getElementById("archive-banner-text").textContent =
+      "Du betrachtest einen archivierten Durchgang (" + label + ") — nur lesbar.";
+  }
+
+  document.getElementById("loading-overlay").style.display = "flex";
+  document.getElementById("areas-grid").style.display       = "none";
+
+  toolboxInit();
+  updateLoginUI();
+  renderRunSelector();
+  loadData();
+  loadClips();
+  loadBingo();
+  showToast((viewingArchive ? "📜 Archiv geöffnet: " : "🔴 Zurück zum aktuellen Run: ") + label, 2500);
+}
+
+function startNGPlusRun() {
+  if (!isAuthorized()) return;
+  var confirmMsg = "NG+ wirklich starten?\n\n"
+    + "Der aktuelle Durchgang (" + currentLiveLabel + ") wird vollständig als Archiv gespeichert "
+    + "(inkl. aller Bosse, Clips und Bingo).\n"
+    + "Danach werden auf der Live-Seite ALLE Bosse, Tode, Feldtode, der Timer und das Bingo-Board "
+    + "zurückgesetzt für einen neuen Durchgang: " + (ngRuns.length === 0 ? "NG+1" : "NG+" + (ngRuns.length + 1)) + ".\n\n"
+    + "Das kann nicht rückgängig gemacht werden. Fortfahren?";
+  if (!window.confirm(confirmMsg)) return;
+
+  showToast("⏳ NG+ wird gestartet – bitte kurz warten…", 4000);
+
+  fetch(APPS_SCRIPT_URL
+    + "?action=startNGPlus"
+    + "&twitchToken=" + encodeURIComponent(getTwitchToken()),
+    { method: "GET", mode: "cors" }
+  )
+  .then(function(r) { return r.text(); })
+  .then(function(t) {
+    if (t && t.indexOf("OK:") === 0) {
+      showToast("✔ NG+ gestartet! Der neue Durchgang beginnt jetzt.", 4000);
+      setTimeout(function() {
+        loadNGRuns();
+        loadData();
+        loadClips();
+        loadBingo();
+      }, 1500);
+      return;
+    }
+    if (t && t.indexOf("unauthorized") !== -1) {
+      showToast("⚠ Keine Berechtigung für NG+ (nur Admins).", 5000);
+      return;
+    }
+    // Jede andere Antwort (z.B. "ERROR:unknown action" bei nicht neu deploytem
+    // Apps Script, oder ein anderer serverseitiger Fehler) ist KEIN Erfolg –
+    // hier wurde weder archiviert noch zurückgesetzt.
+    console.error("[NG+] Unerwartete Server-Antwort:", t);
+    showToast("⚠ NG+ fehlgeschlagen: " + (t || "keine Antwort vom Server") + " — bitte Apps-Script-Deployment prüfen.", 7000);
+  })
+  .catch(function(err) {
+    console.error("[NG+] Fehler:", err);
+    showToast("⚠ NG+ konnte nicht gestartet werden (Verbindungsfehler).", 5000);
+  });
+}
+
+document.addEventListener('click', function(e) {
+  var sel = document.getElementById('run-selector');
+  if (sel && !sel.contains(e.target)) sel.classList.remove('open');
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════════════════
 
 checkAuthOnLoad();
+loadNGRuns();
 loadData();
 loadClips();
 setInterval(loadData,  3000);
 setInterval(loadClips, 15000);
+setInterval(loadNGRuns, 20000);
 startTimerTick();
 checkLiveStatus();
 liveCheckInterval = setInterval(checkLiveStatus, 60000);

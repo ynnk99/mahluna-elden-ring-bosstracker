@@ -369,7 +369,77 @@ body::before {
 .auth-notice.visible { display: flex; }
 .auth-notice .notice-icon { font-size: 16px; }
 
-/* ─── STATS BAR ─── */
+/* ─── NG+ RUN SELECTOR ─── */
+.run-selector {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  z-index: 40;
+}
+
+.run-selector-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  background: rgba(201,164,74,0.08);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--gold);
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.run-selector-btn:hover { border-color: var(--gold); background: rgba(201,164,74,0.14); }
+.run-selector.archive-active .run-selector-btn { border-color: rgba(196,74,58,0.5); color: var(--red-bright); background: rgba(196,74,58,0.08); }
+.run-selector-arrow { font-size: 10px; opacity: 0.7; transition: transform 0.2s ease; }
+.run-selector.open .run-selector-arrow { transform: rotate(180deg); }
+
+.run-selector-list {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 200px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  overflow: hidden;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.run-selector.open .run-selector-list { display: block; }
+
+.run-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  font-family: 'Crimson Pro', serif;
+  font-size: 14px;
+  color: var(--parchment-dim);
+  cursor: pointer;
+  transition: background 0.15s ease;
+  white-space: nowrap;
+}
+
+.run-option:hover { background: rgba(201,164,74,0.08); color: var(--parchment); }
+.run-option.active { color: var(--gold); }
+.run-option .run-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.run-option .run-dot.live { background: var(--green-bright); box-shadow: 0 0 6px var(--green-bright); }
+.run-option .run-dot.archive { background: var(--parchment-dim); }
+.run-option .run-tag { margin-left: auto; font-size: 10px; opacity: 0.5; text-transform: uppercase; letter-spacing: 0.06em; }
+
+.auth-notice.archive-notice { background: rgba(196,74,58,0.08); border-color: rgba(196,74,58,0.3); color: rgba(224,150,140,0.9); }
+
+@media (max-width: 720px) {
+  .run-selector { position: static; margin-bottom: 10px; display: inline-flex; }
+}
 .stats-bar {
   display: flex;
   flex-wrap: wrap;

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Elden Ring™ – Mahluna Boss Tracker</title>
+<title>Elden Ring – Boss Tracker</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="stylesheet" href="style.css">
 <!-- DSGVO: consent.js blockiert ALLE externen Requests bis zur Nutzerentscheidung (Google Sheets + Google Analytics). Schriften und Chart.js sind lokal gehostet und benötigen keine Einwilligung. -->
@@ -94,6 +94,19 @@
     </div>
   </div>
 
+  <!-- Button: NG+ -->
+  <div class="etb-item" id="etb-item-ngplus">
+    <button class="etb-icon-btn" onclick="toolboxOpenPanel('ngplus')" data-tip="NG+" data-tip-always="1">
+      <span>🔁</span>
+    </button>
+    <div class="etb-panel" id="etb-panel-ngplus">
+      <div class="etb-panel-title">New Game +</div>
+      <button class="etb-action-btn etb-btn-danger-toggle" id="etb-btn-ngplus-start" onclick="startNGPlusRun()">
+        <span class="etb-btn-icon">🔁</span><span class="etb-btn-text">NG+ starten</span>
+      </button>
+    </div>
+  </div>
+
 </div>
 
 <div class="page-wrapper">
@@ -119,13 +132,28 @@
       </div>
     </div>
 
-    <h1>Elden Ring™</h1>
+    <h1>Elden Ring</h1>
     <p class="subtitle">Boss Tracker &amp; Fortschrittsübersicht</p>
     <div id="live-badge" class="live-badge" aria-live="polite"></div>
+
+    <!-- ── NG+ RUN-SELECTOR ── -->
+    <div class="run-selector" id="run-selector">
+      <button class="run-selector-btn" onclick="toggleRunSelector()" data-tip="Durchgang wählen (NG / NG+1 / …)" data-tip-always="1">
+        <span id="run-selector-label">🔴 NG</span>
+        <span class="run-selector-arrow">▾</span>
+      </button>
+      <div class="run-selector-list" id="run-selector-list"></div>
+    </div>
+
     <div class="header-ornament">
       <span class="ornament-rune">⚔</span>
     </div>
   </header>
+
+  <div class="auth-notice archive-notice" id="archive-banner">
+    <span class="notice-icon">📜</span>
+    <span id="archive-banner-text">Du betrachtest einen archivierten Durchgang — nur lesbar.</span>
+  </div>
 
   <div class="auth-notice" id="auth-notice">
     <span class="notice-icon">👁</span>
@@ -308,7 +336,7 @@
 <div class="toast" id="toast"></div>
 
 <footer class="site-footer">
-  &copy; ynnk99 &bull; Daten werden alle 5 Sekunden aus Google Sheets geladen &bull; Elden Ring™ Boss Tracker
+  &copy; ynnk99 &bull; Daten werden alle 5 Sekunden aus Google Sheets geladen &bull; Elden Ring Boss Tracker
   &bull; <a href="#" class="footer-privacy-link" onclick="document.getElementById('privacy-modal').style.display='flex'; return false;">Datenschutz</a>
   &bull; <a href="#" class="footer-privacy-link" onclick="document.getElementById('impressum-modal').style.display='flex'; return false;">Impressum</a>
 </footer>
@@ -348,7 +376,7 @@
       <h2>Datenschutzerklärung</h2>
 
       <h3>1. Verantwortliche Person</h3>
-      <p>Diese Website ist ein privates, nicht-kommerzielles Fan-Projekt des Twitch-Streamers Mahluna (ynnk99). Anfragen zum Datenschutz können über den Twitch- oder Discord-Kanal gestellt werden.</p>
+      <p>Diese Website ist ein privates, nicht-kommerzielles Fan-Projekt (ynnk99). Anfragen zum Datenschutz können über den Twitch- oder Discord-Kanal gestellt werden.</p>
 
       <h3>2. Was diese Seite ist</h3>
       <p>Der Elden Ring Boss Tracker ist ein öffentlich zugängliches Overlay-Tool, das den Fortschritt beim Durchspielen von Elden Ring visualisiert. Die Daten werden live aus Google Sheets geladen und alle fünf Sekunden aktualisiert. Es werden keine Nutzerdaten auf eigenen Servern gespeichert.</p>
