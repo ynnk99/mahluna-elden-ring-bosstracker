@@ -3283,8 +3283,12 @@ function loadRunCompareData() {
 
     runCompareData = { runs: runs, canonicalBosses: canonical };
 
+    var totalDefeated = runs.reduce(function(sum, run) {
+      return sum + (run.data ? run.data.doneCount : 0);
+    }, 0);
+
     var subtitleEl = document.getElementById("run-compare-subtitle");
-    if (subtitleEl) subtitleEl.textContent = runs.length + (runs.length === 1 ? " Durchgang · " : " Durchgänge · ") + canonical.length + " Bosse";
+    if (subtitleEl) subtitleEl.textContent = runs.length + (runs.length === 1 ? " Durchgang · " : " Durchgänge · ") + totalDefeated + " Bosse besiegt";
 
     renderRunCompareTable();
   });
@@ -3368,11 +3372,11 @@ function renderRunCompareTable() {
     var theadEl = body.querySelector(".run-compare-table thead");
     var summaryRows = body.querySelectorAll(".rc-summary-tbody tr");
     if (!theadEl || !summaryRows.length) return;
-    var offset = theadEl.getBoundingClientRect().height;
+    var offset = Math.round(theadEl.getBoundingClientRect().height);
     summaryRows.forEach(function(tr) {
       var cells = tr.querySelectorAll("td");
       cells.forEach(function(td) { td.style.top = offset + "px"; });
-      offset += tr.getBoundingClientRect().height;
+      offset += Math.round(tr.getBoundingClientRect().height);
     });
   });
 }
