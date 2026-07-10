@@ -243,6 +243,10 @@
       🎬 Clip-Sammlung
       <span id="btn-clips-count" style="font-family:'Crimson Pro',serif;font-size:12px;opacity:0.6;"></span>
     </button>
+    <button class="toggle-btn build-btn" id="btn-build" onclick="openBuildModal()">
+      <span class="dot"></span>
+      🛡️ Aktueller Build
+    </button>
   </div>
 
   <!-- ── BINGO ── -->
@@ -647,6 +651,29 @@
     <div class="run-compare-body" id="run-compare-body">
       <div class="run-compare-loading">⏳ Lade Durchgänge…</div>
     </div>
+  </div>
+</div>
+
+<!-- ── BUILD MODAL ── -->
+<div class="build-modal-backdrop" id="build-modal-backdrop" onclick="closeBuildModal()"></div>
+<div class="build-modal" id="build-modal" role="dialog" aria-modal="true" aria-label="Aktueller Build">
+  <div class="build-modal-inner">
+    <div class="build-modal-header">
+      <div class="build-modal-title">
+        <span class="build-modal-title-icon">🛡️</span>
+        <div>
+          <h2>Aktueller Build</h2>
+          <span class="build-modal-subtitle" id="build-modal-subtitle">wird geladen…</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
+        <a class="build-planner-link-btn" id="build-planner-link-btn" href="#" target="_blank" rel="noopener noreferrer">
+          Build-Planner öffnen ↗
+        </a>
+        <button class="clip-close-btn" onclick="closeBuildModal()" data-tip="Schließen" data-tip-always="1">✕</button>
+      </div>
+    </div>
+    <div class="build-modal-body" id="build-modal-body"></div>
   </div>
 </div>
 

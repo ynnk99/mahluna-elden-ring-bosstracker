@@ -50,6 +50,31 @@ function getBingoStateUrl() { return gvizUrl(currentRunSheet, "O20:S24"); }
 const RANKING_TOP_N = 10;
 const STREAMER_LOGIN = "mahluna";
 
+// ── BUILD-PLANNER ──────────────────────────────────────────────────────────
+// Um den aktuell gezeigten Build zu ändern: einfach den Link von
+// tarnished.dev/build-planner hier eintragen.
+const BUILD_PLANNER_URL = "https://www.tarnished.dev/build-planner?str=66&dex=17&int=11&fai=11&arc=7&vig=54&min=10&end=40&somber=10&smith=25&twoHanded=true&selectedClass=Vagabond&LoS=false&scaLvl=0&aRun=false&aFlk=false&aPvp=false&cStr=true&cDex=true&cInt=true&cFai=true&cArc=false&cVig=true&cMin=false&enduranceChange=true&rh1=Large+Club&aRh1=Heavy&sRun=Godrick%27s+Great+Rune&sFlk=Opaline+Bubbletear%2CCrimson+Crystal+Tear&sTal=Erdtree%27s+Favor+%2B1%2CDragoncrest+Shield+Talisman+%2B2%2CCrimson+Amber+Medallion+%2B1%2CViridian+Amber+Medallion+%2B2&cht=Crucible+Axe+Armor&gnt=Crucible+Gauntlets&hlm=Banished+Knight+Helm&leg=Crucible+Greaves";
+
+const FEXTRA_WIKI_BASE = "https://eldenring.wiki.fextralife.com";
+
+// Bekannte Item-/Klassenbilder aus dem Fextralife-Wiki. Fehlt ein Item hier,
+// wird stattdessen nur der Name mit einem Link zur Wiki-Seite angezeigt.
+const BUILD_ITEM_IMAGES = {
+  "Vagabond":                     FEXTRA_WIKI_BASE + "/file/Elden-Ring/vagabond_class_elden_ring_wiki_guide_270px.png",
+  "Large Club":                   FEXTRA_WIKI_BASE + "/file/Elden-Ring/large_club_warhammer_weapon_elden_ring_wiki_guide_200px.png",
+  "Banished Knight Helm":         FEXTRA_WIKI_BASE + "/file/Elden-Ring/banished_knight_helm_elden_ring_wiki_guide_200px.png",
+  "Crucible Axe Armor":           FEXTRA_WIKI_BASE + "/file/Elden-Ring/crucible_axe_armor_elden_ring_wiki_guide_200px.png",
+  "Crucible Gauntlets":           FEXTRA_WIKI_BASE + "/file/Elden-Ring/crucible_gauntlets_elden_ring_wiki_guide_200px.png",
+  "Crucible Greaves":             FEXTRA_WIKI_BASE + "/file/Elden-Ring/crucible_greaves_elden_ring_wiki_guide_200px.png",
+  "Godrick's Great Rune":         FEXTRA_WIKI_BASE + "/file/Elden-Ring/godricks-great-rune-key-item-elden-ring-wiki-guide.png",
+  "Opaline Bubbletear":           FEXTRA_WIKI_BASE + "/file/Elden-Ring/opaline_bubbletear_elden_ring_wiki_guide_200px.png",
+  "Crimson Crystal Tear":         FEXTRA_WIKI_BASE + "/file/Elden-Ring/crimson_crystal_tear_elden_ring_wiki_guide_200px.png",
+  "Erdtree's Favor":              FEXTRA_WIKI_BASE + "/file/Elden-Ring/erdtrees_favor_elden_ring_wiki_guide_200px.png",
+  "Dragoncrest Shield Talisman":  FEXTRA_WIKI_BASE + "/file/Elden-Ring/dragoncrest_shield_talisman_talisman_elden_ring_wiki_guide_200px.png",
+  "Crimson Amber Medallion":      FEXTRA_WIKI_BASE + "/file/Elden-Ring/crimson_amber_medallion_talisman_elden_ring_wiki_guide_200px.png",
+  "Viridian Amber Medallion":     FEXTRA_WIKI_BASE + "/file/Elden-Ring/viridian_amber_medallion_talisman_elden_ring_wiki_guide_200px.png",
+};
+
 const MAIN_BOSSES = new Set([
   "Margit, das Grausame Mal",
   "Godrick der Verpflanzte",
@@ -1293,6 +1318,7 @@ document.addEventListener("keydown", function(e) {
     closeClipModal();
     closeQuickClipMenu();
     closeBossMenu();
+    closeBuildModal();
     if (searchQuery) clearSearch();
     return;
   }
@@ -3382,6 +3408,159 @@ function renderRunCompareTable() {
     });
   });
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// BUILD-PLANNER MODAL
+// ═══════════════════════════════════════════════════════════════════════════
+
+function stripTalismanLevel(name) {
+  return String(name).replace(/\s*\+\d+$/, "").trim();
+}
+
+function buildItemImageUrl(name) {
+  return BUILD_ITEM_IMAGES[stripTalismanLevel(name)] || null;
+}
+
+function buildItemWikiUrl(name) {
+  var clean = stripTalismanLevel(name).replace(/'/g, "%27");
+  return FEXTRA_WIKI_BASE + "/" + clean.replace(/\s+/g, "+");
+}
+
+function buildItemCardHtml(name, subtitle) {
+  if (!name) return "";
+  var img = buildItemImageUrl(name);
+  var imgHtml = img
+    ? '<img class="build-item-img" src="' + escAttr(img) + '" alt="' + escAttr(name) + '" loading="lazy">'
+    : '<div class="build-item-img build-item-img-placeholder">✦</div>';
+  return '<a class="build-item-card" href="' + escAttr(buildItemWikiUrl(name)) + '" target="_blank" rel="noopener noreferrer">'
+    + imgHtml
+    + '<div class="build-item-info">'
+    + '<div class="build-item-name">' + escHtml(name) + '</div>'
+    + (subtitle ? '<div class="build-item-sub">' + escHtml(subtitle) + '</div>' : '')
+    + '</div>'
+    + '</a>';
+}
+
+function parseBuildPlannerUrl(url) {
+  var params = new URL(url).searchParams;
+  var weaponUpgrade = parseInt(params.get("smith"), 10) || 0;
+  if (!weaponUpgrade) weaponUpgrade = parseInt(params.get("somber"), 10) || 0;
+
+  return {
+    className: params.get("selectedClass") || "",
+    stats: [
+      { label: "Vig",  value: params.get("vig") },
+      { label: "Mind", value: params.get("min") },
+      { label: "End",  value: params.get("end") },
+      { label: "Str",  value: params.get("str") },
+      { label: "Dex",  value: params.get("dex") },
+      { label: "Int",  value: params.get("int") },
+      { label: "Fai",  value: params.get("fai") },
+      { label: "Arc",  value: params.get("arc") },
+    ],
+    weapon: params.get("rh1") || "",
+    weaponAffinity: params.get("aRh1") || "",
+    weaponUpgrade: weaponUpgrade,
+    twoHanded: params.get("twoHanded") === "true",
+    armor: [
+      { part: "Helm",       name: params.get("hlm") || "" },
+      { part: "Rüstung",    name: params.get("cht") || "" },
+      { part: "Handschuhe", name: params.get("gnt") || "" },
+      { part: "Beinschutz", name: params.get("leg") || "" },
+    ],
+    greatRune: params.get("sRun") || "",
+    tears: (params.get("sFlk") || "").split(",").map(function(s) { return s.trim(); }).filter(Boolean),
+    talismans: (params.get("sTal") || "").split(",").map(function(s) { return s.trim(); }).filter(Boolean),
+  };
+}
+
+function renderBuildModal() {
+  var body = document.getElementById("build-modal-body");
+  var subtitle = document.getElementById("build-modal-subtitle");
+  var linkBtn = document.getElementById("build-planner-link-btn");
+  if (!body) return;
+
+  if (linkBtn) linkBtn.href = BUILD_PLANNER_URL;
+
+  var build;
+  try {
+    build = parseBuildPlannerUrl(BUILD_PLANNER_URL);
+  } catch (e) {
+    console.error("[BuildModal] Fehler beim Parsen der Build-URL:", e);
+    body.innerHTML = '<div class="build-modal-empty">Build konnte nicht geladen werden.</div>';
+    if (subtitle) subtitle.textContent = "Fehler beim Laden";
+    return;
+  }
+
+  if (subtitle) subtitle.textContent = build.className + " · Level " + build.stats.reduce(function(sum, s) { return sum + (parseInt(s.value, 10) || 0); }, 0);
+
+  var classImg = buildItemImageUrl(build.className);
+  var html = '<div class="build-class-row">'
+    + (classImg ? '<img class="build-class-portrait" src="' + escAttr(classImg) + '" alt="' + escAttr(build.className) + '">' : '')
+    + '<div>'
+    + '<div class="build-class-name">' + escHtml(build.className) + '</div>'
+    + '<div class="build-class-sub">Startklasse</div>'
+    + '</div>'
+    + '</div>';
+
+  html += '<div class="build-section">'
+    + '<div class="build-section-title">Attribute</div>'
+    + '<div class="build-stat-grid">'
+    + build.stats.map(function(s) {
+        return '<div class="build-stat-chip"><span class="build-stat-label">' + escHtml(s.label) + '</span><span class="build-stat-value">' + escHtml(s.value || "–") + '</span></div>';
+      }).join("")
+    + '</div>'
+    + '</div>';
+
+  if (build.weapon) {
+    var weaponSub = (build.weaponAffinity ? build.weaponAffinity + " · " : "") + "+" + build.weaponUpgrade + (build.twoHanded ? " · beidhändig" : "");
+    html += '<div class="build-section">'
+      + '<div class="build-section-title">Waffe</div>'
+      + '<div class="build-item-grid">' + buildItemCardHtml(build.weapon, weaponSub) + '</div>'
+      + '</div>';
+  }
+
+  var armorPieces = build.armor.filter(function(a) { return a.name; });
+  if (armorPieces.length) {
+    html += '<div class="build-section">'
+      + '<div class="build-section-title">Rüstung</div>'
+      + '<div class="build-item-grid">' + armorPieces.map(function(a) { return buildItemCardHtml(a.name, a.part); }).join("") + '</div>'
+      + '</div>';
+  }
+
+  if (build.talismans.length) {
+    html += '<div class="build-section">'
+      + '<div class="build-section-title">Talismane</div>'
+      + '<div class="build-item-grid">' + build.talismans.map(function(t) { return buildItemCardHtml(t, "Talisman"); }).join("") + '</div>'
+      + '</div>';
+  }
+
+  if (build.greatRune || build.tears.length) {
+    html += '<div class="build-section">'
+      + '<div class="build-section-title">Great Rune &amp; Träne</div>'
+      + '<div class="build-item-grid">'
+      + (build.greatRune ? buildItemCardHtml(build.greatRune, "Great Rune") : "")
+      + build.tears.map(function(t) { return buildItemCardHtml(t, "Kristallträne"); }).join("")
+      + '</div>'
+      + '</div>';
+  }
+
+  body.innerHTML = html;
+}
+
+function openBuildModal() {
+  document.getElementById("build-modal-backdrop").classList.add("open");
+  document.getElementById("build-modal").classList.add("open");
+  document.body.style.overflow = "hidden";
+  renderBuildModal();
+}
+
+function closeBuildModal() {
+  document.getElementById("build-modal-backdrop").classList.remove("open");
+  document.getElementById("build-modal").classList.remove("open");
+  document.body.style.overflow = "";
+}
+// ─── END BUILD-PLANNER MODAL ─────────────────────────────────────────────────
 
 // ═══════════════════════════════════════════════════════════════════════════
 // INIT

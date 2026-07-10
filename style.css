@@ -2983,3 +2983,247 @@ body.editor-mode { padding-left: 0; }
 @media (max-width: 720px) {
   .run-compare-modal { width: 100vw; height: 100vh; max-height: 100vh; border-radius: 0; }
 }
+
+/* ─── BUILD BUTTON & MODAL ─── */
+.toggle-btn.build-btn { border-color: rgba(74, 140, 74, 0.35); color: rgba(140, 200, 140, 0.85); }
+.toggle-btn.build-btn .dot { background: rgba(74, 140, 74, 0.6); }
+.toggle-btn.build-btn:hover { border-color: var(--green-bright); color: var(--green-bright); background: rgba(74,140,74,0.1); }
+.toggle-btn.build-btn.active { border-color: var(--green-bright); color: var(--green-bright); background: rgba(74,140,74,0.1); box-shadow: 0 0 16px rgba(74,140,74,0.2); }
+.toggle-btn.build-btn.active .dot { background: var(--green-bright); box-shadow: 0 0 8px var(--green-bright); }
+
+.build-modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 3, 1, 0.72);
+  z-index: 1100;
+  backdrop-filter: blur(3px);
+}
+.build-modal-backdrop.open { display: block; }
+
+.build-modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -48%) scale(0.97);
+  opacity: 0;
+  width: min(880px, 96vw);
+  max-height: 92vh;
+  background: #100d08;
+  border: 1px solid rgba(201, 164, 74, 0.35);
+  border-radius: 6px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(201,164,74,0.08);
+  z-index: 1101;
+  overflow: hidden;
+  flex-direction: column;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.build-modal.open {
+  display: flex;
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.build-modal-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.build-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid rgba(201,164,74,0.15);
+  flex-shrink: 0;
+  gap: 14px;
+}
+.build-modal-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.build-modal-title-icon {
+  font-size: 26px;
+  line-height: 1;
+  filter: drop-shadow(0 0 6px rgba(201,164,74,0.4));
+}
+.build-modal-title h2 {
+  font-family: 'Cinzel', serif;
+  font-size: 17px;
+  color: #e3b873;
+  margin: 0 0 2px 0;
+  letter-spacing: 0.06em;
+}
+.build-modal-subtitle {
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 15px;
+  color: #8a7a60;
+  font-style: italic;
+}
+
+.build-planner-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: rgba(201,164,74,0.06);
+  color: var(--gold-light);
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+.build-planner-link-btn:hover { border-color: var(--gold); background: rgba(201,164,74,0.14); }
+
+.build-modal-body {
+  overflow-y: auto;
+  flex: 1;
+  padding: 20px 24px 26px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201,164,74,0.25) transparent;
+}
+.build-modal-body::-webkit-scrollbar { width: 5px; }
+.build-modal-body::-webkit-scrollbar-track { background: transparent; }
+.build-modal-body::-webkit-scrollbar-thumb { background: rgba(201,164,74,0.25); border-radius: 3px; }
+
+.build-section { margin-bottom: 22px; }
+.build-section:last-child { margin-bottom: 0; }
+.build-section-title {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(201,164,74,0.1);
+}
+
+.build-class-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+.build-class-portrait {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  object-fit: cover;
+  background: var(--bg-card);
+  flex-shrink: 0;
+}
+.build-class-name {
+  font-family: 'Cinzel', serif;
+  font-size: 20px;
+  color: var(--gold-light);
+  letter-spacing: 0.04em;
+}
+.build-class-sub {
+  font-family: 'Crimson Pro', serif;
+  font-size: 14px;
+  color: var(--parchment-dim);
+  font-style: italic;
+}
+
+.build-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 10px;
+}
+.build-stat-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+}
+.build-stat-label {
+  font-family: 'Cinzel', serif;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+}
+.build-stat-value {
+  font-family: 'Cinzel', serif;
+  font-size: 19px;
+  color: var(--gold-light);
+  font-weight: 600;
+}
+
+.build-item-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 10px;
+}
+.build-item-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+.build-item-card:hover { border-color: var(--gold-dim); background: rgba(201,164,74,0.06); }
+.build-item-img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 4px;
+  background: rgba(0,0,0,0.3);
+  flex-shrink: 0;
+}
+.build-item-img-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold-dim);
+  font-size: 18px;
+}
+.build-item-info { min-width: 0; }
+.build-item-name {
+  font-family: 'Crimson Pro', serif;
+  font-size: 14.5px;
+  color: var(--parchment);
+  line-height: 1.25;
+}
+.build-item-sub {
+  font-family: 'Cinzel', serif;
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+  margin-top: 2px;
+}
+
+.build-modal-empty {
+  padding: 40px 22px;
+  text-align: center;
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  color: #5a4f38;
+  font-size: 15px;
+}
+
+@media (max-width: 720px) {
+  .build-modal { width: 100vw; height: 100vh; max-height: 100vh; border-radius: 0; }
+  .build-modal-header { padding: 14px 16px; flex-wrap: wrap; }
+  .build-planner-link-btn { font-size: 11px; padding: 7px 10px; }
+}
