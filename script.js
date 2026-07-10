@@ -997,7 +997,7 @@ function updateAreaHeader(areaName) {
 
 var menuOpen = false;
 
-function openBossMenu(e, areaName, bossName) {
+function openBossMenu(e, areaName, bossName, targetEl) {
   if (!isAuthorized()) return;
   e.stopPropagation();
 
@@ -1027,7 +1027,8 @@ function openBossMenu(e, areaName, bossName) {
   document.querySelectorAll(".boss-row.menu-open, .pinned-card.menu-open").forEach(function(r) {
     r.classList.remove("menu-open");
   });
-  e.currentTarget.classList.add("menu-open");
+  var activeEl = targetEl || e.currentTarget;
+  if (activeEl && activeEl.classList) activeEl.classList.add("menu-open");
 
   var menu = document.getElementById("boss-menu");
   menu.classList.add("open");
@@ -1281,7 +1282,7 @@ document.addEventListener("touchend", function(e) {
   if (!row) return;
   if (e.target.closest(".boss-clip-badge")) return;
   e.preventDefault();
-  openBossMenu(e, row.dataset.area, row.dataset.boss);
+  openBossMenu(e, row.dataset.area, row.dataset.boss, row);
 }, { passive: false });
 
 document.addEventListener("keydown", function(e) {
@@ -2617,11 +2618,11 @@ function renderAreas(areas) {
       card.dataset.area = b.area;
       if (isAuthorized()) {
         card.addEventListener("click", function(e) {
-          openBossMenu(e, b.area, b.boss);
+          openBossMenu(e, b.area, b.boss, card);
         });
         card.addEventListener("touchend", function(e) {
           e.preventDefault();
-          openBossMenu(e, b.area, b.boss);
+          openBossMenu(e, b.area, b.boss, card);
         });
       }
       card.innerHTML = '<span class="pinned-deaths">📌 ' + (b.deaths > 0 ? b.deaths : "–") + '</span>'
