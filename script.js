@@ -3539,7 +3539,7 @@ function renderBuildModal() {
 
   if (build.greatRune || build.tears.length) {
     html += '<div class="build-section">'
-      + '<div class="build-section-title">Great Rune &amp; Träne</div>'
+      + '<div class="build-section-title">Große Rune &amp; Arzneimischung</div>'
       + '<div class="build-item-grid">'
       + (build.greatRune ? buildItemCardHtml(build.greatRune, "Great Rune") : "")
       + build.tears.map(function(t) { return buildItemCardHtml(t, "Kristallträne"); }).join("")
