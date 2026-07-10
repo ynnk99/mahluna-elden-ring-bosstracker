@@ -3492,7 +3492,9 @@ function renderBuildModal() {
     return;
   }
 
-  if (subtitle) subtitle.textContent = build.className + " · Level " + build.stats.reduce(function(sum, s) { return sum + (parseInt(s.value, 10) || 0); }, 0);
+  // Charakterlevel = Summe aller 8 Attribute − 79 (Basis-Summe bei Level 1)
+  var statSum = build.stats.reduce(function(sum, s) { return sum + (parseInt(s.value, 10) || 0); }, 0);
+  if (subtitle) subtitle.textContent = build.className + " · Level " + (statSum - 79);
 
   var classImg = buildItemImageUrl(build.className);
   var html = '<div class="build-class-row">'
