@@ -2054,6 +2054,7 @@ function renderClipCard(clip, index) {
     + titleHtml
     + '<div class="clip-card-footer-row">'
     + '<span class="clip-number">Clip ' + String(index + 1).padStart(2, "0") + '</span>'
+    + '<span class="clip-category-badge">' + escHtml(clip.category || "Sonstige") + '</span>'
     + (clip.addedAt ? '<span class="clip-date">📅 ' + formatClipDate(clip.addedAt) + '</span>' : '')
     + (clip.creatorName ? '<span class="clip-creator">✂ ' + escHtml(clip.creatorName) + '</span>' : '')
     + '<a href="' + escAttr(linkUrl) + '" target="_blank" rel="noopener" class="clip-open-link">'
