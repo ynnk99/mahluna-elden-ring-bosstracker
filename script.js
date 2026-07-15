@@ -1549,6 +1549,7 @@ function renderRanking(allBosses) {
 
 var chartCollapsed = false;
 var chartInstance  = null;
+var currentChartBossList = [];
 
 function toggleChart() {
   chartCollapsed = !chartCollapsed;
@@ -1584,10 +1585,20 @@ function renderChart(allBosses) {
 
   var counts  = dates.map(function(d) { return byDate[d].length; });
   var bossList = dates.map(function(d) { return byDate[d]; });
+  // Vom Tooltip-Callback gelesen; wird bei jedem Render aktualisiert, damit
+  // wir die Chart.js-Instanz wiederverwenden können statt sie neu zu bauen.
+  currentChartBossList = bossList;
+
+  if (chartInstance) {
+    // Instanz existiert bereits: nur Daten austauschen + neu zeichnen.
+    // Deutlich günstiger als destroy()+new Chart() bei jedem Datenupdate.
+    chartInstance.data.labels          = dates;
+    chartInstance.data.datasets[0].data = counts;
+    chartInstance.update();
+    return;
+  }
 
   var ctx = document.getElementById("boss-chart").getContext("2d");
-
-  if (chartInstance) { chartInstance.destroy(); }
 
   chartInstance = new Chart(ctx, {
     type: "bar",
@@ -1619,7 +1630,7 @@ function renderChart(allBosses) {
           callbacks: {
             title: function(items) { return items[0].label; },
             label: function(item) {
-              var list = bossList[item.dataIndex];
+              var list = currentChartBossList[item.dataIndex];
               return ["† " + list.length + " Boss" + (list.length > 1 ? "e" : "") + ":"]
                 .concat(list.map(function(n){ return "  · " + n; }));
             }
@@ -2690,7 +2701,7 @@ function renderAreas(areas) {
       ? ' <span style="font-size:11px;color:var(--gold-dim);font-family:\'Crimson Pro\',serif;font-style:italic;">DLC</span>'
       : "";
 
-    card.innerHTML = '<div class="area-header" onclick="toggleArea(\'' + escAttr(areaName) + '\')">'
+    var cardHtml = '<div class="area-header" onclick="toggleArea(\'' + escAttr(areaName) + '\')">'
       + '<div class="area-header-left">'
       + '<span class="area-toggle-icon">▼</span>'
       + '<span class="area-name" data-tip="' + escAttr(areaName) + '">' + escHtml(areaName) + dlcLabel + '</span>'
@@ -2703,6 +2714,15 @@ function renderAreas(areas) {
       + '<div class="boss-list">'
       + data.bosses.map(function(b) { return renderBossRow(b, areaName); }).join("")
       + '</div>';
+
+    // Nur neu rendern, wenn sich der Inhalt dieser Karte wirklich geändert
+    // hat. Ohne diesen Guard wurde bisher bei JEDEM loadData()-Tick (alle
+    // 3s) das komplette innerHTML aller Gebiets-Karten neu geschrieben,
+    // auch wenn sich nichts geändert hatte – unnötiges Reflow/Repaint.
+    if (card._lastHtml !== cardHtml) {
+      card.innerHTML = cardHtml;
+      card._lastHtml = cardHtml;
+    }
 
     var children     = Array.from(grid.children);
     var currentIndex = children.indexOf(card);
@@ -3569,15 +3589,50 @@ function closeBuildModal() {
 // INIT
 // ═══════════════════════════════════════════════════════════════════════════
 
+// ─── VISIBILITY-AWARE POLLING ────────────────────────────────────────────
+// Pollt seltener, wenn der Tab im Hintergrund ist – z.B. weil nebenbei auf
+// einem 2. Monitor ein Twitch-Stream läuft. Sobald der Tab wieder sichtbar
+// wird, wird sofort neu geladen und im normalen Takt weitergemacht. Das
+// vermeidet unnötige Fetches + DOM-Rebuilds, die im Hintergrund CPU/GPU
+// beanspruchen, die der Videodecoder woanders bräuchte.
+function createPoller(fn, activeMs, hiddenMs) {
+  var timer = null;
+  function schedule() {
+    var delay = document.hidden ? hiddenMs : activeMs;
+    timer = setTimeout(function() {
+      fn();
+      schedule();
+    }, delay);
+  }
+  schedule();
+  return {
+    refreshNow: function() {
+      if (timer) clearTimeout(timer);
+      fn();
+      schedule();
+    }
+  };
+}
+
+var pollers = [];
+
+document.addEventListener("visibilitychange", function() {
+  if (!document.hidden) {
+    pollers.forEach(function(p) { p.refreshNow(); });
+  }
+});
+
 checkAuthOnLoad();
 loadNGRuns();
 loadData();
 loadClips();
-setInterval(loadData,  3000);
-setInterval(loadClips, 15000);
-setInterval(loadNGRuns, 20000);
+// Aktiv-Intervall (Tab sichtbar) bleibt wie vorher, Hintergrund-Intervall
+// (Tab nicht sichtbar) ist deutlich entspannter.
+pollers.push(createPoller(loadData,        3000,  20000));
+pollers.push(createPoller(loadClips,      15000,  60000));
+pollers.push(createPoller(loadNGRuns,     20000,  90000));
 startTimerTick();
 checkLiveStatus();
-liveCheckInterval = setInterval(checkLiveStatus, 60000);
+pollers.push(createPoller(checkLiveStatus, 60000, 120000));
 loadBingo();
-setInterval(loadBingo, 10000);
+pollers.push(createPoller(loadBingo,      10000,  45000));
