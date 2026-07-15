@@ -157,9 +157,34 @@ function renderBossLevelPanel() {
     return b.done && b.level !== null && parseLevel(b.level) !== null;
   });
 
-  // Aufsteigend sortieren: erst nach Level (vor /), dann nach Suffix (nach /)
+  // "12.03.2026" → Date; dient als primäres Sortierkriterium, damit Base-Game-
+  // und DLC-Bosse (unterschiedliche Level-Skalen: Charakter-Level vs. Scadu-Level)
+  // chronologisch korrekt gemischt werden, statt dass DLC-Bosse durch die
+  // niedrigeren Scadu-Werte systematisch ans Ende sortiert werden.
+  function parseGermanDate(str) {
+    if (!str) return null;
+    var parts = String(str).split(".");
+    if (parts.length !== 3) return null;
+    var d = new Date(parts[2], parts[1] - 1, parts[0]);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  // Primär chronologisch (Datum) sortieren; bei gleichem Datum (oder falls
+  // kein Datum vorhanden ist) nach Level aufsteigend, inkl. "9/1", "9/2"-Suffix
+  // für mehrere Kills auf demselben Level.
   done.sort(function(a, b) {
+    var da = parseGermanDate(a.date), db = parseGermanDate(b.date);
+
+    if (da && db) {
+      var dcmp = da.getTime() - db.getTime();
+      if (dcmp !== 0) return dcmp;
+    } else if (da || db) {
+      // Einer hat kein Datum -> ans Ende schieben statt die Sortierung zu verfälschen
+      return da ? -1 : 1;
+    }
+
     var pa = parseLevel(a.level), pb = parseLevel(b.level);
+    if (pa === null || pb === null) return 0;
     if (pa.primary !== pb.primary) return pa.primary - pb.primary;
     return pa.secondary - pb.secondary;
   });
