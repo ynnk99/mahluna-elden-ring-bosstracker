@@ -183,6 +183,11 @@ function renderBossLevelPanel() {
       return da ? -1 : 1;
     }
 
+    // Gleiches Datum: Base Game vor DLC, da Scadu-Level (DLC) und
+    // Charakter-Level (Base Game) nicht direkt vergleichbar sind
+    // (z.B. Scadu-Lvl. 0 vs. Charakter-Lvl. 150 am selben Tag).
+    if (a.isDLC !== b.isDLC) return a.isDLC ? 1 : -1;
+
     var pa = parseLevel(a.level), pb = parseLevel(b.level);
     if (pa === null || pb === null) return 0;
     if (pa.primary !== pb.primary) return pa.primary - pb.primary;
