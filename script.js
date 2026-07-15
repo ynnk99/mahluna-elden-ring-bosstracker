@@ -3448,6 +3448,7 @@ function parseBuildPlannerUrl(url) {
 
   return {
     className: params.get("selectedClass") || "",
+    scaduLevel: parseInt(params.get("scaLvl"), 10) || 0,
     stats: [
       { label: "Vig",  value: params.get("vig") },
       { label: "Mind", value: params.get("min") },
@@ -3494,7 +3495,7 @@ function renderBuildModal() {
 
   // Charakterlevel = Summe aller 8 Attribute − 79 (Basis-Summe bei Level 1)
   var statSum = build.stats.reduce(function(sum, s) { return sum + (parseInt(s.value, 10) || 0); }, 0);
-  if (subtitle) subtitle.textContent = " Level " + (statSum - 79);
+  if (subtitle) subtitle.textContent = " Level " + (statSum - 79) + " · Scadu-Lvl. " + build.scaduLevel;
 
   var classImg = buildItemImageUrl(build.className);
   var html = '<div class="build-class-row">'
