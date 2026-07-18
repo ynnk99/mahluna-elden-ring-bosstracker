@@ -53,7 +53,7 @@ const STREAMER_LOGIN = "mahluna";
 // ── BUILD-PLANNER ──────────────────────────────────────────────────────────
 // Um den aktuell gezeigten Build zu ändern: einfach den Link von
 // tarnished.dev/build-planner hier eintragen.
-const BUILD_PLANNER_URL = "https://www.tarnished.dev/build-planner?str=78&dex=17&int=14&fai=11&arc=7&vig=60&min=10&end=41&somber=10&smith=25&twoHanded=true&selectedClass=Vagabond&LoS=false&scaLvl=6&aRun=false&aFlk=false&aPvp=false&cStr=true&cDex=true&cInt=true&cFai=true&cArc=false&cVig=true&cMin=false&enduranceChange=true&rh1=Large+Club&aRh1=Heavy&sRun=Godrick%27s+Great+Rune&sFlk=Opaline+Bubbletear%2CCrimson+Crystal+Tear&sTal=Erdtree%27s+Favor+%2B1%2CDragoncrest+Shield+Talisman+%2B2%2CViridian+Amber+Medallion+%2B2%2CCrimson+Amber+Medallion+%2B2&cht=Armor+of+Solitude&gnt=Gauntlets+of+Solitude&hlm=Helm+of+Solitude&leg=Greaves+of+Solitude";
+const BUILD_PLANNER_URL = "https://www.tarnished.dev/build-planner?str=78&dex=17&int=14&fai=12&arc=7&vig=60&min=10&end=41&somber=10&smith=25&twoHanded=true&selectedClass=Vagabond&LoS=false&scaLvl=7&aRun=false&aFlk=false&aPvp=false&cStr=true&cDex=true&cInt=true&cFai=true&cArc=false&cVig=true&cMin=false&enduranceChange=true&rh1=Large+Club&aRh1=Heavy&sRun=Godrick%27s+Great+Rune&sFlk=Opaline+Bubbletear%2CCrimson+Crystal+Tear&sTal=Erdtree%27s+Favor+%2B1%2CDragoncrest+Shield+Talisman+%2B2%2CViridian+Amber+Medallion+%2B2%2CCrimson+Amber+Medallion+%2B2&cht=Armor+of+Solitude&gnt=Gauntlets+of+Solitude&hlm=Helm+of+Solitude&leg=Greaves+of+Solitude";
 
 const FEXTRA_WIKI_BASE = "https://eldenring.wiki.fextralife.com";
 
