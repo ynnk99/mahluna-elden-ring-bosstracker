@@ -3610,18 +3610,48 @@ function renderBuildModal() {
   body.innerHTML = html;
 }
 
-function openBuildModal() {
+function openBuildModal(skipHistory) {
   document.getElementById("build-modal-backdrop").classList.add("open");
   document.getElementById("build-modal").classList.add("open");
   document.body.style.overflow = "hidden";
   renderBuildModal();
+
+  // URL-Suffix "#build" anhängen, damit der Link direkt teilbar ist und
+  // beim Öffnen automatisch den Build-Modal zeigt (siehe checkBuildLinkOnLoad).
+  if (!skipHistory && window.location.hash !== "#build") {
+    history.pushState({ buildModal: true }, "", window.location.pathname + window.location.search + "#build");
+  }
 }
 
-function closeBuildModal() {
+function closeBuildModal(skipHistory) {
   document.getElementById("build-modal-backdrop").classList.remove("open");
   document.getElementById("build-modal").classList.remove("open");
   document.body.style.overflow = "";
+
+  // "#build"-Suffix wieder aus der URL entfernen.
+  if (!skipHistory && window.location.hash === "#build") {
+    history.pushState(null, "", window.location.pathname + window.location.search);
+  }
 }
+
+// Öffnet den Build-Modal automatisch, wenn die Seite mit "#build" in der
+// URL aufgerufen wird (z.B. über einen geteilten Link).
+function checkBuildLinkOnLoad() {
+  if (window.location.hash === "#build") {
+    openBuildModal(true);
+  }
+}
+
+// Reagiert auf Vor-/Zurück-Navigation im Browser, damit der Modal-Status
+// zum "#build"-Suffix in der URL passt.
+window.addEventListener("popstate", function() {
+  var modalIsOpen = document.getElementById("build-modal").classList.contains("open");
+  if (window.location.hash === "#build" && !modalIsOpen) {
+    openBuildModal(true);
+  } else if (window.location.hash !== "#build" && modalIsOpen) {
+    closeBuildModal(true);
+  }
+});
 // ─── END BUILD-PLANNER MODAL ─────────────────────────────────────────────────
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -3662,6 +3692,7 @@ document.addEventListener("visibilitychange", function() {
 });
 
 checkAuthOnLoad();
+checkBuildLinkOnLoad();
 loadNGRuns();
 loadData();
 loadClips();
