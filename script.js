@@ -22,6 +22,113 @@ const LIVE_SHEET_NAME = "OBS_Overlay";
 // Meta-Tab, der Liste + Zähler der archivierten NG-Durchgänge enthält.
 const NGPLUS_META_SHEET = "_NGPLUS_META";
 
+// ═══════════════════════════════════════════════════════════════════════════
+//  SHEET-SPALTEN-/ZEILEN-REFERENZEN (zentrale Konfiguration)
+// ═══════════════════════════════════════════════════════════════════════════
+// Kommen im Google Sheet Spalten dazu oder werden welche gelöscht, muss NUR
+// dieser Block angepasst werden (Buchstaben wie im Sheet selbst). Der Rest
+// des Codes greift ausschließlich über SHEET_COL/SHEET_ROW + colIdx()/
+// cellAddr() auf Zellen zu, nirgendwo sonst stehen rohe Spaltenindizes.
+const SHEET_COL = {
+  AREA:             "A",  // Gebiet
+  BOSS:             "B",  // Boss
+  DONE:             "C",  // Erledigt (TRUE/FALSE)
+  DATE:             "D",  // Datum des Kills
+  DEATHS:           "E",  // Tode am Boss
+  PINNED:           "F",  // Angepinnt
+  LEVEL:            "G",  // Level/Scadu-Level beim Kill
+  AREA_COLLAPSED:   "H",  // Gebiet eingeklappt (Sheet-Vorgabe)
+  FIELD_DEATHS:     "K",  // Zeile DLC_DEATH_ROW/DLC_FLAGS: Feldtode Base/DLC
+  KILL_TOTAL:       "L",  // Zeile DLC_DEATH_ROW/DLC_FLAGS: Gesamttode Base/DLC
+  TIMER_RUNNING:    "M",  // Zeile1 = Timer läuft (Legacy-Flag), Zeile2 = Reset-Pulse
+  TIMER_LABEL:      "N",  // Zeile3 = Timer-Label (ersetzt "Aktueller Boss:")
+  TIMER_VISIBLE:    "O",  // Zeile1 = Timer sichtbar, Zeile2 = Simple-Modus
+  BASEGAME_DLC:     "R",  // Zeile1 = Base Game an/aus, Zeile2 = DLC an/aus
+  FILTER_OPEN_DONE: "T",  // Zeile1 = nur offene, Zeile2 = nur erledigte
+  TIMER_TS:         "X",  // Zeile1 = Start-Timestamp, Zeile3 = verstrichene Zeit
+  CLIPS_START:      "X",  // Clip-Tabelle: CLIPS_COL_COUNT Spalten ab hier
+  BINGO_TEXT:       "O",  // Bingo-Text-Bereich, BINGO_SIZE Spalten ab hier
+  BINGO_STATE:      "O",  // Bingo-Haken-Bereich, BINGO_SIZE Spalten ab hier
+  HIDE_OVERLAY:     "Z",  // Zeile1 = Overlay ausblenden, Zeile2 = Top-Deaths-Modus
+};
+
+// Feste Zeilen-Referenzen (0-basierter Index im "rows"-Array von gviz).
+const SHEET_ROW = {
+  BASE_FLAGS:    0,   // rows[0] → Sheet-Zeile 1
+  DLC_FLAGS:     1,   // rows[1] → Sheet-Zeile 2
+  LABEL_ROW:     2,   // rows[2] → Sheet-Zeile 3
+  DLC_DEATH_ROW: 168, // rows[168] → Sheet-Zeile 169 (Feldtode/Gesamttode DLC)
+};
+
+// Bingo-Bereich: Start-Zeile (1-basiert, wie im Sheet) + Breite/Höhe (5x5).
+const BINGO_TEXT_ROW_START  = 15; // z.B. O15:S19
+const BINGO_STATE_ROW_START = 20; // z.B. O20:S24
+const BINGO_SIZE            = 5;
+
+// Clip-Tabelle: Start-/End-Zeile (1-basiert, wie im Sheet), Spaltenanzahl.
+const CLIPS_ROW_START  = 9;
+const CLIPS_ROW_END    = 1000;
+const CLIPS_COL_COUNT  = 6; // URL, Kategorie, Titel, Boss, Datum, Creator
+
+// ── Spaltenbuchstabe(n) ⇄ 0-basierter Array-Index ("rows[r].c[idx]") ──────
+function colIdx(letters) {
+  let idx = 0;
+  for (let i = 0; i < letters.length; i++) idx = idx * 26 + (letters.charCodeAt(i) - 64);
+  return idx - 1; // 0-basiert
+}
+
+// 0-basierter Array-Index ⇄ Spaltenbuchstabe (Umkehrfunktion zu colIdx)
+function idxToColLetter(idx) {
+  let n = idx + 1; // 1-basiert
+  let s = "";
+  while (n > 0) {
+    const m = (n - 1) % 26;
+    s = String.fromCharCode(65 + m) + s;
+    n = Math.floor((n - 1) / 26);
+  }
+  return s;
+}
+
+// Spaltenbuchstabe, der "offset" Spalten rechts von "letters" liegt.
+function colLetterOffset(letters, offset) {
+  return idxToColLetter(colIdx(letters) + offset);
+}
+
+// Spaltenbuchstabe(n) + Zeilennummer ⇄ A1-Zelladresse (z.B. "O", 1 → "O1")
+function cellAddr(letters, rowNumber) {
+  return letters + rowNumber;
+}
+
+// Halbstabile interne Bezeichner für die Editor-Toolbox-Zellen. Die Bedeutung
+// bleibt gleich, auch wenn sich die zugehörige Sheet-Spalte über SHEET_COL
+// verschiebt. WICHTIG: Diese Schlüssel (O1, O2, R1, R2, T1, T2, Z1) werden
+// auch von der HTML (onclick-Attribute der Toolbox-Buttons) referenziert und
+// dienen dort nur als interne ID – NICHT umbenennen, nur die SHEET_COL-Werte
+// oben anpassen, wenn sich die tatsächliche Spalte im Sheet ändert.
+const TOGGLE_CELL_ADDR = {
+  O1: cellAddr(SHEET_COL.TIMER_VISIBLE, 1),
+  O2: cellAddr(SHEET_COL.TIMER_VISIBLE, 2),
+  R1: cellAddr(SHEET_COL.BASEGAME_DLC, 1),
+  R2: cellAddr(SHEET_COL.BASEGAME_DLC, 2),
+  T1: cellAddr(SHEET_COL.FILTER_OPEN_DONE, 1),
+  T2: cellAddr(SHEET_COL.FILTER_OPEN_DONE, 2),
+  Z1: cellAddr(SHEET_COL.HIDE_OVERLAY, 1),
+};
+
+// Vorab berechnete 0-basierte Spaltenindizes für die Boss-Zeilen (A-H),
+// damit processData()/parseSheetRowsForCompare() nicht bei jedem Aufruf neu
+// rechnen müssen. Ändert sich SHEET_COL, ändert sich dies automatisch mit.
+const BOSS_COL_IDX = {
+  AREA:           colIdx(SHEET_COL.AREA),
+  BOSS:           colIdx(SHEET_COL.BOSS),
+  DONE:           colIdx(SHEET_COL.DONE),
+  DATE:           colIdx(SHEET_COL.DATE),
+  DEATHS:         colIdx(SHEET_COL.DEATHS),
+  PINNED:         colIdx(SHEET_COL.PINNED),
+  LEVEL:          colIdx(SHEET_COL.LEVEL),
+  AREA_COLLAPSED: colIdx(SHEET_COL.AREA_COLLAPSED),
+};
+
 // Baut eine gviz-URL für einen beliebigen Tab (Standard = lebender Tab).
 function gvizUrl(sheetName, range) {
   return "https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID
@@ -41,11 +148,21 @@ var viewingArchive   = false;   // true = archivierter (nur lesbarer) NG-Durchga
 var ngRuns           = [];      // [{ label, sheetName, archivedAt }] älteste zuerst
 var currentLiveLabel = "NG";    // Label des aktuell laufenden Durchgangs, z.B. "NG+2"
 
-// GEÄNDERT: W→X, AB→AC (Spaltenverschiebung)
-function getClipsUrl()      { return gvizUrl(currentRunSheet, "X9:AC1000"); }
-// GEÄNDERT: N→O, R→S (Spaltenverschiebung)
-function getBingoTextUrl()  { return gvizUrl(currentRunSheet, "O15:S19"); }
-function getBingoStateUrl() { return gvizUrl(currentRunSheet, "O20:S24"); }
+function getClipsUrl() {
+  var startCol = SHEET_COL.CLIPS_START;
+  var endCol   = colLetterOffset(startCol, CLIPS_COL_COUNT - 1);
+  return gvizUrl(currentRunSheet, startCol + CLIPS_ROW_START + ":" + endCol + CLIPS_ROW_END);
+}
+function getBingoTextUrl() {
+  var startCol = SHEET_COL.BINGO_TEXT;
+  var endCol   = colLetterOffset(startCol, BINGO_SIZE - 1);
+  return gvizUrl(currentRunSheet, startCol + BINGO_TEXT_ROW_START + ":" + endCol + (BINGO_TEXT_ROW_START + BINGO_SIZE - 1));
+}
+function getBingoStateUrl() {
+  var startCol = SHEET_COL.BINGO_STATE;
+  var endCol   = colLetterOffset(startCol, BINGO_SIZE - 1);
+  return gvizUrl(currentRunSheet, startCol + BINGO_STATE_ROW_START + ":" + endCol + (BINGO_STATE_ROW_START + BINGO_SIZE - 1));
+}
 
 const RANKING_TOP_N = 10;
 const STREAMER_LOGIN = "mahluna";
@@ -243,7 +360,7 @@ function renderBossLevelPanel() {
 
 // ─── EDITOR TOOLBOX ────────────────────────────────────────────────────────
 var toolboxTimerTick = null;
-// GEÄNDERT: alle Zellnamen auf neue Spaltenadressen angepasst (N→O, Q→R, S→T, Y→Z)
+// Interne, stabile IDs (siehe TOGGLE_CELL_ADDR oben für die tatsächliche Sheet-Zelle).
 var toolboxCellState = { O1: false, O2: false, R1: true, R2: true, T1: false, T2: false, Z1: false };
 var toolboxPendingCells = {}; // cell → timestamp, schützt Button-States vor Sheet-Überschreibung
 
@@ -320,10 +437,10 @@ function toolboxSetTimerLabel() {
   var labelEl = document.getElementById("val-timer-label");
   if (labelEl) labelEl.textContent = timerLabel ? timerLabel + ":" : "Aktueller Boss:";
 
-  // Sheet: N3 setzen (leer = Inhalt löschen)
+  // Sheet: Timer-Label-Zelle setzen (leer = Inhalt löschen)
   if (TOOLBOX_SCRIPT_URL) {
     fetch(TOOLBOX_SCRIPT_URL
-      + "?action=setCell&cell=N3&value=" + encodeURIComponent(label)
+      + "?action=setCell&cell=" + encodeURIComponent(cellAddr(SHEET_COL.TIMER_LABEL, 3)) + "&value=" + encodeURIComponent(label)
       + "&twitchToken=" + encodeURIComponent(getTwitchToken()),
       { method: "GET", mode: "no-cors" }
     ).catch(function(e) { console.error("[Toolbox] setTimerLabel:", e); });
@@ -344,8 +461,12 @@ document.addEventListener('click', function(e) {
 
 function toolboxWriteCell(cell, value) {
   if (!isAuthorized() || !TOOLBOX_SCRIPT_URL) return;
+  // "cell" ist die interne Toggle-ID (O1, R1, ...) oder bereits eine echte
+  // A1-Adresse (z.B. "M1"/"M2" für den Timer) – im ersten Fall über
+  // TOGGLE_CELL_ADDR auf die tatsächliche, per SHEET_COL konfigurierte Spalte auflösen.
+  var addr = TOGGLE_CELL_ADDR[cell] || cell;
   fetch(TOOLBOX_SCRIPT_URL
-    + "?action=setCell&cell=" + encodeURIComponent(cell)
+    + "?action=setCell&cell=" + encodeURIComponent(addr)
     + "&value=" + encodeURIComponent(value)
     + "&twitchToken=" + encodeURIComponent(getTwitchToken()),
     { method: "GET", mode: "no-cors" }
@@ -368,13 +489,12 @@ function toolboxSetBtnActive(btnId, active) {
 }
 
 // ── Cell toggle (O1, O2, R1, R2, T1, T2, Z1) ────────────────────────────
-// HINWEIS: HTML-Button-onclick-Attribute müssen ebenfalls auf neue Zellnamen aktualisiert werden
-// z.B. toolboxToggleCell('O1','etb-btn-O1') statt ('N1','etb-btn-N1')
+// HINWEIS: Diese IDs sind intern-stabil (siehe TOGGLE_CELL_ADDR). Ändert sich
+// nur die Sheet-Spalte, muss HIER NICHTS angepasst werden – nur SHEET_COL oben.
 function toolboxToggleCell(cell, btnId) {
   if (!isAuthorized()) return;
   toolboxCellState[cell] = !toolboxCellState[cell];
   var v = toolboxCellState[cell];
-  // GEÄNDERT: S1→T1, S2→T2
   if (cell === 'T1' && v) {
     toolboxCellState.T2 = false;
     toolboxPendingCells['T2'] = Date.now();
@@ -401,14 +521,12 @@ function toolboxToggleTimer() {
   if (timerStartTs > 0) {
     timerElapsed += Date.now() - timerStartTs;
     timerStartTs = 0;
-    // GEÄNDERT: L1→M1
-    toolboxWriteCell("M1", "FALSE");
+    toolboxWriteCell(cellAddr(SHEET_COL.TIMER_RUNNING, 1), "FALSE");
     toolboxWriteTimerCells(0, timerElapsed);
     if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
   } else {
     timerStartTs = Date.now();
-    // GEÄNDERT: L1→M1
-    toolboxWriteCell("M1", "TRUE");
+    toolboxWriteCell(cellAddr(SHEET_COL.TIMER_RUNNING, 1), "TRUE");
     toolboxWriteTimerCells(timerStartTs, timerElapsed);
     startTimerTick();
   }
@@ -422,8 +540,7 @@ function toolboxTimerReset() {
   timerStartTs = 0;
   timerElapsed = 0;
   if (TOOLBOX_SCRIPT_URL) {
-    // GEÄNDERT: L2→M2
-    fetch(TOOLBOX_SCRIPT_URL + "?action=pulseCell&cell=M2&twitchToken=" + encodeURIComponent(getTwitchToken()), { method: "GET", mode: "no-cors" })
+    fetch(TOOLBOX_SCRIPT_URL + "?action=pulseCell&cell=" + encodeURIComponent(cellAddr(SHEET_COL.TIMER_RUNNING, 2)) + "&twitchToken=" + encodeURIComponent(getTwitchToken()), { method: "GET", mode: "no-cors" })
       .catch(function(e) { console.error("[Toolbox] pulseCell:", e); });
   }
   toolboxWriteTimerCells(0, 0);
@@ -433,13 +550,13 @@ function toolboxTimerReset() {
 }
 
 // Patch helpers – keep cachedRows in sync so next real fetch doesn't revert
-// GEÄNDERT: alle Spaltenindizes um +1 (ab ex-Spalte G, 0-basiert: ≥6 → +1)
-// N→O: 13→14, Q→R: 16→17, S→T: 18→19, Y→Z: 24→25
+// Zeilen/Spalten werden aus SHEET_ROW/SHEET_COL abgeleitet, damit sich bei
+// Spaltenverschiebungen im Sheet nur die Konfiguration oben ändern muss.
 var CELL_MAP = {
-  O1: [0, 14], O2: [1, 14],
-  R1: [0, 17], R2: [1, 17],
-  T1: [0, 19], T2: [1, 19],
-  Z1: [0, 25]
+  O1: [SHEET_ROW.BASE_FLAGS, colIdx(SHEET_COL.TIMER_VISIBLE)], O2: [SHEET_ROW.DLC_FLAGS, colIdx(SHEET_COL.TIMER_VISIBLE)],
+  R1: [SHEET_ROW.BASE_FLAGS, colIdx(SHEET_COL.BASEGAME_DLC)],  R2: [SHEET_ROW.DLC_FLAGS, colIdx(SHEET_COL.BASEGAME_DLC)],
+  T1: [SHEET_ROW.BASE_FLAGS, colIdx(SHEET_COL.FILTER_OPEN_DONE)], T2: [SHEET_ROW.DLC_FLAGS, colIdx(SHEET_COL.FILTER_OPEN_DONE)],
+  Z1: [SHEET_ROW.BASE_FLAGS, colIdx(SHEET_COL.HIDE_OVERLAY)]
 };
 
 function toolboxPatchCell(cell, value) {
@@ -461,47 +578,45 @@ function toolboxPatchTimerCells() {
     if (!cachedRows[r].c[c]) cachedRows[r].c[c] = {};
     cachedRows[r].c[c].v = v;
   }
-  // GEÄNDERT: W→X, 0-basiert: 22→23
-  set(0, 23, timerStartTs);
-  set(2, 23, timerElapsed);
+  var timerColIdx = colIdx(SHEET_COL.TIMER_TS);
+  set(SHEET_ROW.BASE_FLAGS, timerColIdx, timerStartTs);
+  set(SHEET_ROW.LABEL_ROW,  timerColIdx, timerElapsed);
 }
 
 // Direct UI update – no processData, no re-read from cachedRows
 function toolboxRefresh() {
   // Also keep cachedRows patched so the next real sheet poll doesn't revert
   toolboxPatchTimerCells();
-  // GEÄNDERT: N1→O1, Q1→R1, Q2→R2
   toolboxPatchCell('O1', toolboxCellState.O1);
   toolboxPatchCell('R1', toolboxCellState.R1);
   toolboxPatchCell('R2', toolboxCellState.R2);
 }
 
 // Apply cell change immediately to page state
-// GEÄNDERT: alle case-Bezeichner auf neue Spaltennamen
 function toolboxApplyCell(cell, val) {
   switch (cell) {
-    case 'O1': // war N1
+    case 'O1':
       pendingLocalTimer = Date.now();
       timerVisible = val;
       updateTimerDisplay();
       if (val && timerStartTs > 0) startTimerTick();
       else if (!val && timerInterval) { clearInterval(timerInterval); timerInterval = null; }
       break;
-    case 'R1': // war Q1
+    case 'R1':
       showBase = val;
       var b = document.getElementById('btn-basegame');
       if (b) b.classList.toggle('active', val);
       updateFieldDeathsVisibility();
       renderAreas(currentAreas);
       break;
-    case 'R2': // war Q2
+    case 'R2':
       showDLC = val;
       var b = document.getElementById('btn-dlc');
       if (b) b.classList.toggle('active', val);
       updateFieldDeathsVisibility();
       renderAreas(currentAreas);
       break;
-    case 'T1': // war S1
+    case 'T1':
       showOnlyOpen = val;
       if (val) { showOnlyDone = false; toolboxCellState.T2 = false; toolboxSetBtnActive('etb-btn-T2', false); }
       var bo = document.getElementById('btn-open');
@@ -511,7 +626,7 @@ function toolboxApplyCell(cell, val) {
       document.body.classList.toggle('filter-open', showOnlyOpen);
       renderAreas(currentAreas);
       break;
-    case 'T2': // war S2
+    case 'T2':
       showOnlyDone = val;
       if (val) { showOnlyOpen = false; toolboxCellState.T1 = false; toolboxSetBtnActive('etb-btn-T1', false); }
       var bo = document.getElementById('btn-open');
@@ -562,14 +677,13 @@ function toolboxSyncFromRows(rows) {
     toolboxCellState[cell] = isTrue(getCell(r, c));
     toolboxSetBtnActive(btnId, toolboxCellState[cell]);
   }
-  // GEÄNDERT: alle Zellnamen (N→O, Q→R, S→T, Y→Z) und 0-basierten Indizes (+1 ab ex-Spalte G)
-  syncCell('O1', 0, 14, 'etb-btn-O1');  // war: N1, 0, 13
-  syncCell('O2', 1, 14, 'etb-btn-O2');  // war: N2, 1, 13
-  syncCell('R1', 0, 17, 'etb-btn-R1');  // war: Q1, 0, 16
-  syncCell('R2', 1, 17, 'etb-btn-R2');  // war: Q2, 1, 16
-  syncCell('T1', 0, 19, 'etb-btn-T1');  // war: S1, 0, 18
-  syncCell('T2', 1, 19, 'etb-btn-T2');  // war: S2, 1, 18
-  syncCell('Z1', 0, 25, 'etb-btn-Z1');  // war: Y1, 0, 24
+  syncCell('O1', SHEET_ROW.BASE_FLAGS, colIdx(SHEET_COL.TIMER_VISIBLE), 'etb-btn-O1');
+  syncCell('O2', SHEET_ROW.DLC_FLAGS,  colIdx(SHEET_COL.TIMER_VISIBLE), 'etb-btn-O2');
+  syncCell('R1', SHEET_ROW.BASE_FLAGS, colIdx(SHEET_COL.BASEGAME_DLC),  'etb-btn-R1');
+  syncCell('R2', SHEET_ROW.DLC_FLAGS,  colIdx(SHEET_COL.BASEGAME_DLC),  'etb-btn-R2');
+  syncCell('T1', SHEET_ROW.BASE_FLAGS, colIdx(SHEET_COL.FILTER_OPEN_DONE), 'etb-btn-T1');
+  syncCell('T2', SHEET_ROW.DLC_FLAGS,  colIdx(SHEET_COL.FILTER_OPEN_DONE), 'etb-btn-T2');
+  syncCell('Z1', SHEET_ROW.BASE_FLAGS, colIdx(SHEET_COL.HIDE_OVERLAY),  'etb-btn-Z1');
   toolboxSyncTimerUI();
   toolboxInit();
 }
@@ -2402,6 +2516,8 @@ function loadClips() {
 
       rows.forEach(function(row) {
         if (!row || !row.c) return;
+        // Die Clip-Range (getClipsUrl) beginnt bereits bei SHEET_COL.CLIPS_START,
+        // daher sind die Spalten hier relativ zum Range-Anfang 0-basiert (0..5).
         var url         = row.c[0] && row.c[0].v ? String(row.c[0].v).trim() : "";
         var category    = row.c[1] && row.c[1].v ? String(row.c[1].v).trim() : "Sonstige";
         var title       = row.c[2] && row.c[2].v ? String(row.c[2].v).trim() : "";
@@ -2479,18 +2595,18 @@ function loadData() {
 function processData(rows) {
   cachedRows = rows;
   if (isAuthorized()) {
-    // GEÄNDERT: J→K, 0-basiert: 9→10
-    var fdBase = rows[1]   && rows[1].c[10]   ? (Number(rows[1].c[10].v)   || 0) : 0;
-    var fdDlc  = rows[168] && rows[168].c[10] ? (Number(rows[168].c[10].v) || 0) : 0;
+    var fieldDeathsColIdx = colIdx(SHEET_COL.FIELD_DEATHS);
+    var fdBase = rows[SHEET_ROW.DLC_FLAGS]     && rows[SHEET_ROW.DLC_FLAGS].c[fieldDeathsColIdx]     ? (Number(rows[SHEET_ROW.DLC_FLAGS].c[fieldDeathsColIdx].v)     || 0) : 0;
+    var fdDlc  = rows[SHEET_ROW.DLC_DEATH_ROW] && rows[SHEET_ROW.DLC_DEATH_ROW].c[fieldDeathsColIdx] ? (Number(rows[SHEET_ROW.DLC_DEATH_ROW].c[fieldDeathsColIdx].v) || 0) : 0;
     if (!fieldDeathsTimer.base && Date.now() - fieldDeathsPending.base > FIELD_DEATHS_GRACE) { fieldDeaths.base = fdBase; document.getElementById("fdeath-val-base").textContent = fdBase; }
     if (!fieldDeathsTimer.dlc  && Date.now() - fieldDeathsPending.dlc  > FIELD_DEATHS_GRACE) { fieldDeaths.dlc  = fdDlc;  document.getElementById("fdeath-val-dlc").textContent  = fdDlc; }
     document.getElementById("field-deaths-bar").style.display = "flex";
   } else {
     document.getElementById("field-deaths-bar").style.display = "none";
   }
-  // GEÄNDERT: Q→R, 0-basiert: 16→17
-  var baseGameFlag = isTrue(rows[0] && rows[0].c[17] ? rows[0].c[17].v : false);
-  var dlcFlag      = isTrue(rows[1] && rows[1].c[17] ? rows[1].c[17].v : false);
+  var baseDlcFlagColIdx = colIdx(SHEET_COL.BASEGAME_DLC);
+  var baseGameFlag = isTrue(rows[SHEET_ROW.BASE_FLAGS] && rows[SHEET_ROW.BASE_FLAGS].c[baseDlcFlagColIdx] ? rows[SHEET_ROW.BASE_FLAGS].c[baseDlcFlagColIdx].v : false);
+  var dlcFlag      = isTrue(rows[SHEET_ROW.DLC_FLAGS]  && rows[SHEET_ROW.DLC_FLAGS].c[baseDlcFlagColIdx]  ? rows[SHEET_ROW.DLC_FLAGS].c[baseDlcFlagColIdx].v  : false);
 
   if (prevDeaths === null) {
     showBase = baseGameFlag;
@@ -2503,15 +2619,15 @@ function processData(rows) {
   // Only overwrite local timer state if no recent toolbox action (10s grace period)
   if (!pendingLocalTimer || Date.now() - pendingLocalTimer > 10000) {
     pendingLocalTimer = 0;
-    // GEÄNDERT: W→X, 0-basiert: 22→23
-    timerStartTs = Number(rows[0] && rows[0].c[23] ? rows[0].c[23].v : 0) || 0;
-    timerElapsed = Number(rows[2] && rows[2].c[23] ? rows[2].c[23].v : 0) || 0;
-    // GEÄNDERT: N→O, 0-basiert: 13→14
-    timerVisible = isTrue(rows[0] && rows[0].c[14] ? rows[0].c[14].v : false);
+    var timerTsColIdx = colIdx(SHEET_COL.TIMER_TS);
+    timerStartTs = Number(rows[SHEET_ROW.BASE_FLAGS] && rows[SHEET_ROW.BASE_FLAGS].c[timerTsColIdx] ? rows[SHEET_ROW.BASE_FLAGS].c[timerTsColIdx].v : 0) || 0;
+    timerElapsed = Number(rows[SHEET_ROW.LABEL_ROW]  && rows[SHEET_ROW.LABEL_ROW].c[timerTsColIdx]  ? rows[SHEET_ROW.LABEL_ROW].c[timerTsColIdx].v  : 0) || 0;
+    var timerVisibleColIdx = colIdx(SHEET_COL.TIMER_VISIBLE);
+    timerVisible = isTrue(rows[SHEET_ROW.BASE_FLAGS] && rows[SHEET_ROW.BASE_FLAGS].c[timerVisibleColIdx] ? rows[SHEET_ROW.BASE_FLAGS].c[timerVisibleColIdx].v : false);
   }
-  // GEÄNDERT: M→N, 0-basiert: 12→13
-  timerLabel = (rows[2] && rows[2].c[13] && rows[2].c[13].v)
-    ? String(rows[2].c[13].v).trim()
+  var timerLabelColIdx = colIdx(SHEET_COL.TIMER_LABEL);
+  timerLabel = (rows[SHEET_ROW.LABEL_ROW] && rows[SHEET_ROW.LABEL_ROW].c[timerLabelColIdx] && rows[SHEET_ROW.LABEL_ROW].c[timerLabelColIdx].v)
+    ? String(rows[SHEET_ROW.LABEL_ROW].c[timerLabelColIdx].v).trim()
     : "";
   updateTimerDisplay();
   if (timerStartTs > 0) startTimerTick(); else if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
@@ -2519,7 +2635,7 @@ function processData(rows) {
 
   var separatorIndex = -1;
   for (var si = 0; si < rows.length; si++) {
-    if (rows[si] && rows[si].c[1] && rows[si].c[1].v && rows[si].c[1].v.trim() === "SHADOW OF THE ERDTREE DLC") {
+    if (rows[si] && rows[si].c[BOSS_COL_IDX.BOSS] && rows[si].c[BOSS_COL_IDX.BOSS].v && rows[si].c[BOSS_COL_IDX.BOSS].v.trim() === "SHADOW OF THE ERDTREE DLC") {
       separatorIndex = si;
       break;
     }
@@ -2530,8 +2646,8 @@ function processData(rows) {
 
   rows.forEach(function(r, index) {
     if (!r || !r.c) return;
-    var area = r.c[0] && r.c[0].v ? r.c[0].v.trim() : "";
-    var boss = r.c[1] && r.c[1].v ? r.c[1].v.trim() : "";
+    var area = r.c[BOSS_COL_IDX.AREA] && r.c[BOSS_COL_IDX.AREA].v ? r.c[BOSS_COL_IDX.AREA].v.trim() : "";
+    var boss = r.c[BOSS_COL_IDX.BOSS] && r.c[BOSS_COL_IDX.BOSS].v ? r.c[BOSS_COL_IDX.BOSS].v.trim() : "";
     if (!area || !boss) return;
     if (area === "Gebiet" && boss === "Boss") return;
     if (boss === "SHADOW OF THE ERDTREE DLC") return;
@@ -2542,12 +2658,12 @@ function processData(rows) {
     if (isDLC      && !showDLC)  return;
     if (showOnlyMain && !MAIN_BOSSES.has(boss)) return;
 
-    var done           = isTrue(r.c[2] ? r.c[2].v : false);
-    var date           = r.c[3] && r.c[3].f ? r.c[3].f.trim() : "";
-    var deaths         = Number(r.c[4] ? r.c[4].v : 0) || 0;
-    var pinned         = isTrue(r.c[5] ? r.c[5].v : false);
-    // Spalte G (Index 6): Level beim Boss-Kill, z.B. "9" oder "9/2" (gleiche Level aufsteigend nummeriert)
-    var level          = (r.c[6] && r.c[6].v !== null && r.c[6].v !== "") ? String(r.c[6].v).trim() : null;
+    var done           = isTrue(r.c[BOSS_COL_IDX.DONE] ? r.c[BOSS_COL_IDX.DONE].v : false);
+    var date           = r.c[BOSS_COL_IDX.DATE] && r.c[BOSS_COL_IDX.DATE].f ? r.c[BOSS_COL_IDX.DATE].f.trim() : "";
+    var deaths         = Number(r.c[BOSS_COL_IDX.DEATHS] ? r.c[BOSS_COL_IDX.DEATHS].v : 0) || 0;
+    var pinned         = isTrue(r.c[BOSS_COL_IDX.PINNED] ? r.c[BOSS_COL_IDX.PINNED].v : false);
+    // Level beim Boss-Kill, z.B. "9" oder "9/2" (gleiche Level aufsteigend nummeriert)
+    var level          = (r.c[BOSS_COL_IDX.LEVEL] && r.c[BOSS_COL_IDX.LEVEL].v !== null && r.c[BOSS_COL_IDX.LEVEL].v !== "") ? String(r.c[BOSS_COL_IDX.LEVEL].v).trim() : null;
 
     if (showOnlyDone && !done) return;
     if (showOnlyOpen && done) return;
@@ -2566,8 +2682,7 @@ function processData(rows) {
         delete pendingLocalChanges[pendingKey];
       }
     }
-    // GEÄNDERT: G→H, 0-basiert: 6→7
-    var sheetCollapsed = isTrue(r.c[7] ? r.c[7].v : false);
+    var sheetCollapsed = isTrue(r.c[BOSS_COL_IDX.AREA_COLLAPSED] ? r.c[BOSS_COL_IDX.AREA_COLLAPSED].v : false);
     var key            = area + "|" + boss;
 
     if (!(key in previousBossStates)) {
@@ -2589,9 +2704,9 @@ function processData(rows) {
     allBosses.push({ boss: boss, deaths: deaths, done: done, area: area, date: date, level: level, isDLC: isDLC });
   });
 
-  // GEÄNDERT: K→L, 0-basiert: 10→11
-  var kBase = rows[1]   && rows[1].c[11]   ? (Number(rows[1].c[11].v)   || 0) : 0;
-  var kDlc  = rows[168] && rows[168].c[11] ? (Number(rows[168].c[11].v) || 0) : 0;
+  var killTotalColIdx = colIdx(SHEET_COL.KILL_TOTAL);
+  var kBase = rows[SHEET_ROW.DLC_FLAGS]     && rows[SHEET_ROW.DLC_FLAGS].c[killTotalColIdx]     ? (Number(rows[SHEET_ROW.DLC_FLAGS].c[killTotalColIdx].v)     || 0) : 0;
+  var kDlc  = rows[SHEET_ROW.DLC_DEATH_ROW] && rows[SHEET_ROW.DLC_DEATH_ROW].c[killTotalColIdx] ? (Number(rows[SHEET_ROW.DLC_DEATH_ROW].c[killTotalColIdx].v) || 0) : 0;
   var globalDeaths;
   if (showOnlyMain) {
     globalDeaths = allBosses.reduce(function(s, b) { return s + b.deaths; }, 0);
@@ -3258,16 +3373,18 @@ function closeRunCompare() {
 // Parst die Rohzeilen eines Run-Tabs (gleiche Spaltenbelegung wie processData)
 // in eine kompakte, für den Vergleich nutzbare Struktur.
 function parseSheetRowsForCompare(rows) {
-  // K/L-Spalten (0-basiert 10/11): Feldtode (K) & Gesamt-Tode-Zähler (L), je einmal
-  // für Base Game (Zeile 1) und einmal für DLC (Zeile 168) hinterlegt.
-  var fdBase = rows[1]   && rows[1].c[10] ? (Number(rows[1].c[10].v)   || 0) : 0;
-  var fdDlc  = rows[168] && rows[168].c[10] ? (Number(rows[168].c[10].v) || 0) : 0;
-  var kBase  = rows[1]   && rows[1].c[11] ? (Number(rows[1].c[11].v)   || 0) : 0;
-  var kDlc   = rows[168] && rows[168].c[11] ? (Number(rows[168].c[11].v) || 0) : 0;
+  // Feldtode (SHEET_COL.FIELD_DEATHS) & Gesamt-Tode-Zähler (SHEET_COL.KILL_TOTAL),
+  // je einmal für Base Game und einmal für DLC hinterlegt (siehe SHEET_ROW).
+  var fieldDeathsColIdx = colIdx(SHEET_COL.FIELD_DEATHS);
+  var killTotalColIdx   = colIdx(SHEET_COL.KILL_TOTAL);
+  var fdBase = rows[SHEET_ROW.DLC_FLAGS]     && rows[SHEET_ROW.DLC_FLAGS].c[fieldDeathsColIdx]     ? (Number(rows[SHEET_ROW.DLC_FLAGS].c[fieldDeathsColIdx].v)     || 0) : 0;
+  var fdDlc  = rows[SHEET_ROW.DLC_DEATH_ROW] && rows[SHEET_ROW.DLC_DEATH_ROW].c[fieldDeathsColIdx] ? (Number(rows[SHEET_ROW.DLC_DEATH_ROW].c[fieldDeathsColIdx].v) || 0) : 0;
+  var kBase  = rows[SHEET_ROW.DLC_FLAGS]     && rows[SHEET_ROW.DLC_FLAGS].c[killTotalColIdx]       ? (Number(rows[SHEET_ROW.DLC_FLAGS].c[killTotalColIdx].v)       || 0) : 0;
+  var kDlc   = rows[SHEET_ROW.DLC_DEATH_ROW] && rows[SHEET_ROW.DLC_DEATH_ROW].c[killTotalColIdx]   ? (Number(rows[SHEET_ROW.DLC_DEATH_ROW].c[killTotalColIdx].v)   || 0) : 0;
 
   var separatorIndex = -1;
   for (var si = 0; si < rows.length; si++) {
-    if (rows[si] && rows[si].c[1] && rows[si].c[1].v && String(rows[si].c[1].v).trim() === "SHADOW OF THE ERDTREE DLC") {
+    if (rows[si] && rows[si].c[BOSS_COL_IDX.BOSS] && rows[si].c[BOSS_COL_IDX.BOSS].v && String(rows[si].c[BOSS_COL_IDX.BOSS].v).trim() === "SHADOW OF THE ERDTREE DLC") {
       separatorIndex = si;
       break;
     }
@@ -3279,15 +3396,15 @@ function parseSheetRowsForCompare(rows) {
 
   rows.forEach(function(r, index) {
     if (!r || !r.c) return;
-    var area = r.c[0] && r.c[0].v ? String(r.c[0].v).trim() : "";
-    var boss = r.c[1] && r.c[1].v ? String(r.c[1].v).trim() : "";
+    var area = r.c[BOSS_COL_IDX.AREA] && r.c[BOSS_COL_IDX.AREA].v ? String(r.c[BOSS_COL_IDX.AREA].v).trim() : "";
+    var boss = r.c[BOSS_COL_IDX.BOSS] && r.c[BOSS_COL_IDX.BOSS].v ? String(r.c[BOSS_COL_IDX.BOSS].v).trim() : "";
     if (!area || !boss) return;
     if (area === "Gebiet" && boss === "Boss") return;
     if (boss === "SHADOW OF THE ERDTREE DLC") return;
 
     var isDLC  = separatorIndex !== -1 && index > separatorIndex;
-    var done   = isTrue(r.c[2] ? r.c[2].v : false);
-    var deaths = Number(r.c[4] ? r.c[4].v : 0) || 0;
+    var done   = isTrue(r.c[BOSS_COL_IDX.DONE] ? r.c[BOSS_COL_IDX.DONE].v : false);
+    var deaths = Number(r.c[BOSS_COL_IDX.DEATHS] ? r.c[BOSS_COL_IDX.DEATHS].v : 0) || 0;
 
     var entry = { area: area, boss: boss, done: done, deaths: deaths, isDLC: isDLC };
     bossMap[area + "|" + boss] = entry;
