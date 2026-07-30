@@ -170,7 +170,7 @@ const STREAMER_LOGIN = "mahluna";
 // ── BUILD-PLANNER ──────────────────────────────────────────────────────────
 // Um den aktuell gezeigten Build zu ändern: einfach den Link von
 // tarnished.dev/build-planner hier eintragen.
-const BUILD_PLANNER_URL = "https://www.tarnished.dev/build-planner?str=81&dex=18&int=16&fai=11&arc=7&vig=60&min=10&end=41&somber=10&smith=25&twoHanded=true&selectedClass=Vagabond&LoS=false&scaLvl=7&aRun=false&aFlk=false&aPvp=false&cStr=true&cDex=true&cInt=true&cFai=true&cArc=false&cVig=true&cMin=false&enduranceChange=false&rh1=Large+Club&aRh1=Heavy&sRun=Godrick%27s+Great+Rune&sFlk=Opaline+Bubbletear%2CCrimson+Crystal+Tear&sTal=Erdtree%27s+Favor+%2B1%2CDragoncrest+Shield+Talisman+%2B2%2CViridian+Amber+Medallion+%2B2%2CCrimson+Amber+Medallion+%2B2&cht=Armor+of+Solitude&gnt=Gauntlets+of+Solitude&hlm=Helm+of+Solitude&leg=Greaves+of+Solitude";
+const BUILD_PLANNER_URL = "https://www.tarnished.dev/build-planner?str=81&dex=18&int=16&fai=11&arc=7&vig=60&min=10&end=41&somber=10&smith=25&twoHanded=true&selectedClass=Vagabond&LoS=false&scaLvl=7&aRun=false&aFlk=false&aPvp=false&cStr=true&cDex=true&cInt=true&cFai=true&cArc=false&cVig=true&cMin=false&enduranceChange=false&rh1=Large+Club&aRh1=Heavy&sRun=Godrick%27s+Great+Rune&sFlk=Opaline+Bubbletear%2CCrimson+Crystal+Tear&sTal=Erdtree%27s+Favor+%2B1%2CViridian+Amber+Medallion+%2B2%2CCrimson+Amber+Medallion+%2B2%2CPearldrake+Talisman+%2B3&cht=Armor+of+Solitude&gnt=Gauntlets+of+Solitude&hlm=Helm+of+Solitude&leg=Greaves+of+Solitude";
 
 const FEXTRA_WIKI_BASE = "https://eldenring.wiki.fextralife.com";
 
@@ -190,6 +190,7 @@ const BUILD_ITEM_IMAGES = {
   "Dragoncrest Shield Talisman":  FEXTRA_WIKI_BASE + "/file/Elden-Ring/dragoncrest_shield_talisman_talisman_elden_ring_wiki_guide_200px.png",
   "Crimson Amber Medallion":      FEXTRA_WIKI_BASE + "/file/Elden-Ring/crimson_amber_medallion_talisman_elden_ring_wiki_guide_200px.png",
   "Viridian Amber Medallion":     FEXTRA_WIKI_BASE + "/file/Elden-Ring/viridian_amber_medallion_talisman_elden_ring_wiki_guide_200px.png",
+  "Pearldrake Talisman":          FEXTRA_WIKI_BASE + "file/Elden-Ring/pearldrake_talisman_3_talisman_elden_ring_shadow_of_the_erdtree_dlc_wiki_guide_200px.png
 };
 
 const MAIN_BOSSES = new Set([
