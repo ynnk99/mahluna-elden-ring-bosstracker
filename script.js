@@ -12,7 +12,6 @@ const ALLOWED_USERS = [
   "mahluna",
   "der_gude_nico",
   "Deeichkind",
-  "rhananas",
 ];
 
 const SPREADSHEET_ID = "1r9BzZJYFrk4rQLlMn4ZPBBUuc8u_peqwThTi1UTCQcE";
