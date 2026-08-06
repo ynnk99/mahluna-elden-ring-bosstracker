@@ -190,7 +190,7 @@ const BUILD_ITEM_IMAGES = {
   "Dragoncrest Shield Talisman":  FEXTRA_WIKI_BASE + "/file/Elden-Ring/dragoncrest_shield_talisman_talisman_elden_ring_wiki_guide_200px.png",
   "Crimson Amber Medallion":      FEXTRA_WIKI_BASE + "/file/Elden-Ring/crimson_amber_medallion_talisman_elden_ring_wiki_guide_200px.png",
   "Viridian Amber Medallion":     FEXTRA_WIKI_BASE + "/file/Elden-Ring/viridian_amber_medallion_talisman_elden_ring_wiki_guide_200px.png",
-  "Pearldrake Talisman":          FEXTRA_WIKI_BASE + "file/Elden-Ring/pearldrake_talisman_3_talisman_elden_ring_shadow_of_the_erdtree_dlc_wiki_guide_200px.png",
+  "Pearldrake Talisman":          FEXTRA_WIKI_BASE + "/file/Elden-Ring/pearldrake_talisman_3_talisman_elden_ring_shadow_of_the_erdtree_dlc_wiki_guide_200px.png",
 };
 
 const MAIN_BOSSES = new Set([
