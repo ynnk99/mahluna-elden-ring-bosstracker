@@ -194,7 +194,7 @@ const BUILD_ITEM_IMAGES = {
   "Pearldrake Talisman":          FEXTRA_WIKI_BASE + "/file/Elden-Ring/pearldrake_talisman_3_talisman_elden_ring_shadow_of_the_erdtree_dlc_wiki_guide_200px.png",
   "Two-Handed Sword Talisman":    FEXTRA_WIKI_BASE + "/file/Elden-Ring/two-handed_sword_talisman_talisman_elden_ring_shadow_of_the_erdtree_dlc_wiki_guide_200px.png",
   "Two-Headed Turtle Talisman":   FEXTRA_WIKI_BASE + "/file/Elden-Ring/two-headed_turtle_talisman_talisman_elden_ring_shadow_of_the_erdtree_dlc_wiki_guide_200px.png",
-  "Crimson Seed Talisman +1":     FEXTRA_WIKI_BASE + "/file/Elden-Ring/crimson_seed_talisman_1_talisman_elden_ring_shadow_of_the_erdtree_dlc_wiki_guide_200px.png",
+  "Crimson Seed Talisman":     FEXTRA_WIKI_BASE + "/file/Elden-Ring/crimson_seed_talisman_1_talisman_elden_ring_shadow_of_the_erdtree_dlc_wiki_guide_200px.png",
 };
 
 const MAIN_BOSSES = new Set([
